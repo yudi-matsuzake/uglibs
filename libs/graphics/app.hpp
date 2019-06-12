@@ -4,6 +4,7 @@
 #include <memory>
 #include <string_view>
 #include <stdexcept>
+#include <tuple>
 
 // WARN: include glad.h before glfw3.h
 #include "glad/glad.h"
@@ -30,7 +31,20 @@ public:
 
 	window_type* window();
 
+	window_type* window() const;
+
 	virtual void on_input(key_input k);
+
+	bool should_close() const;
+	void should_close(bool) const;
+
+	std::tuple<int32_t, int32_t> get_framebuffer_size() const;
+
+	void poll_events() const;
+
+	float get_time() const;
+
+	void swap_buffers() const;
 
 protected:
 
