@@ -34,6 +34,8 @@ public:
 
 	std::tuple<int32_t, int32_t> get_framebuffer_size() const;
 
+	std::tuple<float, float> get_cursor_position() const;
+
 	void poll_events() const;
 
 	float get_time() const;
