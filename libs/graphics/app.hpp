@@ -27,10 +27,7 @@ public:
 	virtual ~app();
 
 	window_type* window();
-
 	window_type* window() const;
-
-	virtual void on_input(key_input k);
 
 	bool should_close() const;
 	void should_close(bool) const;
@@ -42,6 +39,8 @@ public:
 	float get_time() const;
 
 	void swap_buffers() const;
+
+	virtual void on_input(key_input k);
 
 protected:
 
