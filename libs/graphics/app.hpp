@@ -6,10 +6,7 @@
 #include <stdexcept>
 #include <tuple>
 
-// WARN: include glad.h before glfw3.h
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-
+#include "graphics/misc.hpp"
 
 namespace graphics{
 
