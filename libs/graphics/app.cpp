@@ -131,6 +131,14 @@ std::tuple<int32_t, int32_t> app::get_framebuffer_size() const
 	return { width, height };
 }
 
+std::tuple<float, float> app::get_cursor_position() const
+{
+	double x, y;
+	glfwGetCursorPos(window(), &x, &y);
+
+	return { x, y };
+}
+
 window_type* app::window()
 {
 	return m_window.get();
