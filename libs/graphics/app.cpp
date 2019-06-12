@@ -94,7 +94,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	: m_window(create_window(width, height, window_title))
 {
 	// associate this aplication with the glfw window
-	glfwSetWindowUserPointer(m_window.get(), this);
+	glfwSetWindowUserPointer(window(), this);
 	glfwSetKeyCallback(window(), key_callback);
 
 	glfwMakeContextCurrent(window());
@@ -110,13 +110,50 @@ app::app(int32_t width, int32_t height, char const* window_title)
 app::~app()
 {}
 
+bool app::should_close() const
+{
+	return glfwWindowShouldClose(window());
+}
+
+void app::should_close(bool b) const
+{
+	glfwSetWindowShouldClose(window(), b);
+}
+
+std::tuple<int32_t, int32_t> app::get_framebuffer_size() const
+{
+	int width, height;
+	glfwGetFramebufferSize(window(), &width, &height);
+
+	return { width, height };
+}
 
 window_type* app::window()
 {
 	return m_window.get();
 }
 
+window_type* app::window() const
+{
+	return m_window.get();
+}
+
 void app::on_input(key_input)
 {}
+
+void app::poll_events() const
+{
+	glfwPollEvents();
+}
+
+float app::get_time() const
+{
+	return static_cast<float>(glfwGetTime());
+}
+
+void app::swap_buffers() const
+{
+	glfwSwapBuffers(window());
+}
 
 }
