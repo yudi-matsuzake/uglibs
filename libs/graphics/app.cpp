@@ -83,6 +83,9 @@ app::context::context()
 			"Could not inicialize the glfw context"
 		);
 	}
+
+	// some arbitrarily preferences
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 }
 
 app::context::~context()
@@ -138,9 +141,6 @@ window_type* app::window() const
 	return m_window.get();
 }
 
-void app::on_input(key_input)
-{}
-
 void app::poll_events() const
 {
 	glfwPollEvents();
@@ -155,5 +155,8 @@ void app::swap_buffers() const
 {
 	glfwSwapBuffers(window());
 }
+
+void app::on_input(key_input)
+{}
 
 }
