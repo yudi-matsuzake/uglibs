@@ -20,7 +20,7 @@ struct key_input{
 	int mods;
 };
 
-struct rect{
+struct rect2d{
 	int32_t x, y;
 	int32_t width, height;
 };
@@ -49,7 +49,9 @@ public:
 
 	void swap_buffers() const;
 
-	void set_viewport(rect const& r) const;
+	void set_viewport(rect2d const& r) const;
+
+	bool is_key_pressed(int32_t key) const;
 
 	virtual void on_input(key_input const& k);
 
