@@ -20,6 +20,11 @@ struct key_input{
 	int mods;
 };
 
+struct rect{
+	int32_t x, y;
+	int32_t width, height;
+};
+
 class app{
 public:
 	explicit app(int32_t width, int32_t height, char const* window_title);
@@ -36,13 +41,17 @@ public:
 
 	std::tuple<float, float> get_cursor_position() const;
 
+	void clear() const;
+
 	void poll_events() const;
 
 	float get_time() const;
 
 	void swap_buffers() const;
 
-	virtual void on_input(key_input k);
+	void set_viewport(rect const& r) const;
+
+	virtual void on_input(key_input const& k);
 
 protected:
 
