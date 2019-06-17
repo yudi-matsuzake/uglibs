@@ -149,6 +149,11 @@ window_type* app::window() const
 	return m_window.get();
 }
 
+void app::clear() const
+{
+	GL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
 void app::poll_events() const
 {
 	glfwPollEvents();
@@ -161,10 +166,15 @@ float app::get_time() const
 
 void app::swap_buffers() const
 {
-	glfwSwapBuffers(window());
+	GL(glfwSwapBuffers(window()));
 }
 
-void app::on_input(key_input)
+void app::set_viewport(rect const& r) const
+{
+	GL(glViewport(r.x, r.y, r.width, r.height));
+}
+
+void app::on_input(key_input const&)
 {}
 
 }
