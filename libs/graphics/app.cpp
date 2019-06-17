@@ -108,6 +108,10 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	glfwSwapInterval(1);
 
+	glfwSetInputMode(window(), GLFW_STICKY_KEYS, GLFW_TRUE);
+
+	GL(glEnable(GL_BLEND));
+	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
 }
 
 app::~app()
@@ -169,9 +173,14 @@ void app::swap_buffers() const
 	GL(glfwSwapBuffers(window()));
 }
 
-void app::set_viewport(rect const& r) const
+void app::set_viewport(rect2d const& r) const
 {
 	GL(glViewport(r.x, r.y, r.width, r.height));
+}
+
+bool app::is_key_pressed(int32_t key) const
+{
+	return glfwGetKey(window(), key);
 }
 
 void app::on_input(key_input const&)
