@@ -20,9 +20,15 @@ struct key_input{
 	int mods;
 };
 
+struct scroll_input{
+	double x_offset, y_offset;
+};
+
 struct rect2d{
-	int32_t x, y;
-	int32_t width, height;
+	glm::vec2 position;
+	float width, height;
+
+	friend void operator*=(rect2d& r, float scalar);
 };
 
 class app{
@@ -40,6 +46,7 @@ public:
 	std::tuple<int32_t, int32_t> get_framebuffer_size() const;
 
 	std::tuple<float, float> get_cursor_position() const;
+	glm::vec2 get_cursor_vector() const;
 
 	void clear() const;
 
@@ -53,7 +60,8 @@ public:
 
 	bool is_key_pressed(int32_t key) const;
 
-	virtual void on_input(key_input const& k);
+	virtual void on_input(key_input const& input);
+	virtual void on_input(scroll_input const& input);
 
 protected:
 
