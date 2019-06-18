@@ -88,8 +88,6 @@ static window_ptr create_window(
 {
 
 	glfwSetErrorCallback(error_callback);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 	auto w = window_ptr(
 		glfwCreateWindow(
@@ -121,6 +119,11 @@ app::context::context()
 			"Could not inicialize the glfw context"
 		);
 	}
+
+	// opengl hints
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// some arbitrarily preferences
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
