@@ -5,6 +5,17 @@
 namespace graphics{
 
 /*
+ * auxiliar structs and class implementation
+ */
+
+void operator*=(rect2d& r, float scalar)
+{
+
+	r.height *= scalar;
+	r.width *= scalar;
+}
+
+/*
  * callbacks
  * =========
  */
@@ -30,6 +41,15 @@ static void key_callback(
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 	a->on_input(key_input{ key, scancode, action, mods });
+}
+
+static void scroll_callback(
+	GLFWwindow* window,
+	double xoffset,
+	double yoffset)
+{
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	a->on_input(scroll_input{ xoffset, yoffset });
 }
 
 /*
@@ -99,6 +119,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	// associate this aplication with the glfw window
 	glfwSetWindowUserPointer(window(), this);
 	glfwSetKeyCallback(window(), key_callback);
+	glfwSetScrollCallback(window(), scroll_callback);
 
 	glfwMakeContextCurrent(window());
 
@@ -143,6 +164,13 @@ std::tuple<float, float> app::get_cursor_position() const
 	return { x, y };
 }
 
+glm::vec2 app::get_cursor_vector() const
+{
+	auto [ x, y ] = get_cursor_position();
+
+	return { x, y };
+}
+
 window_type* app::window()
 {
 	return m_window.get();
@@ -175,7 +203,14 @@ void app::swap_buffers() const
 
 void app::set_viewport(rect2d const& r) const
 {
-	GL(glViewport(r.x, r.y, r.width, r.height));
+	auto to_int = [](auto x){ return static_cast<int32_t>(x); };
+
+	GL(glViewport(
+		to_int(r.position.x),
+		to_int(r.position.y),
+		to_int(r.width),
+		to_int(r.height)
+	));
 }
 
 bool app::is_key_pressed(int32_t key) const
@@ -184,6 +219,9 @@ bool app::is_key_pressed(int32_t key) const
 }
 
 void app::on_input(key_input const&)
+{}
+
+void app::on_input(scroll_input const&)
 {}
 
 }
