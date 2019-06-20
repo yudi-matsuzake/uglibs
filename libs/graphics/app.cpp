@@ -207,6 +207,15 @@ void app::clear() const
 	GL(glClear(GL_COLOR_BUFFER_BIT));
 }
 
+void app::set_clear_color(
+	float r,
+	float g,
+	float b,
+	float a) const
+{
+	GL(glClearColor(r, g, b, a));
+}
+
 void app::poll_events() const
 {
 	glfwPollEvents();
