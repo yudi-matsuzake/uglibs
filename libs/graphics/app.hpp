@@ -54,6 +54,13 @@ public:
 
 	void clear() const;
 
+	void set_clear_color(
+		float r,
+		float g,
+		float b,
+		float a
+	) const;
+
 	void poll_events() const;
 
 	float get_time() const;
