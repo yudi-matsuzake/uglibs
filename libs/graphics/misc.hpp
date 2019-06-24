@@ -8,6 +8,12 @@
 
 namespace graphics{
 
+/*
+ * structs and aliases
+ * ===================
+ */
+using color = glm::vec4;
+
 /**
   * check compilation and throw an exception (runtime_error) in case
   * the shader with id `id` failed to be compiled

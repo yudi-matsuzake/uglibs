@@ -9,7 +9,6 @@ namespace graphics{
 struct ball2d {
 	glm::vec2 c{ 0.f, 0.f };
 	float r = 0.f;
-	glm::vec4 color{ 1.f, 1.f, 1.f, 1.f };
 };
 
 class ball2d_render {
@@ -24,7 +23,8 @@ public:
 	void operator()(
 		glm::mat4 const& v,
 		glm::mat4 const& p,
-		ball2d const& b
+		ball2d const& b,
+		color const& c
 	);
 
 protected:
