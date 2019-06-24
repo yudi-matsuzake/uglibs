@@ -54,7 +54,8 @@ ball2d_render::ball2d_render()
 void ball2d_render::operator()(
 		glm::mat4 const& v,
 		glm::mat4 const& p,
-		ball2d const& b)
+		ball2d const& b,
+		color const& c)
 {
 
 	auto left	= b.c.x - b.r;
@@ -108,7 +109,7 @@ void ball2d_render::operator()(
 
 	GL(id = glGetUniformLocation(m_program_id, "u_color"));
 	GL(glUniform4f(
-		id, b.color.r, b.color.g, b.color.b, b.color.a
+		id, c.r, c.g, c.b, c.a
 	));
 
 	// draw
