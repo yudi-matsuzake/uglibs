@@ -1,36 +1,29 @@
+#include <iterator>
+
 #include "graphics/ball2d-render.hpp"
 
 namespace graphics{
 
 ball2d_render::ball2d_render()
 {
-	// create and compile shaders
-	GL(m_vertex_shader_id = glCreateShader(GL_VERTEX_SHADER));
-	GL(m_fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER));
 
-	GL(glShaderSource(
-		m_vertex_shader_id,
-		m_vertex_shaders.size(),
-		m_vertex_shaders.data(),
-		nullptr
-	));
-	GL(glShaderSource(
-		m_fragment_shader_id,
-		m_fragment_shaders.size(),
-		m_fragment_shaders.data(),
-		nullptr
-	));
+	m_vertex_shader.set_source(
+		std::cbegin(m_vertex_shaders),
+		std::cend(m_vertex_shaders)
+	);
+
+	m_fragment_shader.set_source(
+		std::cbegin(m_fragment_shaders),
+		std::cend(m_fragment_shaders)
+	);
 
 	// create and link program
-	GL(glCompileShader(m_vertex_shader_id));
-	check_shader_compilation(m_vertex_shader_id);
-
-	GL(glCompileShader(m_fragment_shader_id));
-	check_shader_compilation(m_fragment_shader_id);
+	m_vertex_shader.compile();
+	m_fragment_shader.compile();
 
 	GL(m_program_id = glCreateProgram());
-	GL(glAttachShader(m_program_id, m_vertex_shader_id));
-	GL(glAttachShader(m_program_id, m_fragment_shader_id));
+	GL(glAttachShader(m_program_id, m_vertex_shader.id()));
+	GL(glAttachShader(m_program_id, m_fragment_shader.id()));
 	GL(glLinkProgram(m_program_id));
 
 	// create buffers
@@ -84,13 +77,13 @@ void ball2d_render::operator()(
 	));
 
 	GL(glVertexAttribPointer(
-				0,
-				3,
-				GL_FLOAT,
-				GL_FALSE,
-				vscreen.size(),
-				0
-				));
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		vscreen.size(),
+		0
+	));
 	GL(glEnableVertexAttribArray(0));
 
 	// set uniforms
