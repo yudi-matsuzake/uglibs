@@ -1,8 +1,10 @@
 #pragma once
 
 #include <array>
+#include <string_view>
 
 #include "graphics/misc.hpp"
+#include "graphics/shader.hpp"
 
 namespace graphics{
 
@@ -29,8 +31,9 @@ public:
 
 protected:
 
-	uint32_t m_vertex_shader_id;
-	uint32_t m_fragment_shader_id;
+	vertex_shader m_vertex_shader;
+	fragment_shader m_fragment_shader;
+
 	uint32_t m_program_id;
 
 	uint32_t m_vscr_vao;
@@ -42,7 +45,7 @@ protected:
 	 * vertex and fragment shaders
 	 * ---------------------------
 	 */
-	static constexpr auto m_vertex_shaders = std::array{R"__(
+	static constexpr std::string_view m_vertex_shaders = R"__(
 #version 330 core
 
 uniform mat4 u_view;
@@ -57,9 +60,9 @@ void main()
 	gl_Position = u_projection*u_view*vec4(vscr, 1.f);
 	p = vscr.xy;
 }
-)__"};
+)__";
 
-	static constexpr auto m_fragment_shaders = std::array{R"__(
+	static constexpr std::string_view m_fragment_shaders = R"__(
 #version 330 core
 
 uniform vec2  u_center;
@@ -82,7 +85,7 @@ void main()
 		fragment_color = u_color;
 	}
 }
-)__"};
+)__";
 
 	static constexpr auto m_vscreen_indices = std::array{
 		0u, 1u, 2u, 0u, 2u, 3u
