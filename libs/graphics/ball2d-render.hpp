@@ -5,6 +5,7 @@
 
 #include "graphics/misc.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/program.hpp"
 
 namespace graphics{
 
@@ -34,7 +35,7 @@ protected:
 	vertex_shader m_vertex_shader;
 	fragment_shader m_fragment_shader;
 
-	uint32_t m_program_id;
+	program m_program;
 
 	uint32_t m_vscr_vao;
 	uint32_t m_vscr_vbo;
