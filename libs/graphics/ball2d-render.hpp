@@ -6,6 +6,8 @@
 #include "graphics/misc.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/program.hpp"
+#include "graphics/vao.hpp"
+#include "graphics/buffers.hpp"
 
 namespace graphics{
 
@@ -37,22 +39,9 @@ protected:
 
 	program m_program;
 
-	uint32_t m_vscr_vao;
-	uint32_t m_vscr_vbo;
-	uint32_t m_vscr_ebo;
-
-	/*
-	 *
-	 * vertex and fragment shaders
-	 * ---------------------------
-	 */
-	static const std::string_view m_vertex_shaders;
-	static const std::string_view m_fragment_shaders;
-
-	static constexpr auto m_vscreen_indices = std::array{
-		0u, 1u, 2u, 0u, 2u, 3u
-	};
-
+	vao m_vscr_vao;
+	vbo m_vscr_vbo;
+	ebo m_vscr_ebo;
 };
 
 }

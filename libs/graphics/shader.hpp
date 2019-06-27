@@ -20,7 +20,8 @@ public:
 	template<class I>
 	void set_source(I begin_it, I end_it)
 	{
-		m_source.resize(std::distance(begin_it, end_it));
+		auto d = static_cast<unsigned>(std::distance(begin_it, end_it));
+		m_source.resize(d);
 		std::copy(begin_it, end_it, begin(m_source));
 
 		char* data = m_source.data();

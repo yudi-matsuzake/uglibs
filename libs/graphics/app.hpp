@@ -24,17 +24,6 @@ struct scroll_input{
 	double x_offset, y_offset;
 };
 
-struct rect2d{
-	glm::vec2 position;
-	float width, height;
-
-	friend void operator*=(rect2d& r, float scalar);
-	friend void operator+=(rect2d& r, glm::vec2 const& v);
-	friend void operator-=(rect2d& r, glm::vec2 const& v);
-
-	glm::vec2 center() const;
-};
-
 class app{
 public:
 	explicit app(int32_t width, int32_t height, char const* window_title);
