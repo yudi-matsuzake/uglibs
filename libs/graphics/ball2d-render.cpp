@@ -4,6 +4,50 @@
 
 namespace graphics{
 
+constexpr std::string_view ball2d_render::m_vertex_shaders =
+R"__(
+#version 330 core
+
+uniform mat4 u_view;
+uniform mat4 u_projection;
+
+layout (location = 0) in vec3 vscr;
+
+out vec2 p;
+
+void main()
+{
+	gl_Position = u_projection*u_view*vec4(vscr, 1.f);
+	p = vscr.xy;
+}
+)__";
+
+constexpr std::string_view ball2d_render::m_fragment_shaders =
+R"__(
+#version 330 core
+
+uniform vec2  u_center;
+uniform float u_radius;
+uniform vec4 u_color;
+
+out vec4 fragment_color;
+
+in vec2 p;
+
+void main()
+{
+
+	fragment_color = vec4(0., 0., 0., 0.);
+
+	vec2 v = p - u_center;
+	float dist = sqrt(dot(v, v));
+
+	if(dist <= u_radius){
+		fragment_color = u_color;
+	}
+}
+)__";
+
 ball2d_render::ball2d_render()
 {
 
