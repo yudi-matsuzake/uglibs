@@ -46,47 +46,8 @@ protected:
 	 * vertex and fragment shaders
 	 * ---------------------------
 	 */
-	static constexpr std::string_view m_vertex_shaders = R"__(
-#version 330 core
-
-uniform mat4 u_view;
-uniform mat4 u_projection;
-
-layout (location = 0) in vec3 vscr;
-
-out vec2 p;
-
-void main()
-{
-	gl_Position = u_projection*u_view*vec4(vscr, 1.f);
-	p = vscr.xy;
-}
-)__";
-
-	static constexpr std::string_view m_fragment_shaders = R"__(
-#version 330 core
-
-uniform vec2  u_center;
-uniform float u_radius;
-uniform vec4 u_color;
-
-out vec4 fragment_color;
-
-in vec2 p;
-
-void main()
-{
-
-	fragment_color = vec4(0., 0., 0., 0.);
-
-	vec2 v = p - u_center;
-	float dist = sqrt(dot(v, v));
-
-	if(dist <= u_radius){
-		fragment_color = u_color;
-	}
-}
-)__";
+	static const std::string_view m_vertex_shaders;
+	static const std::string_view m_fragment_shaders;
 
 	static constexpr auto m_vscreen_indices = std::array{
 		0u, 1u, 2u, 0u, 2u, 3u
