@@ -4,7 +4,12 @@
 
 namespace graphics{
 
-constexpr std::string_view ball2d_render::m_vertex_shaders =
+/*
+ * constants
+ * =========
+ */
+
+static constexpr std::string_view m_vertex_shaders =
 R"__(
 #version 330 core
 
@@ -22,7 +27,7 @@ void main()
 }
 )__";
 
-constexpr std::string_view ball2d_render::m_fragment_shaders =
+static constexpr std::string_view m_fragment_shaders =
 R"__(
 #version 330 core
 
@@ -48,6 +53,15 @@ void main()
 }
 )__";
 
+static constexpr auto m_vscreen_indices = std::array{
+	0u, 1u, 2u, 0u, 2u, 3u
+};
+
+/*
+ * methods implementation
+ * ======================
+ */
+
 ball2d_render::ball2d_render()
 {
 
@@ -69,21 +83,9 @@ ball2d_render::ball2d_render()
 	m_program.attach_shader(m_fragment_shader);
 	m_program.link();
 
-	// create buffers
-	GL(glGenVertexArrays(1, &m_vscr_vao));
-	GL(glGenBuffers(1, &m_vscr_vbo));
-	GL(glGenBuffers(1, &m_vscr_ebo));
+	m_vscr_vao.bind();
 
-	GL(glBindVertexArray(m_vscr_vao));
-
-	GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vscr_ebo));
-	GL(glBufferData(
-		GL_ELEMENT_ARRAY_BUFFER,
-		sizeof m_vscreen_indices,
-		m_vscreen_indices.data(),
-		GL_STATIC_DRAW
-	));
-
+	m_vscr_ebo.set_data(m_vscreen_indices.data(), m_vscreen_indices.size());
 }
 
 
@@ -107,17 +109,9 @@ void ball2d_render::operator()(
 
 	// bind buffers and program
 	m_program.use();
-	GL(glBindVertexArray(m_vscr_vao));
-	GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vscr_ebo));
-	GL(glBindBuffer(GL_ARRAY_BUFFER, m_vscr_vbo));
-
-	// set the vertex buffer data
-	GL(glBufferData(
-		GL_ARRAY_BUFFER,
-		sizeof vscreen,
-		vscreen.data(),
-		GL_DYNAMIC_DRAW
-	));
+	m_vscr_vao.bind();
+	m_vscr_ebo.bind();
+	m_vscr_vbo.set_data(vscreen.data(), vscreen.size());
 
 	GL(glVertexAttribPointer(
 		0,
