@@ -108,4 +108,11 @@ void program::set_uniform(char const* name, glm::mat4 const& m) const
 	GL(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(m)));
 }
 
+void program::set_uniform(char const* name, glm::vec4 const& v) const
+{
+	int32_t id;
+	GL(id = glGetUniformLocation(m_id, name));
+	GL(glUniform4fv(id, 1, glm::value_ptr(v)));
+}
+
 } // end of namespace graphics

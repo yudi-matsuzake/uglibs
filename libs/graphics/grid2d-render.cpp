@@ -23,7 +23,6 @@ out vec2 p;
 void main()
 {
 	gl_Position = u_projection*u_view*vec4(vscr, 1.f);
-	/* gl_Position = u_projection*vec4(vscr, 1.f); */
 	p = vscr.xy;
 }
 )__";
@@ -41,12 +40,12 @@ in vec2 p;
 void main()
 {
 
-	fragment_color = vec4(1., 0., 0., 1.);
+	vec2 m = mod(p, 1.0f);
+	vec2 d = abs(m - 0.5f)*2.0f;
+	vec2 s = smoothstep(0.9f, 1.0f, d*step(0.9f, d));
+	float a = max(s.x, s.y);
 
-	float dist = sqrt(dot(p, p));
-
-	if(dist <= 100.0)
-		fragment_color = u_color;
+	fragment_color = vec4(u_color.rgb, min(a, u_color.a));
 }
 )__";
 
@@ -88,8 +87,7 @@ grid2d_render::grid2d_render()
 void grid2d_render::operator()(
 		glm::mat4 const& p,
 		glm::mat4 const& v,
-		rect2d const& rect,
-		color const& c)
+		rect2d const& rect)
 {
 
 	glm::vec4 pos{ rect.position, 0.f, 1.f };
@@ -126,10 +124,15 @@ void grid2d_render::operator()(
 	// set uniforms
 	m_program.set_uniform("u_projection", p);
 	m_program.set_uniform("u_view", v);
-	m_program.set_uniform("u_color", c.r, c.g, c.b, c.a);
+	m_program.set_uniform("u_color", m_grid_color);
 
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+}
+
+void grid2d_render::set_grid_color(color const& c)
+{
+	m_grid_color = c;
 }
 
 } // end of namespace graphics
