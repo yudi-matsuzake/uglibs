@@ -32,20 +32,42 @@ R"__(
 #version 330 core
 
 uniform vec4 u_color;
+uniform float u_width;
 
 out vec4 fragment_color;
 
 in vec2 p;
 
+vec2 smoothdist(vec2 v, float width)
+{
+	float tmp = 1.0f - width;
+
+	vec2 d = abs(v - 0.5f)*2.0f;
+	return step(tmp, d);
+}
+
+bool in_range(float a, float b, float x)
+{
+	return x >= a && x <= b;
+}
+
 void main()
 {
 
+	float width = u_width;
+	vec4 axis_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
 	vec2 m = mod(p, 1.0f);
-	vec2 d = abs(m - 0.5f)*2.0f;
-	vec2 s = smoothstep(0.9f, 1.0f, d*step(0.9f, d));
+	vec2 s = smoothdist(m, width);
+
 	float a = max(s.x, s.y);
 
-	fragment_color = vec4(u_color.rgb, min(a, u_color.a));
+	vec4 color = u_color;
+	float hw = width/2.0f; // half width
+	if(in_range(-hw, hw, p.x) || in_range(-hw, hw, p.y))
+		color = axis_color;
+
+	fragment_color = vec4(color.rgb, min(a, color.a));
 }
 )__";
 
@@ -125,6 +147,7 @@ void grid2d_render::operator()(
 	m_program.set_uniform("u_projection", p);
 	m_program.set_uniform("u_view", v);
 	m_program.set_uniform("u_color", m_grid_color);
+	m_program.set_uniform("u_width", m_grid_width);
 
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
@@ -133,6 +156,11 @@ void grid2d_render::operator()(
 void grid2d_render::set_grid_color(color const& c)
 {
 	m_grid_color = c;
+}
+
+void grid2d_render::set_grid_width(float width)
+{
+	m_grid_width = width;
 }
 
 } // end of namespace graphics
