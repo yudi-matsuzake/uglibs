@@ -25,6 +25,7 @@ public:
 		float f4
 	) const;
 	void set_uniform(char const* name, glm::mat4 const& m) const;
+	void set_uniform(char const* name, glm::vec2 const& v) const;
 	void set_uniform(char const* name, glm::vec4 const& v) const;
 
 protected:
