@@ -32,15 +32,16 @@ R"__(
 #version 330 core
 
 uniform vec4 u_color;
-uniform float u_width;
+uniform vec2 u_proj_size;
+uniform vec2 u_resolution;
 
 out vec4 fragment_color;
 
 in vec2 p;
 
-vec2 smoothdist(vec2 v, float width)
+vec2 smoothdist(vec2 v, float thick)
 {
-	float tmp = 1.0f - width;
+	float tmp = 1.0f - thick;
 
 	vec2 d = abs(v - 0.5f)*2.0f;
 	return step(tmp, d);
@@ -54,17 +55,21 @@ bool in_range(float a, float b, float x)
 void main()
 {
 
-	float width = u_width;
+	vec2 thick2 = u_proj_size/u_resolution;
+	float thick = max(thick2.x, thick2.y);
+	float a_thick = 1.0f - clamp(thick*5.0f, 0.0f, 1.0f);
+
 	vec4 axis_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	vec2 m = mod(p, 1.0f);
-	vec2 s = smoothdist(m, width);
+	vec2 s = smoothdist(m, thick);
 
-	float a = max(s.x, s.y);
+	float a = min(max(s.x, s.y), a_thick);
 
 	vec4 color = u_color;
-	float hw = width/2.0f; // half width
-	if(in_range(-hw, hw, p.x) || in_range(-hw, hw, p.y))
+
+	float ht = thick/2.0f; // half thick
+	if(in_range(-ht, ht, p.x) || in_range(-ht, ht, p.y))
 		color = axis_color;
 
 	fragment_color = vec4(color.rgb, min(a, color.a));
@@ -147,7 +152,8 @@ void grid2d_render::operator()(
 	m_program.set_uniform("u_projection", p);
 	m_program.set_uniform("u_view", v);
 	m_program.set_uniform("u_color", m_grid_color);
-	m_program.set_uniform("u_width", m_grid_width);
+	m_program.set_uniform("u_proj_size", glm::vec2{ rect.width, rect.height });
+	m_program.set_uniform("u_resolution", m_resolution);
 
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
@@ -158,9 +164,10 @@ void grid2d_render::set_grid_color(color const& c)
 	m_grid_color = c;
 }
 
-void grid2d_render::set_grid_width(float width)
+void grid2d_render::set_resolution(float w, float h)
 {
-	m_grid_width = width;
+	m_resolution.x = w;
+	m_resolution.y = h;
 }
 
 } // end of namespace graphics
