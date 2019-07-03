@@ -26,6 +26,7 @@ public:
 	);
 
 	void set_grid_color(color const& c);
+	void set_grid_width(float width);
 
 protected:
 
@@ -39,6 +40,7 @@ protected:
 	ebo m_vscr_ebo;
 
 	color m_grid_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float m_grid_width = 0.1f;
 };
 
 }
