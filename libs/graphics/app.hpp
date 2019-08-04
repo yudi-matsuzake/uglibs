@@ -60,8 +60,8 @@ public:
 
 	bool is_key_pressed(int32_t key) const;
 
-	virtual void on_input(key_input const& input);
-	virtual void on_input(scroll_input const& input);
+	virtual void on_key_input(key_input const& input);
+	virtual void on_scroll_input(scroll_input const& input);
 
 protected:
 
