@@ -29,7 +29,7 @@ static void key_callback(
 	int action, int mods)
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
-	a->on_input(key_input{ key, scancode, action, mods });
+	a->on_key_input(key_input{ key, scancode, action, mods });
 }
 
 static void scroll_callback(
@@ -38,7 +38,7 @@ static void scroll_callback(
 	double yoffset)
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
-	a->on_input(scroll_input{ xoffset, yoffset });
+	a->on_scroll_input(scroll_input{ xoffset, yoffset });
 }
 
 /*
@@ -219,10 +219,10 @@ bool app::is_key_pressed(int32_t key) const
 	return glfwGetKey(window(), key);
 }
 
-void app::on_input(key_input const&)
+void app::on_key_input(key_input const&)
 {}
 
-void app::on_input(scroll_input const&)
+void app::on_scroll_input(scroll_input const&)
 {}
 
 }
