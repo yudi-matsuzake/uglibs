@@ -29,9 +29,11 @@ public:
 		glm::mat4 const& v,
 		glm::mat4 const& p,
 		ball2d const& b,
-		color const& c
+		color const& c,
+		rect2d const& rect
 	);
 
+	void set_resolution(float w, float h);
 protected:
 
 	vertex_shader m_vertex_shader;
@@ -42,6 +44,8 @@ protected:
 	vao m_vscr_vao;
 	vbo m_vscr_vbo;
 	ebo m_vscr_ebo;
+
+	glm::vec2 m_resolution;
 };
 
 }
