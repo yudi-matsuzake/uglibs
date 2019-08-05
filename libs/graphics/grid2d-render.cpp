@@ -112,9 +112,9 @@ grid2d_render::grid2d_render()
 }
 
 void grid2d_render::operator()(
-		glm::mat4 const& p,
-		glm::mat4 const& v,
-		rect2d const& rect)
+	glm::mat4 const& p,
+	glm::mat4 const& v,
+	rect2d const& rect)
 {
 
 	glm::vec4 pos{ rect.position, 0.f, 1.f };

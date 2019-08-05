@@ -35,6 +35,9 @@ uniform vec2  u_center;
 uniform float u_radius;
 uniform vec4 u_color;
 
+uniform vec2 u_proj_size;
+uniform vec2 u_resolution;
+
 out vec4 fragment_color;
 
 in vec2 p;
@@ -47,9 +50,16 @@ void main()
 	vec2 v = p - u_center;
 	float dist = sqrt(dot(v, v));
 
-	if(dist <= u_radius){
+	if(dist <= u_radius)
 		fragment_color = u_color;
-	}
+
+	vec2 thick2 = u_proj_size/u_resolution;
+	float thick = max(0.0, max(thick2.x, thick2.y));
+
+	float b = abs(dist - u_radius);
+	vec4 boundary_color = vec4(1.0, 1.0, 1.0, 1.0-b);
+	b = smoothstep(0.0, thick, b);
+	fragment_color = fragment_color*b + (1.0-b)*boundary_color;
 }
 )__";
 
@@ -90,16 +100,16 @@ ball2d_render::ball2d_render()
 
 
 void ball2d_render::operator()(
-		glm::mat4 const& v,
-		glm::mat4 const& p,
-		ball2d const& b,
-		color const& c)
+	glm::mat4 const& v,
+	glm::mat4 const& p,
+	ball2d const& b,
+	color const& c,
+	rect2d const& rect)
 {
-
-	auto left	= b.c.x - b.r;
-	auto right	= b.c.x + b.r;
-	auto top	= b.c.y + b.r;
-	auto bottom	= b.c.y - b.r;
+	auto left	= b.c.x - 2*b.r;
+	auto right	= b.c.x + 2*b.r;
+	auto top	= b.c.y + 2*b.r;
+	auto bottom	= b.c.y - 2*b.r;
 	auto vscreen = std::array{
 		right, bottom, .0f,
 		right, top, .0f,
@@ -130,8 +140,19 @@ void ball2d_render::operator()(
 	m_program.set_uniform("u_view", v);
 	m_program.set_uniform("u_color", c.r, c.g, c.b, c.a);
 
+	m_program.set_uniform(
+		"u_proj_size",
+		glm::vec2{ rect.width, rect.height });
+	m_program.set_uniform("u_resolution", m_resolution);
+
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+}
+
+void ball2d_render::set_resolution(float w, float h)
+{
+	m_resolution.x = w;
+	m_resolution.y = h;
 }
 
 } // end of namespace graphics
