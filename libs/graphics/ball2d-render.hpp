@@ -34,6 +34,8 @@ public:
 	);
 
 	void set_resolution(float w, float h);
+	void set_boundary_color(graphics::color const& c);
+	void set_draw_boundary(bool b);
 protected:
 
 	vertex_shader m_vertex_shader;
@@ -46,6 +48,12 @@ protected:
 	ebo m_vscr_ebo;
 
 	glm::vec2 m_resolution;
+
+	graphics::color m_boundary_color = graphics::color{
+		1.0, 1.0, 1.0, 1.0
+	};
+
+	bool m_draw_boundary = true;
 };
 
 }
