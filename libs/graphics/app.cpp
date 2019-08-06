@@ -67,7 +67,7 @@ static window_ptr create_window(
 			window_title,
 			nullptr,
 			nullptr),
-		&glfwDestroyWindow
+		glfwDestroyWindow
 	);
 
 	if(!w) terminate_and_throw("Could not create a glfw window");
@@ -109,11 +109,11 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	: m_window(create_window(width, height, window_title))
 {
 	// associate this aplication with the glfw window
-	glfwSetWindowUserPointer(window(), this);
-	glfwSetKeyCallback(window(), key_callback);
-	glfwSetScrollCallback(window(), scroll_callback);
+	glfwSetWindowUserPointer(window().get(), this);
+	glfwSetKeyCallback(window().get(), key_callback);
+	glfwSetScrollCallback(window().get(), scroll_callback);
 
-	glfwMakeContextCurrent(window());
+	glfwMakeContextCurrent(window().get());
 
 	if(!gladLoadGL())
 		throw std::runtime_error("glad could not be loaded");
@@ -121,7 +121,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	glfwSwapInterval(1);
 
-	glfwSetInputMode(window(), GLFW_STICKY_KEYS, GLFW_TRUE);
+	glfwSetInputMode(window().get(), GLFW_STICKY_KEYS, GLFW_TRUE);
 
 	GL(glEnable(GL_BLEND));
 	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
@@ -132,18 +132,18 @@ app::~app()
 
 bool app::should_close() const
 {
-	return glfwWindowShouldClose(window());
+	return glfwWindowShouldClose(window().get());
 }
 
 void app::should_close(bool b) const
 {
-	glfwSetWindowShouldClose(window(), b);
+	glfwSetWindowShouldClose(window().get(), b);
 }
 
 std::tuple<int32_t, int32_t> app::get_framebuffer_size() const
 {
 	int width, height;
-	glfwGetFramebufferSize(window(), &width, &height);
+	glfwGetFramebufferSize(window().get(), &width, &height);
 
 	return { width, height };
 }
@@ -151,7 +151,7 @@ std::tuple<int32_t, int32_t> app::get_framebuffer_size() const
 std::tuple<float, float> app::get_cursor_position() const
 {
 	double x, y;
-	glfwGetCursorPos(window(), &x, &y);
+	glfwGetCursorPos(window().get(), &x, &y);
 
 	return { x, y };
 }
@@ -163,14 +163,14 @@ glm::vec2 app::get_cursor_vector() const
 	return { x, y };
 }
 
-window_type* app::window()
+window_ptr app::window()
 {
-	return m_window.get();
+	return m_window;
 }
 
-window_type* app::window() const
+window_ptr app::window() const
 {
-	return m_window.get();
+	return m_window;
 }
 
 void app::clear() const
@@ -199,7 +199,7 @@ float app::get_time() const
 
 void app::swap_buffers() const
 {
-	GL(glfwSwapBuffers(window()));
+	GL(glfwSwapBuffers(window().get()));
 }
 
 void app::set_viewport(rect2d const& r) const
@@ -216,7 +216,7 @@ void app::set_viewport(rect2d const& r) const
 
 bool app::is_key_pressed(int32_t key) const
 {
-	return glfwGetKey(window(), key);
+	return glfwGetKey(window().get(), key);
 }
 
 void app::on_key_input(key_input const&)
