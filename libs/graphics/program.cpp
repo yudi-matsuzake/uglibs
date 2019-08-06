@@ -122,4 +122,12 @@ void program::set_uniform(char const* name, glm::vec4 const& v) const
 	GL(glUniform4fv(id, 1, glm::value_ptr(v)));
 }
 
+void program::set_uniform(char const* name, bool b) const
+{
+	int32_t id;
+	GL(id = glGetUniformLocation(m_id, name));
+	GL(glUniform1i(id, b));
+}
+
+
 } // end of namespace graphics
