@@ -11,7 +11,7 @@
 namespace graphics{
 
 using window_type = GLFWwindow;
-using window_ptr = std::unique_ptr<window_type, decltype(&glfwDestroyWindow)>;
+using window_ptr = std::shared_ptr<window_type>;
 
 struct key_input{
 	int key;
@@ -30,8 +30,8 @@ public:
 
 	virtual ~app();
 
-	window_type* window();
-	window_type* window() const;
+	window_ptr window();
+	window_ptr window() const;
 
 	bool should_close() const;
 	void should_close(bool) const;
