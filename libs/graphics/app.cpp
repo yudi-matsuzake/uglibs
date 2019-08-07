@@ -29,7 +29,10 @@ static void key_callback(
 	int action, int mods)
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
-	a->on_key_input(key_input{ key, scancode, action, mods });
+
+	key_input input{ key, scancode, action, mods };
+	a->on_key_input(input);
+	a->on_key_input_components(input);
 }
 
 static void scroll_callback(
@@ -38,7 +41,10 @@ static void scroll_callback(
 	double yoffset)
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
-	a->on_scroll_input(scroll_input{ xoffset, yoffset });
+
+	scroll_input input{ xoffset, yoffset };
+	a->on_scroll_input(input);
+	a->on_scroll_input_components(input);
 }
 
 /*
@@ -106,7 +112,12 @@ app::context::~context()
 }
 
 app::app(int32_t width, int32_t height, char const* window_title)
-	: m_window(create_window(width, height, window_title))
+	: m_window(create_window(width, height, window_title)),
+	  m_viewport{
+		{0.0, 0.0},
+		static_cast<float>(width),
+		static_cast<float>(height)
+	  }
 {
 	// associate this aplication with the glfw window
 	glfwSetWindowUserPointer(window().get(), this);
@@ -148,12 +159,12 @@ std::tuple<int32_t, int32_t> app::get_framebuffer_size() const
 	return { width, height };
 }
 
-std::tuple<float, float> app::get_cursor_position() const
+std::tuple<double, double> app::get_cursor_position() const
 {
-	double x, y;
-	glfwGetCursorPos(window().get(), &x, &y);
-
-	return { x, y };
+	return {
+		m_cached_data.cursor_position.x,
+		m_cached_data.cursor_position.y
+	};
 }
 
 glm::vec2 app::get_cursor_vector() const
@@ -187,14 +198,24 @@ void app::set_clear_color(
 	GL(glClearColor(r, g, b, a));
 }
 
+void app::add_component(std::shared_ptr<component> ptr)
+{
+	m_component_manager.add_component(ptr);
+}
+
 void app::poll_events() const
 {
 	glfwPollEvents();
 }
 
-float app::get_time() const
+double app::get_time() const
 {
-	return static_cast<float>(glfwGetTime());
+	return m_cached_data.time;
+}
+
+double app::get_delta() const
+{
+	return m_cached_data.delta;
 }
 
 void app::swap_buffers() const
@@ -202,9 +223,16 @@ void app::swap_buffers() const
 	GL(glfwSwapBuffers(window().get()));
 }
 
-void app::set_viewport(rect2d const& r) const
+rect2d const& app::get_viewport() const
+{
+	return m_viewport;
+}
+
+void app::set_viewport(rect2d const& r)
 {
 	auto to_int = [](auto x){ return static_cast<int32_t>(x); };
+
+	m_viewport = r;
 
 	GL(glViewport(
 		to_int(r.position.x),
@@ -224,5 +252,104 @@ void app::on_key_input(key_input const&)
 
 void app::on_scroll_input(scroll_input const&)
 {}
+
+void app::update_components() const
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->update();
+	}
+}
+
+void app::update_all()
+{
+	update_cached_data();
+	update();
+	update_components();
+}
+
+void app::draw_components() const
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->draw();
+	}
+}
+
+void app::draw_all()
+{
+	draw();
+	draw_components();
+}
+
+int app::run()
+{
+	while(!should_close()){
+		update_all();
+
+		set_viewport(m_viewport);
+		clear();
+
+		draw_all();
+
+		swap_buffers();
+		poll_events();
+	}
+
+	return EXIT_SUCCESS;
+}
+
+/* int32_t app::run() */
+/* { */
+/* 	while (!should_close()) { */
+/* 		update_all(); */
+
+/* 		set_viewport(m_viewport); */
+/* 		clear(); */
+
+/* 		draw_all(); */
+/* 		swap_buffers(); */
+/* 		poll_events(); */
+
+/* 		m_component_manager.remove_expired_components(); */
+/* 	} */
+
+/* 	return EXIT_SUCCESS; */
+/* } */
+
+void app::update_cached_data()
+{
+	auto now = glfwGetTime();
+	m_cached_data.delta = now - m_cached_data.time;
+	m_cached_data.time = now;
+
+	glfwGetFramebufferSize(
+		window().get(),
+		&m_cached_data.framebuffer_size.width,
+		&m_cached_data.framebuffer_size.height
+	);
+
+	glfwGetCursorPos(
+		window().get(),
+		&m_cached_data.cursor_position.x,
+		&m_cached_data.cursor_position.y
+	);
+}
+
+void app::on_key_input_components(key_input const& input)
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->on_key_input(input);
+	}
+}
+
+void app::on_scroll_input_components(scroll_input const& input)
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->on_scroll_input(input);
+	}
+}
 
 }
