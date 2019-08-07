@@ -110,10 +110,14 @@ void ball2d_render::operator()(
 	color const& c,
 	rect2d const& rect)
 {
-	auto left	= b.c.x - 2*b.r;
-	auto right	= b.c.x + 2*b.r;
-	auto top	= b.c.y + 2*b.r;
-	auto bottom	= b.c.y - 2*b.r;
+	/*
+	 * arbitrarily add 2 to the radius because of
+	 * the ball boundary antialiasing
+	 */
+	auto left	= b.c.x - (b.r + 2);
+	auto right	= b.c.x + (b.r + 2);
+	auto top	= b.c.y + (b.r + 2);
+	auto bottom	= b.c.y - (b.r + 2);
 	auto vscreen = std::array{
 		right, bottom, .0f,
 		right, top, .0f,
@@ -146,7 +150,8 @@ void ball2d_render::operator()(
 
 	m_program.set_uniform(
 		"u_proj_size",
-		glm::vec2{ rect.width, rect.height });
+		glm::vec2{ rect.width, rect.height }
+	);
 	m_program.set_uniform("u_resolution", m_resolution);
 	m_program.set_uniform("u_boundary_color", m_boundary_color);
 	m_program.set_uniform("u_draw_boundary", m_draw_boundary);
