@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <iostream>
 #include <memory>
 #include <string_view>
@@ -7,24 +8,14 @@
 #include <tuple>
 
 #include "graphics/misc.hpp"
+#include "graphics/component-manager.hpp"
 
 namespace graphics{
 
 using window_type = GLFWwindow;
 using window_ptr = std::shared_ptr<window_type>;
 
-struct key_input{
-	int key;
-	int scancode;
-	int action;
-	int mods;
-};
-
-struct scroll_input{
-	double x_offset, y_offset;
-};
-
-class app{
+class app : public component{
 public:
 	explicit app(int32_t width, int32_t height, char const* window_title);
 
@@ -38,7 +29,7 @@ public:
 
 	std::tuple<int32_t, int32_t> get_framebuffer_size() const;
 
-	std::tuple<float, float> get_cursor_position() const;
+	std::tuple<double, double> get_cursor_position() const;
 	glm::vec2 get_cursor_vector() const;
 
 	void clear() const;
@@ -50,19 +41,31 @@ public:
 		float a
 	) const;
 
+	void add_component(std::shared_ptr<component> ptr);
+
 	void poll_events() const;
-
-	float get_time() const;
-
+	double get_time() const;
+	double get_delta() const;
 	void swap_buffers() const;
-
-	void set_viewport(rect2d const& r) const;
-
 	bool is_key_pressed(int32_t key) const;
 
-	virtual void on_key_input(key_input const& input);
-	virtual void on_scroll_input(scroll_input const& input);
+	rect2d const& get_viewport() const;
+	void set_viewport(rect2d const& r);
 
+	virtual void on_key_input(key_input const& input) override;
+	virtual void on_scroll_input(scroll_input const& input) override;
+
+	virtual int32_t run();
+
+	void update_cached_data();
+	void update_components() const;
+	void update_all();
+
+	void draw_components() const;
+	void draw_all();
+
+	void on_key_input_components(key_input const& input);
+	void on_scroll_input_components(scroll_input const& input);
 protected:
 
 	/**
@@ -75,6 +78,27 @@ protected:
 	} m_context;
 
 	window_ptr m_window;
+	component_manager m_component_manager;
+	rect2d m_viewport;
+
+	/**
+	  * this struct holds all cached data for one loop
+	  */
+	struct{
+		double time = 0.0;
+		double delta = 0.0;
+
+		struct{
+			int32_t width = 0;
+			int32_t height = 0;
+		} framebuffer_size;
+
+		struct{
+			double x = 0.0;
+			double y = 0.0;
+		} cursor_position;
+
+	} m_cached_data;
 };
 
 }
