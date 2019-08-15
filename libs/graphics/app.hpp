@@ -15,7 +15,7 @@ namespace graphics{
 using window_type = GLFWwindow;
 using window_ptr = std::shared_ptr<window_type>;
 
-class app : public component{
+class app {
 public:
 	explicit app(int32_t width, int32_t height, char const* window_title);
 
@@ -52,14 +52,17 @@ public:
 	rect2d const& get_viewport() const;
 	void set_viewport(rect2d const& r);
 
-	virtual void on_key_input(key_input const& input) override;
-	virtual void on_scroll_input(scroll_input const& input) override;
+	virtual void on_key_input(key_input const& input);
+	virtual void on_scroll_input(scroll_input const& input);
 
 	virtual int32_t run();
 
 	void update_cached_data();
 	void update_components() const;
 	void update_all();
+
+	virtual void update();
+	virtual void draw();
 
 	void draw_components() const;
 	void draw_all();
