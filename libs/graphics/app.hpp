@@ -10,6 +10,10 @@
 #include "graphics/misc.hpp"
 #include "graphics/component-manager.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 namespace graphics{
 
 using window_type = GLFWwindow;
