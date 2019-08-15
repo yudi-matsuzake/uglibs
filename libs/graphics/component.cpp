@@ -3,6 +3,15 @@
 namespace graphics{
 
 
+component::component(app* app_ptr)
+	: m_app(app_ptr)
+{}
+
+app* component::get_app()
+{
+	return m_app;
+}
+
 void component::update()
 {}
 

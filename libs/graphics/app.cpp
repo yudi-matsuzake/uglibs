@@ -253,6 +253,9 @@ void app::on_key_input(key_input const&)
 void app::on_scroll_input(scroll_input const&)
 {}
 
+void app::update()
+{}
+
 void app::update_components() const
 {
 	for(auto&& [ id, ptr ] : m_component_manager){
@@ -267,6 +270,9 @@ void app::update_all()
 	update();
 	update_components();
 }
+
+void app::draw()
+{}
 
 void app::draw_components() const
 {
@@ -298,24 +304,6 @@ int app::run()
 
 	return EXIT_SUCCESS;
 }
-
-/* int32_t app::run() */
-/* { */
-/* 	while (!should_close()) { */
-/* 		update_all(); */
-
-/* 		set_viewport(m_viewport); */
-/* 		clear(); */
-
-/* 		draw_all(); */
-/* 		swap_buffers(); */
-/* 		poll_events(); */
-
-/* 		m_component_manager.remove_expired_components(); */
-/* 	} */
-
-/* 	return EXIT_SUCCESS; */
-/* } */
 
 void app::update_cached_data()
 {
