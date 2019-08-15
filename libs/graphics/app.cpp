@@ -84,11 +84,6 @@ static window_ptr create_window(
 /*
  * context wrapper
  */
-
-/*
- * app constructors and destructors
- * ================================
- */
 app::context::context()
 {
 	if (!glfwInit()){
@@ -111,6 +106,10 @@ app::context::~context()
 	glfwTerminate();
 }
 
+/*
+ * app constructors and destructors
+ * ================================
+ */
 app::app(int32_t width, int32_t height, char const* window_title)
 	: m_window(create_window(width, height, window_title)),
 	  m_viewport{
@@ -118,11 +117,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 		static_cast<float>(width),
 		static_cast<float>(height)
 	  },
-	  m_near_plane{
-		{0.0, 0.0},
-		static_cast<float>(width),
-		static_cast<float>(height)
-	  }
+	  m_near_plane{ m_viewport }
 {
 	// associate this aplication with the glfw window
 	glfwSetWindowUserPointer(window().get(), this);
@@ -149,10 +144,33 @@ app::app(int32_t width, int32_t height, char const* window_title)
 		m_near_plane.position.y + m_near_plane.height,
 		1.f, -1.f
 	);
+
+	/*
+	 * imgui context
+	 * =============
+	 */
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::GetIO().ConfigFlags |=
+		ImGuiConfigFlags_NavEnableKeyboard;
+	// style
+	ImGui::StyleColorsDark();
+	// render
+	ImGui_ImplGlfw_InitForOpenGL(window().get(), true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 app::~app()
-{}
+{
+
+	/*
+	 * imgui context destruction
+	 * =============
+	 */
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
 
 bool app::should_close() const
 {
