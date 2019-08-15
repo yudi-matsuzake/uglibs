@@ -41,6 +41,12 @@ public:
 		float a
 	) const;
 
+	glm::mat4 const& projection_matrix() const;
+	glm::mat4& projection_matrix();
+
+	glm::mat4 const& view_matrix() const;
+	glm::mat4& view_matrix();
+
 	void add_component(std::shared_ptr<component> ptr);
 
 	void poll_events() const;
@@ -51,6 +57,9 @@ public:
 
 	rect2d const& get_viewport() const;
 	void set_viewport(rect2d const& r);
+
+	rect2d const& get_near_plane() const;
+	void set_near_plane(rect2d const& r);
 
 	virtual void on_key_input(key_input const& input);
 	virtual void on_scroll_input(scroll_input const& input);
@@ -82,7 +91,11 @@ protected:
 
 	window_ptr m_window;
 	component_manager m_component_manager;
-	rect2d m_viewport;
+	rect2d m_viewport{ {0, 0}, 0, 0 };
+	rect2d m_near_plane{ {0.f, 0.f}, 0, 0};
+
+	glm::mat4 m_view_matrix{ 1.f };
+	glm::mat4 m_projection_matrix; 
 
 	/**
 	  * this struct holds all cached data for one loop
