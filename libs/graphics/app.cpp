@@ -117,6 +117,11 @@ app::app(int32_t width, int32_t height, char const* window_title)
 		{0.0, 0.0},
 		static_cast<float>(width),
 		static_cast<float>(height)
+	  },
+	  m_near_plane{
+		{0.0, 0.0},
+		static_cast<float>(width),
+		static_cast<float>(height)
 	  }
 {
 	// associate this aplication with the glfw window
@@ -136,6 +141,14 @@ app::app(int32_t width, int32_t height, char const* window_title)
 
 	GL(glEnable(GL_BLEND));
 	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
+
+	m_projection_matrix = glm::ortho(
+		m_near_plane.position.x,
+		m_near_plane.position.x + m_near_plane.width,
+		m_near_plane.position.y,
+		m_near_plane.position.y + m_near_plane.height,
+		1.f, -1.f
+	);
 }
 
 app::~app()
@@ -198,6 +211,26 @@ void app::set_clear_color(
 	GL(glClearColor(r, g, b, a));
 }
 
+glm::mat4 const& app::projection_matrix() const
+{
+	return m_projection_matrix;
+}
+
+glm::mat4& app::projection_matrix()
+{
+	return m_projection_matrix;
+}
+
+glm::mat4 const& app::view_matrix() const
+{
+	return m_view_matrix;
+}
+
+glm::mat4& app::view_matrix()
+{
+	return m_view_matrix;
+}
+
 void app::add_component(std::shared_ptr<component> ptr)
 {
 	m_component_manager.add_component(ptr);
@@ -240,6 +273,16 @@ void app::set_viewport(rect2d const& r)
 		to_int(r.width),
 		to_int(r.height)
 	));
+}
+
+rect2d const& app::get_near_plane() const
+{
+	return m_near_plane;
+}
+
+void app::set_near_plane(rect2d const& r)
+{
+	m_near_plane = r;
 }
 
 bool app::is_key_pressed(int32_t key) const
