@@ -76,7 +76,8 @@ static constexpr auto m_vscreen_indices = std::array{
  * ======================
  */
 
-ball2d_render::ball2d_render()
+ball2d_render::ball2d_render(app* app_ptr)
+	: render(app_ptr)
 {
 
 	m_vertex_shader.set_source(
@@ -103,12 +104,7 @@ ball2d_render::ball2d_render()
 }
 
 
-void ball2d_render::operator()(
-	glm::mat4 const& v,
-	glm::mat4 const& p,
-	ball2d const& b,
-	color const& c,
-	rect2d const& rect)
+void ball2d_render::operator()(ball2d const& b)
 {
 	/*
 	 * arbitrarily add 2 to the radius because of
@@ -141,18 +137,17 @@ void ball2d_render::operator()(
 	));
 	GL(glEnableVertexAttribArray(0));
 
+	auto pv = get_app()->get_projected_viewport();
+	auto [ w, h ] = get_app()->get_framebuffer_size();
+
 	// set uniforms
 	m_program.set_uniform("u_center", b.c.x, b.c.y);
 	m_program.set_uniform("u_radius", b.r);
-	m_program.set_uniform("u_projection", p);
-	m_program.set_uniform("u_view", v);
-	m_program.set_uniform("u_color", c.r, c.g, c.b, c.a);
-
-	m_program.set_uniform(
-		"u_proj_size",
-		glm::vec2{ rect.width, rect.height }
-	);
-	m_program.set_uniform("u_resolution", m_resolution);
+	m_program.set_uniform("u_projection", get_app()->projection_matrix());
+	m_program.set_uniform("u_view", get_app()->view_matrix());
+	m_program.set_uniform("u_color", m_fill_color);
+	m_program.set_uniform("u_proj_size", pv.width, pv.height);
+	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });
 	m_program.set_uniform("u_boundary_color", m_boundary_color);
 	m_program.set_uniform("u_draw_boundary", m_draw_boundary);
 
@@ -160,10 +155,9 @@ void ball2d_render::operator()(
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 }
 
-void ball2d_render::set_resolution(float w, float h)
+void ball2d_render::set_fill_color(graphics::color const& c)
 {
-	m_resolution.x = w;
-	m_resolution.y = h;
+	m_fill_color = c;
 }
 
 void ball2d_render::set_boundary_color(glm::vec4 const& v)

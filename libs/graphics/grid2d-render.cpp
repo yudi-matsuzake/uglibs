@@ -144,12 +144,14 @@ void grid2d_render::operator()()
 	));
 	GL(glEnableVertexAttribArray(0));
 
+	auto [ w, h ] = get_app()->get_framebuffer_size();
+
 	// set uniforms
 	m_program.set_uniform("u_projection", get_app()->projection_matrix());
 	m_program.set_uniform("u_view", get_app()->view_matrix());
 	m_program.set_uniform("u_color", m_grid_color);
-	m_program.set_uniform("u_proj_size", glm::vec2{ pv.width, pv.height });
-	m_program.set_uniform("u_resolution", m_resolution);
+	m_program.set_uniform("u_proj_size", pv.width, pv.height);
+	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });
 
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
@@ -158,12 +160,6 @@ void grid2d_render::operator()()
 void grid2d_render::set_grid_color(color const& c)
 {
 	m_grid_color = c;
-}
-
-void grid2d_render::set_resolution(float w, float h)
-{
-	m_resolution.x = w;
-	m_resolution.y = h;
 }
 
 } // end of namespace graphics

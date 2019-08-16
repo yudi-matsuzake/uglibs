@@ -18,6 +18,9 @@ void component::update()
 void component::draw()
 {}
 
+void component::draw_ui()
+{}
+
 void component::on_key_input(key_input const&)
 {}
 

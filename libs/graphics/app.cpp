@@ -354,6 +354,30 @@ void app::draw_all()
 	draw_components();
 }
 
+void app::draw_ui()
+{}
+
+void app::draw_components_ui()
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->draw_ui();
+	}
+}
+
+void app::draw_all_ui()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	draw_ui();
+	draw_components_ui();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 int app::run()
 {
 	while(!should_close()){
@@ -363,6 +387,8 @@ int app::run()
 		clear();
 
 		draw_all();
+
+		draw_all_ui();
 
 		swap_buffers();
 		poll_events();
