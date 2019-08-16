@@ -8,22 +8,19 @@
 #include "graphics/program.hpp"
 #include "graphics/vao.hpp"
 #include "graphics/buffers.hpp"
+#include "graphics/render.hpp"
 
 namespace graphics{
 
-class grid2d_render {
+class grid2d_render : public render{
 public:
 
-	grid2d_render();
+	grid2d_render(app* app_ptr);
 
 	/**
 	  * renders a grid in the rect `rect`
 	  */
-	void operator()(
-		glm::mat4 const& p,
-		glm::mat4 const& v,
-		rect2d const& rect
-	);
+	void operator()();
 
 	void set_grid_color(color const& c);
 

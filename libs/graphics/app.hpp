@@ -46,10 +46,10 @@ public:
 	) const;
 
 	glm::mat4 const& projection_matrix() const;
-	glm::mat4& projection_matrix();
+	void set_projection_matrix(glm::mat4 const& m);
 
 	glm::mat4 const& view_matrix() const;
-	glm::mat4& view_matrix();
+	void set_view_matrix(glm::mat4 const& m);
 
 	void add_component(std::shared_ptr<component> ptr);
 
@@ -82,7 +82,12 @@ public:
 
 	void on_key_input_components(key_input const& input);
 	void on_scroll_input_components(scroll_input const& input);
+
+	rect2d const& get_projected_viewport() const;
 protected:
+
+	void set_viewport();
+	void update_projected_viewport();
 
 	/**
 	  * context is a glfw context wrapper, the constructor will run
@@ -100,6 +105,7 @@ protected:
 
 	glm::mat4 m_view_matrix{ 1.f };
 	glm::mat4 m_projection_matrix; 
+	rect2d m_projected_viewport{ {0.0, 0.0}, 0.0, 0.0};
 
 	/**
 	  * this struct holds all cached data for one loop
