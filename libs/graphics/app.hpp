@@ -80,6 +80,10 @@ public:
 	void draw_components() const;
 	void draw_all();
 
+	virtual void draw_ui();
+	virtual void draw_components_ui();
+	virtual void draw_all_ui();
+
 	void on_key_input_components(key_input const& input);
 	void on_scroll_input_components(scroll_input const& input);
 

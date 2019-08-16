@@ -24,8 +24,6 @@ public:
 
 	void set_grid_color(color const& c);
 
-	void set_resolution(float w, float h);
-
 protected:
 
 	vertex_shader m_vertex_shader;
@@ -38,7 +36,6 @@ protected:
 	ebo m_vscr_ebo;
 
 	color m_grid_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glm::vec2 m_resolution;
 };
 
 }

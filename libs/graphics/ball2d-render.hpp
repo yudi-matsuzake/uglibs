@@ -8,6 +8,7 @@
 #include "graphics/program.hpp"
 #include "graphics/vao.hpp"
 #include "graphics/buffers.hpp"
+#include "graphics/render.hpp"
 
 namespace graphics{
 
@@ -16,25 +17,19 @@ struct ball2d {
 	float r = 0.f;
 };
 
-class ball2d_render {
+class ball2d_render : public render{
 public:
 
-	ball2d_render();
+	ball2d_render(app* app_ptr);
 
 	/**
 	  * renders a 2d ball `b` with the view matrix `v` and
 	  * the projection matrix `p`
 	  */
-	void operator()(
-		glm::mat4 const& v,
-		glm::mat4 const& p,
-		ball2d const& b,
-		color const& c,
-		rect2d const& rect
-	);
+	void operator()(ball2d const& b);
 
-	void set_resolution(float w, float h);
 	void set_boundary_color(graphics::color const& c);
+	void set_fill_color(graphics::color const& c);
 	void set_draw_boundary(bool b);
 protected:
 
@@ -47,7 +42,7 @@ protected:
 	vbo m_vscr_vbo;
 	ebo m_vscr_ebo;
 
-	glm::vec2 m_resolution;
+	color m_fill_color = { 1.0, 1.0, 1.0, 1.0 };
 
 	graphics::color m_boundary_color = graphics::color{
 		1.0, 1.0, 1.0, 1.0
