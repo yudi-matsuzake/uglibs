@@ -59,13 +59,14 @@ void ortographic_zoom::update()
 		proj_frustrum -= v;
 	}
 
-	get_app()->projection_matrix() = glm::ortho(
+	get_app()->set_projection_matrix(
+		glm::ortho(
 		proj_frustrum.position.x,
 		proj_frustrum.position.x + proj_frustrum.width,
 		proj_frustrum.position.y,
 		proj_frustrum.position.y + proj_frustrum.height,
 		1.f, -1.f
-	);
+	));
 
 	get_app()->set_near_plane(proj_frustrum);
 

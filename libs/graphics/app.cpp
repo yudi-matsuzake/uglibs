@@ -165,7 +165,7 @@ app::~app()
 
 	/*
 	 * imgui context destruction
-	 * =============
+	 * =========================
 	 */
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -234,9 +234,10 @@ glm::mat4 const& app::projection_matrix() const
 	return m_projection_matrix;
 }
 
-glm::mat4& app::projection_matrix()
+void app::set_projection_matrix(glm::mat4 const& m)
 {
-	return m_projection_matrix;
+	m_projection_matrix = m;
+	update_projected_viewport();
 }
 
 glm::mat4 const& app::view_matrix() const
@@ -244,9 +245,10 @@ glm::mat4 const& app::view_matrix() const
 	return m_view_matrix;
 }
 
-glm::mat4& app::view_matrix()
+void app::set_view_matrix(glm::mat4 const& m)
 {
-	return m_view_matrix;
+	m_view_matrix = m;
+	update_projected_viewport();
 }
 
 void app::add_component(std::shared_ptr<component> ptr)
@@ -281,15 +283,18 @@ rect2d const& app::get_viewport() const
 
 void app::set_viewport(rect2d const& r)
 {
+	m_viewport = r;
+}
+
+void app::set_viewport()
+{
 	auto to_int = [](auto x){ return static_cast<int32_t>(x); };
 
-	m_viewport = r;
-
 	GL(glViewport(
-		to_int(r.position.x),
-		to_int(r.position.y),
-		to_int(r.width),
-		to_int(r.height)
+		to_int(m_viewport.position.x),
+		to_int(m_viewport.position.y),
+		to_int(m_viewport.width),
+		to_int(m_viewport.height)
 	));
 }
 
@@ -354,7 +359,7 @@ int app::run()
 	while(!should_close()){
 		update_all();
 
-		set_viewport(m_viewport);
+		set_viewport();
 		clear();
 
 		draw_all();
@@ -385,6 +390,20 @@ void app::update_cached_data()
 	);
 }
 
+void app::update_projected_viewport()
+{
+	glm::mat4 vp = glm::inverse(projection_matrix()*view_matrix());
+
+	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
+	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };
+
+	m_projected_viewport = rect2d{
+		{ ul.x, ul.y },
+		dr.x - ul.x,
+		dr.y - ul.y
+	};
+}
+
 void app::on_key_input_components(key_input const& input)
 {
 	for(auto&& [ id, ptr ] : m_component_manager){
@@ -399,6 +418,11 @@ void app::on_scroll_input_components(scroll_input const& input)
 		if(auto c = ptr.lock())
 			c->on_scroll_input(input);
 	}
+}
+
+rect2d const& app::get_projected_viewport() const
+{
+	return m_projected_viewport;
 }
 
 }

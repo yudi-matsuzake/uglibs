@@ -85,7 +85,8 @@ static constexpr auto m_vscreen_indices = std::array{
  * ======================
  */
 
-grid2d_render::grid2d_render()
+grid2d_render::grid2d_render(app* app_ptr)
+	: render(app_ptr)
 {
 
 	m_vertex_shader.set_source(
@@ -111,19 +112,14 @@ grid2d_render::grid2d_render()
 	m_vscr_ebo.set_data(m_vscreen_indices.data(), m_vscreen_indices.size());
 }
 
-void grid2d_render::operator()(
-	glm::mat4 const& p,
-	glm::mat4 const& v,
-	rect2d const& rect)
+void grid2d_render::operator()()
 {
 
-	glm::vec4 pos{ rect.position, 0.f, 1.f };
-	pos = glm::inverse(v)*pos;
-
-	auto left	= pos.x;
-	auto right	= pos.x + rect.width;
-	auto top	= pos.y + rect.height;
-	auto bottom	= pos.y;
+	auto pv = get_app()->get_projected_viewport();
+	auto left	= pv.position.x;
+	auto right	= pv.position.x + pv.width;
+	auto top	= pv.position.y + pv.height;
+	auto bottom	= pv.position.y;
 
 	auto vscreen = std::array{
 		right, bottom, .0f,
@@ -149,10 +145,10 @@ void grid2d_render::operator()(
 	GL(glEnableVertexAttribArray(0));
 
 	// set uniforms
-	m_program.set_uniform("u_projection", p);
-	m_program.set_uniform("u_view", v);
+	m_program.set_uniform("u_projection", get_app()->projection_matrix());
+	m_program.set_uniform("u_view", get_app()->view_matrix());
 	m_program.set_uniform("u_color", m_grid_color);
-	m_program.set_uniform("u_proj_size", glm::vec2{ rect.width, rect.height });
+	m_program.set_uniform("u_proj_size", glm::vec2{ pv.width, pv.height });
 	m_program.set_uniform("u_resolution", m_resolution);
 
 	// draw
