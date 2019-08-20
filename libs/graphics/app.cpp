@@ -22,6 +22,16 @@ static void error_callback(int code, const char *description)
 	throw std::runtime_error(ss.str());
 }
 
+static void drop_callback(
+	GLFWwindow* window,
+	int count,
+	char const** paths)
+{
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	path_container p(paths, paths + count);
+	a->on_drop_path(p);
+}
+
 static void key_callback(
 	GLFWwindow* window,
 	int key,
@@ -123,6 +133,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	glfwSetWindowUserPointer(window().get(), this);
 	glfwSetKeyCallback(window().get(), key_callback);
 	glfwSetScrollCallback(window().get(), scroll_callback);
+	glfwSetDropCallback(window().get(), drop_callback);
 
 	glfwMakeContextCurrent(window().get());
 
@@ -312,6 +323,9 @@ bool app::is_key_pressed(int32_t key) const
 {
 	return glfwGetKey(window().get(), key);
 }
+
+void app::on_drop_path(path_container const&)
+{}
 
 void app::on_key_input(key_input const&)
 {}
