@@ -25,6 +25,7 @@ public:
 	virtual ~component() = default;
 
 	app* get_app();
+	app const* get_app() const;
 
 	virtual void update();
 	virtual void draw();

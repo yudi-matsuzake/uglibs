@@ -61,6 +61,7 @@ public:
 	double get_delta() const;
 	void swap_buffers() const;
 	bool is_key_pressed(int32_t key) const;
+	bool is_mouse_button_pressed(int32_t mouse_button) const;
 
 	rect2d const& get_viewport() const;
 	void set_viewport(rect2d const& r);
