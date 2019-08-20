@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <vector>
 #include <iostream>
 #include <memory>
@@ -18,6 +19,8 @@ namespace graphics{
 
 using window_type = GLFWwindow;
 using window_ptr = std::shared_ptr<window_type>;
+
+using path_container = std::vector<std::filesystem::path>;
 
 class app {
 public:
@@ -65,6 +68,7 @@ public:
 	rect2d const& get_near_plane() const;
 	void set_near_plane(rect2d const& r);
 
+	virtual void on_drop_path(path_container const& path);
 	virtual void on_key_input(key_input const& input);
 	virtual void on_scroll_input(scroll_input const& input);
 
