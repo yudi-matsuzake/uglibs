@@ -321,7 +321,12 @@ void app::set_near_plane(rect2d const& r)
 
 bool app::is_key_pressed(int32_t key) const
 {
-	return glfwGetKey(window().get(), key);
+	return glfwGetKey(window().get(), key) == GLFW_PRESS;
+}
+
+bool app::is_mouse_button_pressed(int32_t mouse_button) const
+{
+	return glfwGetMouseButton(window().get(), mouse_button) == GLFW_PRESS;
 }
 
 void app::on_drop_path(path_container const&)

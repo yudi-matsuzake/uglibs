@@ -12,6 +12,11 @@ app* component::get_app()
 	return m_app;
 }
 
+app const* component::get_app() const
+{
+	return m_app;
+}
+
 void component::update()
 {}
 
