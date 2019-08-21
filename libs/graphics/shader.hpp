@@ -15,7 +15,7 @@ public:
 
 	virtual ~shader();
 
-	unsigned int id() const;
+	uint32_t id() const;
 
 	template<class I>
 	void set_source(I begin_it, I end_it)
@@ -33,7 +33,7 @@ public:
 
 protected:
 
-	unsigned int m_id;
+	uint32_t m_id;
 	shader_source m_source;
 };
 
