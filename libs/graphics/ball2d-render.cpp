@@ -132,7 +132,7 @@ void ball2d_render::operator()(ball2d const& b)
 		3,
 		GL_FLOAT,
 		GL_FALSE,
-		vscreen.size(),
+		0,
 		0
 	));
 	GL(glEnableVertexAttribArray(0));

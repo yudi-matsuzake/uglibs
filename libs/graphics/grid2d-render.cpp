@@ -139,7 +139,7 @@ void grid2d_render::operator()()
 		3,
 		GL_FLOAT,
 		GL_FALSE,
-		vscreen.size(),
+		0,
 		0
 	));
 	GL(glEnableVertexAttribArray(0));

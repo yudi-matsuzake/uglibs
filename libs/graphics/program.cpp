@@ -57,7 +57,7 @@ void program::link() const
 	check_program_linkage(m_id);
 }
 
-unsigned int program::id() const
+uint32_t program::id() const
 {
 	return m_id;
 }

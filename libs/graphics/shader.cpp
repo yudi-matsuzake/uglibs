@@ -32,9 +32,9 @@ static void check_shader_compilation(uint32_t id)
 	}
 }
 
-static unsigned int create_shader(unsigned int shader_type)
+static uint32_t create_shader(uint32_t shader_type)
 {
-	unsigned int id;
+	uint32_t id;
 	GL(id = glCreateShader(shader_type));
 	return id;
 }
@@ -44,7 +44,7 @@ static unsigned int create_shader(unsigned int shader_type)
  * ========================
  */
 
-shader::shader(unsigned int shader_type)
+shader::shader(uint32_t shader_type)
 	: m_id(create_shader(shader_type))
 {}
 
@@ -61,7 +61,7 @@ shader::~shader()
 	GL(glDeleteShader(m_id));
 }
 
-unsigned int shader::id() const
+uint32_t shader::id() const
 {
 	return m_id;
 }
