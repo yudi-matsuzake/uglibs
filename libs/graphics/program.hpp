@@ -29,6 +29,8 @@ public:
 	void set_uniform(char const* name, glm::vec4 const& v) const;
 	void set_uniform(char const* name, bool b) const;
 
+	void set_uniform(char const* name, int32_t n) const;
+
 protected:
 	uint32_t m_id;
 
