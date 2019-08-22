@@ -1,5 +1,4 @@
 #include "graphics/texture2d.hpp"
-#include "graphics/misc.hpp"
 
 namespace graphics{
 
@@ -10,38 +9,29 @@ static uint32_t generate_texture2d()
 	return texture_id;
 }
 
-texture2d::texture2d(int32_t width, int32_t height, void* data)
+texture2d::texture2d()
 	: m_id(generate_texture2d())
+{}
+
+texture2d::texture2d(
+	uint8_t* data,
+	int32_t width,
+	int32_t height,
+	wrap_type s_wrap,
+	wrap_type t_wrap,
+	filter_type min_filter,
+	filter_type mag_filter)
+
+	: texture2d()
 {
-	bind();
+	set_texture_wrap_s(s_wrap);
+	set_texture_wrap_t(t_wrap);
 
-	GL(glTexParameteri(
-		GL_TEXTURE_2D,
-		GL_TEXTURE_WRAP_S,
-		GL_CLAMP_TO_BORDER
-	));
+	set_texture_minifier_filter(min_filter);
+	set_texture_magnifier_filter(mag_filter);
 
-	GL(glTexParameteri(
-		GL_TEXTURE_2D,
-		GL_TEXTURE_WRAP_T,
-		GL_CLAMP_TO_BORDER
-	));
-
-	GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-
-	GL(glTexImage2D(
-		GL_TEXTURE_2D,
-		0,
-		GL_RGB,
-		width, height,
-		0,
-		GL_RGB,
-		GL_UNSIGNED_BYTE,
-		data
-	));
-
-	GL(glGenerateMipmap(GL_TEXTURE_2D));
+	set_data(data, width, height);
+	generate_mipmap();
 }
 
 texture2d::~texture2d()
@@ -54,9 +44,71 @@ uint32_t texture2d::id() const
 	return m_id;
 }
 
-void texture2d::bind() const
+void texture2d::bind(uint32_t texture_unit) const
 {
+	GL(glActiveTexture(GL_TEXTURE0 + texture_unit));
 	GL(glBindTexture(GL_TEXTURE_2D, id()));
+}
+
+void texture2d::set_texture_wrap_s(wrap_type wrap)
+{
+	bind();
+	GL(glTexParameteri(
+		GL_TEXTURE_2D,
+		GL_TEXTURE_WRAP_S,
+		static_cast<int>(wrap)
+	));
+}
+
+void texture2d::set_texture_wrap_t(wrap_type wrap)
+{
+	bind();
+	GL(glTexParameteri(
+		GL_TEXTURE_2D,
+		GL_TEXTURE_WRAP_T,
+		static_cast<int>(wrap)
+	));
+}
+
+void texture2d::set_texture_magnifier_filter(filter_type filter)
+{
+	bind();
+	GL(glTexParameteri(
+		GL_TEXTURE_2D,
+		GL_TEXTURE_MAG_FILTER,
+		static_cast<int>(filter)
+	));
+}
+
+void texture2d::set_texture_minifier_filter(filter_type filter)
+{
+	bind();
+	GL(glTexParameteri(
+		GL_TEXTURE_2D,
+		GL_TEXTURE_MIN_FILTER,
+		static_cast<int>(filter)
+	));
+}
+
+void texture2d::generate_mipmap()
+{
+	bind();
+	GL(glGenerateMipmap(GL_TEXTURE_2D));
+}
+
+void texture2d::set_data(uint8_t* data, int32_t width, int32_t height)
+{
+	bind();
+	GL(glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGB,
+		width, height,
+		0,
+		GL_RGB,
+		GL_UNSIGNED_BYTE,
+		data
+	));
 }
 
 } // end of namespace graphics
