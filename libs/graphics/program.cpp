@@ -129,5 +129,13 @@ void program::set_uniform(char const* name, bool b) const
 	GL(glUniform1i(id, b));
 }
 
+void program::set_uniform(char const* name, int32_t n) const
+{
+	int32_t id;
+	GL(id = glGetUniformLocation(m_id, name));
+	GL(glUniform1i(id, n));
+}
+
+
 
 } // end of namespace graphics

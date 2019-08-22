@@ -44,9 +44,8 @@ uint32_t texture2d::id() const
 	return m_id;
 }
 
-void texture2d::bind(uint32_t texture_unit) const
+void texture2d::bind() const
 {
-	GL(glActiveTexture(GL_TEXTURE0 + texture_unit));
 	GL(glBindTexture(GL_TEXTURE_2D, id()));
 }
 
@@ -109,6 +108,12 @@ void texture2d::set_data(uint8_t* data, int32_t width, int32_t height)
 		GL_UNSIGNED_BYTE,
 		data
 	));
+}
+
+void texture2d::activate(uint32_t texture_unit) const
+{
+	GL(glActiveTexture(GL_TEXTURE0 + texture_unit));
+	bind();
 }
 
 } // end of namespace graphics
