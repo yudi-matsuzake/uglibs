@@ -240,6 +240,12 @@ void app::set_clear_color(
 	GL(glClearColor(r, g, b, a));
 }
 
+void app::set_clear_color(graphics::color const& clear) const
+{
+	set_clear_color(clear.r, clear.g, clear.b, clear.a);
+}
+
+
 glm::mat4 const& app::projection_matrix() const
 {
 	return m_projection_matrix;

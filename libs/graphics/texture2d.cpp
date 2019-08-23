@@ -14,7 +14,7 @@ texture2d::texture2d()
 {}
 
 texture2d::texture2d(
-	uint8_t* data,
+	unsigned char const* data,
 	int32_t width,
 	int32_t height,
 	wrap_type s_wrap,
@@ -89,13 +89,23 @@ void texture2d::set_texture_minifier_filter(filter_type filter)
 	));
 }
 
+void texture2d::set_border_color(color const& border_color) const
+{
+	bind();
+	GL(glTexParameterfv(
+		GL_TEXTURE_2D,
+		GL_TEXTURE_BORDER_COLOR,
+		glm::value_ptr(border_color)
+	));
+}
+
 void texture2d::generate_mipmap()
 {
 	bind();
 	GL(glGenerateMipmap(GL_TEXTURE_2D));
 }
 
-void texture2d::set_data(uint8_t* data, int32_t width, int32_t height)
+void texture2d::set_data(unsigned char const* data, int32_t width, int32_t height)
 {
 	bind();
 	GL(glTexImage2D(
@@ -104,7 +114,7 @@ void texture2d::set_data(uint8_t* data, int32_t width, int32_t height)
 		GL_RGB,
 		width, height,
 		0,
-		GL_RGB,
+		GL_RGBA,
 		GL_UNSIGNED_BYTE,
 		data
 	));
