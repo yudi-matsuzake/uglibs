@@ -24,7 +24,7 @@ public:
 
 	texture2d();
 	texture2d(
-		uint8_t* data,
+		unsigned char const* data,
 		int32_t width,
 		int32_t height,
 		wrap_type s_wrap = wrap_type::REPEAT,
@@ -44,9 +44,11 @@ public:
 	void set_texture_magnifier_filter(filter_type filter);
 	void set_texture_minifier_filter(filter_type filter);
 
+	void set_border_color(color const& border_color) const;
+
 	void generate_mipmap();
 
-	void set_data(uint8_t* data, int32_t width, int32_t height);
+	void set_data(unsigned char const* data, int32_t width, int32_t height);
 
 	void activate(uint32_t texture_unit) const;
 

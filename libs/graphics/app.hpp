@@ -41,12 +41,14 @@ public:
 
 	void clear() const;
 
+	void set_clear_color(graphics::color const& clear) const;
 	void set_clear_color(
 		float r,
 		float g,
 		float b,
 		float a
 	) const;
+
 
 	glm::mat4 const& projection_matrix() const;
 	void set_projection_matrix(glm::mat4 const& m);
