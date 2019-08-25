@@ -62,7 +62,7 @@ void main()
 
 		float b = abs(dist - u_radius);
 		b = smoothstep(0.0, thick, b);
-		fragment_color = fragment_color*b + (1.0-b)*u_boundary_color;
+		fragment_color = mix(u_boundary_color, fragment_color, b);
 	}
 }
 )__";
