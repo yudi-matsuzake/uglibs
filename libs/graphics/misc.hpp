@@ -23,6 +23,7 @@ struct rect2d{
 	friend void operator-=(rect2d& r, glm::vec2 const& v);
 
 	glm::vec2 center() const;
+	glm::vec2 size() const;
 };
 
 } // end of namespace graphics
