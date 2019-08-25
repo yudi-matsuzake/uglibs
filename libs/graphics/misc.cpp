@@ -34,4 +34,9 @@ glm::vec2 rect2d::center() const
 	};
 }
 
+glm::vec2 rect2d::size() const
+{
+	return { width, height };
+}
+
 } // end of namespace graphics
