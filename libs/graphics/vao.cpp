@@ -25,4 +25,40 @@ void vao::bind() const
 	GL(glBindVertexArray(m_id));
 }
 
+void vao::set_attribute_layout(const vao::attribute_layout& attributes) const
+{
+	bind();
+	for(auto&& atribute : attributes){
+		GL(glVertexAttribPointer(
+			atribute.index,
+			static_cast<int32_t>(atribute.n_member),
+			atribute.type,
+			atribute.normalized?GL_TRUE:GL_FALSE,
+			static_cast<int32_t>(attributes.stride()),
+			reinterpret_cast<void*>(atribute.offset)
+		));
+		GL(glEnableVertexAttribArray(atribute.index));
+	}
+}
+
+vao::attr<float>::attr(uint32_t a_n_member, bool a_normalized)
+	: vao::attribute(
+		0,
+		sizeof(float),
+		a_n_member,
+		GL_FLOAT,
+		0,
+		a_normalized)
+{}
+
+vao::attr<double>::attr(std::uint32_t a_n_member, bool a_normalized)
+	: vao::attribute(
+		0,
+		sizeof(double),
+		a_n_member,
+		GL_DOUBLE,
+		0,
+		a_normalized)
+{}
+
 } // end of namespace graphics

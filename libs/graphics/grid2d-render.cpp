@@ -134,15 +134,7 @@ void grid2d_render::operator()()
 	m_vscr_ebo.bind();
 	m_vscr_vbo.set_data(vscreen.data(), vscreen.size());
 
-	GL(glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		0
-	));
-	GL(glEnableVertexAttribArray(0));
+	m_vscr_vao.set_attribute_layout({ graphics::vao::attr<float>(3) });
 
 	auto [ w, h ] = get_app()->get_framebuffer_size();
 
