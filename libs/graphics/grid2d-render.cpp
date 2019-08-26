@@ -118,8 +118,8 @@ void grid2d_render::operator()()
 	auto pv = get_app()->get_projected_viewport();
 	auto left	= pv.position.x;
 	auto right	= pv.position.x + pv.width;
-	auto top	= pv.position.y + pv.height;
-	auto bottom	= pv.position.y;
+	auto top	= pv.position.y;
+	auto bottom	= pv.position.y - pv.height;
 
 	auto vscreen = std::array{
 		right, bottom, .0f,

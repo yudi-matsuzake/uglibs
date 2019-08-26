@@ -451,7 +451,7 @@ void app::update_projected_viewport()
 	m_projected_viewport = rect2d{
 		{ ul.x, ul.y },
 		dr.x - ul.x,
-		dr.y - ul.y
+		ul.y - dr.y 
 	};
 }
 
