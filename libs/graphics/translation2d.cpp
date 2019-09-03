@@ -65,7 +65,7 @@ glm::vec3 translation2d::build_translation_vector() const
 
 	auto mv = get_app()->get_cursor_vector();
 
-	if(get_app()->is_mouse_button_pressed(GLFW_MOUSE_BUTTON_RIGHT)){
+	if(get_app()->is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)){
 		auto mov = mv - last_cursor_position;
 		auto const& vp = get_app()->get_viewport();
 		auto const& np = get_app()->get_near_plane();

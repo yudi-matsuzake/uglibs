@@ -38,11 +38,13 @@ static void key_callback(
 	int scancode,
 	int action, int mods)
 {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
-	key_input input{ key, scancode, action, mods };
-	a->on_key_input(input);
-	a->on_key_input_components(input);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	if(!a->ui_want_capture_keyboard()){
+		key_input input{ key, scancode, action, mods };
+		a->on_key_input(input);
+		a->on_key_input_components(input);
+	}
 }
 
 static void scroll_callback(
@@ -52,9 +54,11 @@ static void scroll_callback(
 {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
-	scroll_input input{ xoffset, yoffset };
-	a->on_scroll_input(input);
-	a->on_scroll_input_components(input);
+	if(!a->ui_want_capture_mouse()){
+		scroll_input input{ xoffset, yoffset };
+		a->on_scroll_input(input);
+		a->on_scroll_input_components(input);
+	}
 }
 
 /*
@@ -327,12 +331,17 @@ void app::set_near_plane(rect2d const& r)
 
 bool app::is_key_pressed(int32_t key) const
 {
-	return glfwGetKey(window().get(), key) == GLFW_PRESS;
+	return !ui_want_capture_keyboard() &&
+		glfwGetKey(window().get(), key) == GLFW_PRESS;
 }
 
 bool app::is_mouse_button_pressed(int32_t mouse_button) const
 {
-	return glfwGetMouseButton(window().get(), mouse_button) == GLFW_PRESS;
+	return !ui_want_capture_keyboard()
+		&& glfwGetMouseButton(
+			window().get(),
+			mouse_button
+		) == GLFW_PRESS;
 }
 
 void app::on_drop_path(path_container const&)
@@ -474,6 +483,16 @@ void app::on_scroll_input_components(scroll_input const& input)
 rect2d const& app::get_projected_viewport() const
 {
 	return m_projected_viewport;
+}
+
+bool app::ui_want_capture_mouse() const
+{
+	return ImGui::GetIO().WantCaptureMouse;
+}
+
+bool app::ui_want_capture_keyboard() const
+{
+	return ImGui::GetIO().WantCaptureKeyboard;
 }
 
 }
