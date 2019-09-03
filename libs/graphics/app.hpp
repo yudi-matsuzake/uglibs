@@ -96,6 +96,9 @@ public:
 	void on_scroll_input_components(scroll_input const& input);
 
 	rect2d const& get_projected_viewport() const;
+
+	bool ui_want_capture_mouse() const;
+	bool ui_want_capture_keyboard() const;
 protected:
 
 	void set_viewport();
