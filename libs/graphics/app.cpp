@@ -495,4 +495,37 @@ bool app::ui_want_capture_keyboard() const
 	return ImGui::GetIO().WantCaptureKeyboard;
 }
 
+cv::Mat app::get_current_frame_image() const
+{
+	auto& vp = get_viewport();
+
+	auto w = static_cast<int>(vp.width);
+	auto h = static_cast<int>(vp.height);
+
+	static cv::Mat img;
+	img.create(h, w, CV_8UC3);
+
+	//use fast 4-byte alignment (default anyway) if possible
+	GL(glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4));
+
+	//set length of one complete row in destination data (doesn't need to equal img.cols)
+	GL(glPixelStorei(
+		GL_PACK_ROW_LENGTH,
+		static_cast<int32_t>(img.step/img.elemSize())
+	));
+
+	GL(glReadPixels(
+		0, 0,
+		img.cols, img.rows,
+		GL_BGR,
+		GL_UNSIGNED_BYTE,
+		img.data
+	));
+
+	cv::Mat flipped(img.size(), img.type());
+	cv::flip(img, flipped, 0);
+	return flipped;
+}
+
+
 }
