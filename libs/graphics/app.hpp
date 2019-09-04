@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <tuple>
 
+#include <opencv2/core/core.hpp>
+
 #include "graphics/misc.hpp"
 #include "graphics/component-manager.hpp"
 
@@ -99,6 +101,9 @@ public:
 
 	bool ui_want_capture_mouse() const;
 	bool ui_want_capture_keyboard() const;
+
+	cv::Mat get_current_frame_image() const;
+
 protected:
 
 	void set_viewport();
