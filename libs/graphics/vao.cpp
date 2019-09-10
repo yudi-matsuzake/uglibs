@@ -25,6 +25,11 @@ void vao::bind() const
 	GL(glBindVertexArray(m_id));
 }
 
+uint32_t vao::id() const
+{
+	return m_id;
+}
+
 void vao::set_attribute_layout(const vao::attribute_layout& attributes) const
 {
 	bind();
