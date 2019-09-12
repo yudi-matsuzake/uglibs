@@ -1,6 +1,6 @@
 #include "ug/graphics/component.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 
 component::component(app* app_ptr)

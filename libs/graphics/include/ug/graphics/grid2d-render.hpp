@@ -10,7 +10,7 @@
 #include "ug/graphics/buffers.hpp"
 #include "ug/graphics/render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class grid2d_render : public render{
 public:

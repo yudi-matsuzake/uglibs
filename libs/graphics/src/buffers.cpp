@@ -1,6 +1,6 @@
 #include "ug/graphics/buffers.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 static uint32_t gen_buffer()
 {

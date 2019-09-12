@@ -6,7 +6,7 @@
 
 #include "ug/graphics/opengl-error.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * structs and aliases

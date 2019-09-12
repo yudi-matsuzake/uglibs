@@ -2,7 +2,7 @@
 
 #include "component.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class ortographic_zoom : public component{
 public:

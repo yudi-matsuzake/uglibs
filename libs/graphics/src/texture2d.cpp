@@ -1,6 +1,6 @@
 #include "ug/graphics/texture2d.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 static uint32_t generate_texture2d()
 {

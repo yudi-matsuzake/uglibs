@@ -18,7 +18,7 @@
 #include "imgui_impl_opengl3.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-namespace graphics{
+namespace ug::graphics{
 
 using window_type = GLFWwindow;
 using window_ptr = std::shared_ptr<window_type>;

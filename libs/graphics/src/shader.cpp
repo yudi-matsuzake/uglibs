@@ -1,6 +1,6 @@
 #include "ug/graphics/shader.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * check compilation and throw an exception in case

@@ -2,7 +2,7 @@
 
 #include "ug/graphics/shader.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class program{
 public:

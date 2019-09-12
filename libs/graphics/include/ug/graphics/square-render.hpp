@@ -9,7 +9,7 @@
 #include "ug/graphics/vao.hpp"
 #include "ug/graphics/buffers.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 struct square {
 	glm::vec2 c{ 0.f, 0.f };

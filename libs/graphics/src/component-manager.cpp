@@ -1,6 +1,6 @@
 #include "ug/graphics/component-manager.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 void component_manager::add_component(
 	std::shared_ptr<component> ptr,

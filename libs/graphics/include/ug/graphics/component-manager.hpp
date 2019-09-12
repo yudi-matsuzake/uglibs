@@ -6,7 +6,7 @@
 
 #include "ug/graphics/component.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 using component_ptr = std::weak_ptr<component>;
 using component_container = std::map<uint64_t, component_ptr>;

@@ -10,7 +10,7 @@
 #include "ug/graphics/buffers.hpp"
 #include "ug/graphics/render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 struct ball2d {
 	glm::vec2 c{ 0.f, 0.f };

@@ -2,7 +2,7 @@
 
 #include "ug/graphics/square-render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * constants

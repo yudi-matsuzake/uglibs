@@ -2,7 +2,7 @@
 
 #include "ug/graphics/ball2d-render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * constants

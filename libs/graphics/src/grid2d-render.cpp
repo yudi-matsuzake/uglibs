@@ -2,7 +2,7 @@
 
 #include "ug/graphics/grid2d-render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * constants

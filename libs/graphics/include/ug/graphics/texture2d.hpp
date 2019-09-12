@@ -4,7 +4,7 @@
 
 #include "ug/graphics/misc.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 enum class wrap_type : int32_t {
 	CLAMP_TO_EDGE		= GL_CLAMP_TO_EDGE,

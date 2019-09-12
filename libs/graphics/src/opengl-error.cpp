@@ -1,6 +1,6 @@
 #include "ug/graphics/opengl-error.hpp"
 
-namespace graphics {
+namespace ug::graphics{
 
 void glerror_msg(
 	int pre,

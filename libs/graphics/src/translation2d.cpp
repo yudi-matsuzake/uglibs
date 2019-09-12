@@ -1,7 +1,7 @@
 #include "ug/graphics/app.hpp"
 #include "ug/graphics/translation2d.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 translation2d::translation2d(app* app_ptr)
 	: component(app_ptr)

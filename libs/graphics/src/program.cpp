@@ -3,7 +3,7 @@
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/program.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 /*
  * check linkage status and throw an exception in case

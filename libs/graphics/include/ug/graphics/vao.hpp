@@ -4,7 +4,7 @@
 #include <vector>
 #include <initializer_list>
 
-namespace graphics{
+namespace ug::graphics{
 
 class vao{
 protected:

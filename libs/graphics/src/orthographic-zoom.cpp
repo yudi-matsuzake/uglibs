@@ -2,7 +2,7 @@
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/orthographic-zoom.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 ortographic_zoom::ortographic_zoom(app* app_ptr)
 	: component(app_ptr)

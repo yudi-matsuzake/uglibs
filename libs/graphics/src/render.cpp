@@ -1,6 +1,6 @@
 #include "ug/graphics/render.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 render::render(app* app_ptr)
 	: m_app(app_ptr)

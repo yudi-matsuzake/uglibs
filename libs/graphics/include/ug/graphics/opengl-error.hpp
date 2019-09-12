@@ -10,7 +10,7 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
-namespace graphics {
+namespace ug::graphics{
 
 void glerror_msg(
 	int pre,

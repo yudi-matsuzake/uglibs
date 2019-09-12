@@ -5,7 +5,7 @@
 
 #include "ug/graphics/misc.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 using shader_source = std::vector<char>;
 

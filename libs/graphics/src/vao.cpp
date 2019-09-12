@@ -2,7 +2,7 @@
 
 #include "ug/graphics/misc.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 static uint32_t gen_vao()
 {

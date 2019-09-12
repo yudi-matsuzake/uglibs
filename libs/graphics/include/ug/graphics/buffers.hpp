@@ -4,7 +4,7 @@
 
 #include "ug/graphics/misc.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class buffer {
 public:

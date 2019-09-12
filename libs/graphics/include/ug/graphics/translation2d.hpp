@@ -4,7 +4,7 @@
 
 #include "component.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class translation2d : public component{
 public:

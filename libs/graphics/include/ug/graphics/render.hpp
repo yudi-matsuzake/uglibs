@@ -2,7 +2,7 @@
 
 #include "ug/graphics/app.hpp"
 
-namespace graphics{
+namespace ug::graphics{
 
 class render{
 public:
