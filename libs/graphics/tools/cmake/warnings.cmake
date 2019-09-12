@@ -1,9 +1,9 @@
-add_library(project_warnings INTERFACE)
+add_library(ug-graphics-warnings INTERFACE)
 
 if(MSVC)
-	target_compile_options(project_warnings INTERFACE /W4)
+	target_compile_options(ug-graphics-warnings INTERFACE /W4)
 else()
-	target_compile_options(project_warnings
+	target_compile_options(ug-graphics-warnings
 		INTERFACE
 		-Wall
 		-Wextra
@@ -54,6 +54,5 @@ else()
 		# warn on security issues around functions that format output
 		# (ie printf)
 		-Wformat=2
-					
 	)
 endif()

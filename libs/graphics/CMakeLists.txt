@@ -72,7 +72,7 @@ add_library(
 )
 target_link_libraries(
 	graphics
-	PUBLIC project_warnings glfw OpenGL::GL imgui glad ${OpenCV_LIBS}
+	PUBLIC ug-graphics-warnings glfw OpenGL::GL imgui glad ${OpenCV_LIBS}
 )
 target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
@@ -107,7 +107,7 @@ install(DIRECTORY ${IMGUI_DIR} DESTINATION include/ug)
 install(DIRECTORY ${GLAD_DIR} DESTINATION include/ug)
 
 # installation of libraries
-install(TARGETS imgui glad graphics project_warnings EXPORT ugConfig
+install(TARGETS imgui glad graphics ug-graphics-warnings EXPORT ugConfig
 	CONFIGURATIONS Release
 	ARCHIVE  DESTINATION lib/ug
 	LIBRARY  DESTINATION lib/ug
@@ -115,4 +115,4 @@ install(TARGETS imgui glad graphics project_warnings EXPORT ugConfig
 )
 
 install(EXPORT ugConfig NAMESPACE ug:: DESTINATION share/ug/cmake)
-export(TARGETS glad imgui graphics project_warnings FILE ugConfig.cmake)
+export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
