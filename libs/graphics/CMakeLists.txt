@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(ug_graphics
+project(graphics
 	VERSION 0.0.0
 	DESCRIPTION "ug-graphics is a graphics library comprised of window, input, and graphics abstraction/facilities"
 	LANGUAGES C CXX
@@ -32,9 +32,9 @@ find_package(glfw3 3.3 REQUIRED)
 
 # ug graphics library
 add_library(
-	ug_graphics STATIC
+	graphics STATIC
 
-	# ug_graphics
+	# graphics
 	./src/opengl-error.cpp
 	./src/component.cpp
 	./src/misc.cpp
@@ -71,21 +71,19 @@ add_library(
 
 )
 target_link_libraries(
-	ug_graphics
-	PUBLIC project_warnings glfw OpenGL::GL ug_imgui ug_glad ${OpenCV_LIBS}
+	graphics
+	PUBLIC project_warnings glfw OpenGL::GL imgui glad ${OpenCV_LIBS}
 )
-
+target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
-	ug_graphics
+	graphics
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
-
-		$<BUILD_INTERFACE:${OpenCV_INCLUDE_DIRS}>
-
+		${OpenCV_INCLUDE_DIRS}
 )
 target_include_directories(
-	ug_graphics
+	graphics
 	SYSTEM PUBLIC
 		$<BUILD_INTERFACE:${IMGUI_DIR}>
 		$<INSTALL_INTERFACE:include>
@@ -95,7 +93,7 @@ target_include_directories(
 
 		# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/glm>
 )
-target_compile_features(ug_graphics PUBLIC cxx_std_17)
+target_compile_features(graphics PUBLIC cxx_std_17)
 
 # include(CTest)
 # include(Catch)
@@ -104,17 +102,17 @@ target_compile_features(ug_graphics PUBLIC cxx_std_17)
 # installing ------------------------------------------------------------------
 
 # installing headers
-install(DIRECTORY ./include DESTINATION include)
-install(DIRECTORY ${IMGUI_DIR} DESTINATION include/ug/imgui)
-install(DIRECTORY ${GLAD_DIR}/include DESTINATION include/ug)
+install(DIRECTORY ./include/ug DESTINATION include)
+install(DIRECTORY ${IMGUI_DIR} DESTINATION include/ug)
+install(DIRECTORY ${GLAD_DIR} DESTINATION include/ug)
 
-# util
-install(TARGETS ug_imgui ug_glad ug_graphics project_warnings EXPORT ugGraphics
+# installation of libraries
+install(TARGETS imgui glad graphics project_warnings EXPORT ugConfig
 	CONFIGURATIONS Release
-	ARCHIVE  DESTINATION lib
-	LIBRARY  DESTINATION lib
-	RUNTIME  DESTINATION bin
+	ARCHIVE  DESTINATION lib/ug
+	LIBRARY  DESTINATION lib/ug
+	RUNTIME  DESTINATION bin/ug
 )
 
-install(EXPORT ugGraphics NAMESPACE ug:: DESTINATION share/ug/cmake)
-export(TARGETS ug_glad ug_imgui ug_graphics project_warnings FILE ugGraphics.cmake)
+install(EXPORT ugConfig NAMESPACE ug:: DESTINATION share/ug/cmake)
+export(TARGETS glad imgui graphics project_warnings FILE ugConfig.cmake)
