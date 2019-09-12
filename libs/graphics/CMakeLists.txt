@@ -108,7 +108,6 @@ install(DIRECTORY ${GLAD_DIR} DESTINATION include/ug)
 
 # installation of libraries
 install(TARGETS imgui glad graphics ug-graphics-warnings EXPORT ugConfig
-	CONFIGURATIONS Release
 	ARCHIVE  DESTINATION lib/ug
 	LIBRARY  DESTINATION lib/ug
 	RUNTIME  DESTINATION bin/ug
