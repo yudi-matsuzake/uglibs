@@ -50,8 +50,8 @@ const char* glerror_get_error_description(GLenum error);
 			file,					\
 			line,					\
 			pretty_function,			\
-			graphics::glerror_get_error_macro(error),	\
-			graphics::glerror_get_error_description(error)\
+			ug::graphics::glerror_get_error_macro(error),	\
+			ug::graphics::glerror_get_error_description(error)\
 		);						\
 	}
 
@@ -63,7 +63,7 @@ const char* glerror_get_error_description(GLenum error);
 			file,					\
 			line,					\
 			pretty_function,			\
-			graphics::glerror_pre_callback		\
+			ug::graphics::glerror_pre_callback	\
 		);						\
 		x;						\
 		GL_TEST(					\
@@ -71,7 +71,7 @@ const char* glerror_get_error_description(GLenum error);
 			file,					\
 			line,					\
 			pretty_function,			\
-			graphics::glerror_post_callback		\
+			ug::graphics::glerror_post_callback	\
 		);						\
 	}while(0)
 
