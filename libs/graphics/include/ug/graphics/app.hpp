@@ -10,8 +10,8 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "graphics/misc.hpp"
-#include "graphics/component-manager.hpp"
+#include "ug/graphics/misc.hpp"
+#include "ug/graphics/component-manager.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

@@ -1,4 +1,4 @@
-#include "graphics/component.hpp"
+#include "ug/graphics/component.hpp"
 
 namespace graphics{
 

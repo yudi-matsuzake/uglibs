@@ -1,6 +1,6 @@
-#include "graphics/app.hpp"
-#include "graphics/misc.hpp"
-#include "graphics/orthographic-zoom.hpp"
+#include "ug/graphics/app.hpp"
+#include "ug/graphics/misc.hpp"
+#include "ug/graphics/orthographic-zoom.hpp"
 
 namespace graphics{
 

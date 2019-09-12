@@ -1,6 +1,6 @@
 #include <iterator>
 
-#include "graphics/square-render.hpp"
+#include "ug/graphics/square-render.hpp"
 
 namespace graphics{
 

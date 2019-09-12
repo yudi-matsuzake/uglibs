@@ -1,6 +1,6 @@
 #include <array>
 
-#include "graphics/misc.hpp"
+#include "ug/graphics/misc.hpp"
 
 #include "component.hpp"
 

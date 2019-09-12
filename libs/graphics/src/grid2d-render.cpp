@@ -1,6 +1,6 @@
 #include <iterator>
 
-#include "graphics/grid2d-render.hpp"
+#include "ug/graphics/grid2d-render.hpp"
 
 namespace graphics{
 

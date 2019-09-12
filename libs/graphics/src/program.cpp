@@ -1,7 +1,7 @@
 #include <vector>
 
-#include "graphics/misc.hpp"
-#include "graphics/program.hpp"
+#include "ug/graphics/misc.hpp"
+#include "ug/graphics/program.hpp"
 
 namespace graphics{
 

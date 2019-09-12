@@ -1,5 +1,5 @@
-#include "graphics/app.hpp"
-#include "graphics/translation2d.hpp"
+#include "ug/graphics/app.hpp"
+#include "ug/graphics/translation2d.hpp"
 
 namespace graphics{
 

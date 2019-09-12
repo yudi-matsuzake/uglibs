@@ -3,11 +3,11 @@
 #include <array>
 #include <string_view>
 
-#include "graphics/misc.hpp"
-#include "graphics/shader.hpp"
-#include "graphics/program.hpp"
-#include "graphics/vao.hpp"
-#include "graphics/buffers.hpp"
+#include "ug/graphics/misc.hpp"
+#include "ug/graphics/shader.hpp"
+#include "ug/graphics/program.hpp"
+#include "ug/graphics/vao.hpp"
+#include "ug/graphics/buffers.hpp"
 
 namespace graphics{
 

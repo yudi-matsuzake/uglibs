@@ -1,6 +1,6 @@
-#include "graphics/vao.hpp"
+#include "ug/graphics/vao.hpp"
 
-#include "graphics/misc.hpp"
+#include "ug/graphics/misc.hpp"
 
 namespace graphics{
 

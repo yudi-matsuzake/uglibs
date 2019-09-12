@@ -1,4 +1,4 @@
-#include "graphics/component-manager.hpp"
+#include "ug/graphics/component-manager.hpp"
 
 namespace graphics{
 

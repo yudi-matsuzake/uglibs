@@ -1,4 +1,4 @@
-#include "graphics/opengl-error.hpp"
+#include "ug/graphics/opengl-error.hpp"
 
 namespace graphics {
 
