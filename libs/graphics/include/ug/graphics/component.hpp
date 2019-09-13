@@ -24,7 +24,7 @@ public:
 
 	virtual void on_key_input(key_input const&);
 	virtual void on_scroll_input(scroll_input const&);
-	virtual void on_drop_path(path_container const&);
+	virtual void on_drop_path(path_input const&);
 
 protected:
 	app* m_app = nullptr;

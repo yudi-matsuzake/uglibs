@@ -48,7 +48,7 @@ public:
 	virtual bool is_key_pressed(int32_t key) const;
 	virtual bool is_mouse_button_pressed(int32_t mouse_button) const;
 
-	virtual void on_drop_path(path_container const& path);
+	virtual void on_drop_path(path_input const& path);
 	virtual void on_key_input(key_input const& input);
 	virtual void on_scroll_input(scroll_input const& input);
 

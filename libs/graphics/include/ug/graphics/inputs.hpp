@@ -5,7 +5,7 @@
 
 namespace ug::graphics{
 
-using path_container = std::vector<std::filesystem::path>;
+using path_input = std::vector<std::filesystem::path>;
 
 struct key_input{
 	int key;

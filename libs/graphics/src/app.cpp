@@ -162,7 +162,7 @@ bool app::is_mouse_button_pressed(int32_t mouse_button) const
 		&& window::is_mouse_button_pressed(mouse_button);
 }
 
-void app::on_drop_path(path_container const& input)
+void app::on_drop_path(path_input const& input)
 {
 	for(auto&& [ id, ptr ] : m_component_manager){
 		if(auto c = ptr.lock())

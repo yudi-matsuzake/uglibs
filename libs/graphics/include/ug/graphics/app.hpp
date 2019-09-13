@@ -53,7 +53,7 @@ public:
 
 	double get_delta() const;
 
-	virtual void on_drop_path(path_container const& path) override;
+	virtual void on_drop_path(path_input const& path) override;
 	virtual void on_key_input(key_input const& input) override;
 	virtual void on_scroll_input(scroll_input const& input) override;
 

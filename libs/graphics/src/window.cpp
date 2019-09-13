@@ -28,7 +28,7 @@ static void drop_callback(
 	char const** paths)
 {
 	window* a = static_cast<window*>(glfwGetWindowUserPointer(w));
-	path_container p(paths, paths + count);
+	path_input p(paths, paths + count);
 	a->on_drop_path(p);
 }
 
@@ -200,7 +200,7 @@ bool window::is_mouse_button_pressed(int32_t mouse_button) const
 	return glfwGetMouseButton(ptr(), mouse_button) == GLFW_PRESS;
 }
 
-void window::on_drop_path(path_container const&)
+void window::on_drop_path(path_input const&)
 {}
 
 void window::on_key_input(key_input const&)
