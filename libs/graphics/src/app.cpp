@@ -138,6 +138,19 @@ void app::set_near_plane(rect2d const& r)
 	m_near_plane = r;
 }
 
+double app::get_delta() const
+{
+	static bool init = false;
+	static double last_time = get_time();
+
+	if(!init){
+		init = true;
+		return 0.0;
+	}
+
+	return get_time() - last_time;
+}
+
 bool app::is_key_pressed(int32_t key) const
 {
 	return !ui_want_capture_keyboard() &&

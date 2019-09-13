@@ -46,7 +46,6 @@ public:
 	void poll_events() const;
 
 	double get_time() const;
-	double get_delta() const;
 
 	virtual bool is_key_pressed(int32_t key) const;
 	virtual bool is_mouse_button_pressed(int32_t mouse_button) const;
