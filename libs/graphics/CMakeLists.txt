@@ -44,6 +44,7 @@ add_library(
 	./src/grid2d-render.cpp
 	./src/vao.cpp
 	./src/program.cpp
+	./src/window.cpp
 	./src/app.cpp
 	./src/component-manager.cpp
 	./src/buffers.cpp
@@ -62,6 +63,7 @@ add_library(
 	./include/ug/graphics/component.hpp
 	./include/ug/graphics/square-render.hpp
 	./include/ug/graphics/buffers.hpp
+	./include/ug/graphics/window.hpp
 	./include/ug/graphics/app.hpp
 	./include/ug/graphics/ball2d-render.hpp
 	./include/ug/graphics/orthographic-zoom.hpp
@@ -72,7 +74,14 @@ add_library(
 )
 target_link_libraries(
 	graphics
-	PUBLIC ug-graphics-warnings glfw OpenGL::GL imgui glad ${OpenCV_LIBS}
+	PUBLIC
+		ug-graphics-warnings
+		glfw
+		OpenGL::GL
+		imgui
+		glad
+		${OpenCV_LIBS}
+		stdc++fs
 )
 target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
@@ -99,6 +108,14 @@ target_compile_features(graphics PUBLIC cxx_std_17)
 # include(Catch)
 # catch_discover_tests(shrep-tests)
 
+# test programs
+option(GRAPHICS_TEST "Add test programs for graphics library" ON)
+
+if(${GRAPHICS_TEST})
+	add_executable(hello-graphics ./test/hello-graphics.cpp)
+	target_link_libraries(hello-graphics PRIVATE graphics)
+endif()
+
 # installing ------------------------------------------------------------------
 
 # installing headers
@@ -114,4 +131,6 @@ install(TARGETS imgui glad graphics ug-graphics-warnings EXPORT ugConfig
 )
 
 install(EXPORT ugConfig NAMESPACE ug:: DESTINATION share/ug/cmake)
+export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
+# This makes the project importable from the build directory
 export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
