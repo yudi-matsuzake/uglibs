@@ -162,14 +162,29 @@ bool app::is_mouse_button_pressed(int32_t mouse_button) const
 		&& window::is_mouse_button_pressed(mouse_button);
 }
 
-void app::on_drop_path(path_container const&)
-{}
+void app::on_drop_path(path_container const& input)
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->on_drop_path(input);
+	}
+}
 
-void app::on_key_input(key_input const&)
-{}
+void app::on_key_input(key_input const& input)
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->on_key_input(input);
+	}
+}
 
-void app::on_scroll_input(scroll_input const&)
-{}
+void app::on_scroll_input(scroll_input const& input)
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->on_scroll_input(input);
+	}
+}
 
 void app::update()
 {}

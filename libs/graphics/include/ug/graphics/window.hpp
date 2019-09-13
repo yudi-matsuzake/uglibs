@@ -21,8 +21,6 @@ namespace ug::graphics{
 using window_type = GLFWwindow;
 using window_ptr = std::unique_ptr<window_type, decltype(&glfwDestroyWindow)>;
 
-using path_container = std::vector<std::filesystem::path>;
-
 class window {
 public:
 	explicit window(

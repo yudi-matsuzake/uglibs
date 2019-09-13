@@ -1,6 +1,11 @@
 #pragma once
 
+#include <vector>
+#include <filesystem>
+
 namespace ug::graphics{
+
+using path_container = std::vector<std::filesystem::path>;
 
 struct key_input{
 	int key;
