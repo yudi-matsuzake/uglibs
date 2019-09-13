@@ -59,7 +59,6 @@ public:
 
 	virtual int32_t run();
 
-	void update_cached_data();
 	void update_components() const;
 	void update_all();
 
@@ -92,6 +91,10 @@ protected:
 
 	void set_viewport();
 	void update_projected_viewport();
+	void update_time();
+
+	double m_last_time{ get_time() };
+	double m_delta{ 0.0 };
 
 	component_manager m_component_manager;
 	rect2d m_viewport{ {0, 0}, 0, 0 };

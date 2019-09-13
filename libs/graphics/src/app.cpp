@@ -138,17 +138,16 @@ void app::set_near_plane(rect2d const& r)
 	m_near_plane = r;
 }
 
+void app::update_time()
+{
+	auto now = get_time();
+	m_delta = now - m_last_time;
+	m_last_time = now;
+}
+
 double app::get_delta() const
 {
-	static bool init = false;
-	static double last_time = get_time();
-
-	if(!init){
-		init = true;
-		return 0.0;
-	}
-
-	return get_time() - last_time;
+	return m_delta;
 }
 
 bool app::is_key_pressed(int32_t key) const
@@ -185,6 +184,7 @@ void app::update_components() const
 
 void app::update_all()
 {
+
 	update();
 	update_components();
 }
@@ -233,6 +233,7 @@ void app::draw_all_ui()
 int app::run()
 {
 	while(!should_close()){
+		update_time();
 		update_all();
 
 		set_viewport();
