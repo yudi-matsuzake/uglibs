@@ -9,14 +9,16 @@ namespace ug::graphics{
  * ================================
  */
 app::app(int32_t width, int32_t height, char const* window_title)
+
 	: window(width, height, window_title),
 	  m_viewport{
 		{0.0, 0.0},
 		static_cast<float>(width),
 		static_cast<float>(height)
 	  },
-	  m_near_plane{ m_viewport }
+	  m_camera(std::make_unique<orthographic_camera>(m_viewport))
 {
+
 	if(!gladLoadGL())
 		throw std::runtime_error("glad could not be loaded");
 
@@ -24,14 +26,6 @@ app::app(int32_t width, int32_t height, char const* window_title)
 
 	GL(glEnable(GL_BLEND));
 	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
-
-	m_projection_matrix = glm::ortho(
-		m_near_plane.position.x,
-		m_near_plane.position.x + m_near_plane.width,
-		m_near_plane.position.y,
-		m_near_plane.position.y + m_near_plane.height,
-		1.f, -1.f
-	);
 
 	/*
 	 * imgui context
@@ -46,6 +40,8 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	// render
 	ImGui_ImplGlfw_InitForOpenGL(ptr(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+	update_projected_viewport();
 }
 
 app::~app()
@@ -74,31 +70,20 @@ void app::set_clear_color(
 	GL(glClearColor(r, g, b, a));
 }
 
+ug::graphics::camera const* app::camera() const
+{
+	return m_camera.get();
+}
+
+ug::graphics::camera* app::camera()
+{
+	return m_camera.get();
+}
+
+
 void app::set_clear_color(graphics::color const& clear) const
 {
 	set_clear_color(clear.r, clear.g, clear.b, clear.a);
-}
-
-glm::mat4 const& app::projection_matrix() const
-{
-	return m_projection_matrix;
-}
-
-void app::set_projection_matrix(glm::mat4 const& m)
-{
-	m_projection_matrix = m;
-	update_projected_viewport();
-}
-
-glm::mat4 const& app::view_matrix() const
-{
-	return m_view_matrix;
-}
-
-void app::set_view_matrix(glm::mat4 const& m)
-{
-	m_view_matrix = m;
-	update_projected_viewport();
 }
 
 void app::add_component(std::shared_ptr<component> ptr)
@@ -126,16 +111,6 @@ void app::set_viewport()
 		to_int(m_viewport.width),
 		to_int(m_viewport.height)
 	));
-}
-
-rect2d const& app::get_near_plane() const
-{
-	return m_near_plane;
-}
-
-void app::set_near_plane(rect2d const& r)
-{
-	m_near_plane = r;
 }
 
 void app::update_time()
@@ -187,7 +162,8 @@ void app::on_scroll_input(scroll_input const& input)
 }
 
 void app::update()
-{}
+{
+}
 
 void app::update_components() const
 {
@@ -199,7 +175,6 @@ void app::update_components() const
 
 void app::update_all()
 {
-
 	update();
 	update_components();
 }
@@ -250,6 +225,7 @@ int app::run()
 	while(!should_close()){
 		update_time();
 		update_all();
+		update_projected_viewport();
 
 		set_viewport();
 		clear();
@@ -267,7 +243,10 @@ int app::run()
 
 void app::update_projected_viewport()
 {
-	glm::mat4 vp = glm::inverse(projection_matrix()*view_matrix());
+	glm::mat4 vp = glm::inverse(
+		m_camera->projection_matrix()*
+		m_camera->view_matrix()
+	);
 
 	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
 	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };

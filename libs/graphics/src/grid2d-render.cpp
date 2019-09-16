@@ -115,11 +115,11 @@ grid2d_render::grid2d_render(app* app_ptr)
 void grid2d_render::operator()()
 {
 
-	auto pv = get_app()->get_projected_viewport();
-	auto left	= pv.position.x;
-	auto right	= pv.position.x + pv.width;
-	auto top	= pv.position.y;
-	auto bottom	= pv.position.y - pv.height;
+	auto const& pv = get_app()->get_projected_viewport();
+	auto left	= pv.left();
+	auto right	= pv.right();
+	auto top	= pv.top();
+	auto bottom	= pv.bottom();
 
 	auto vscreen = std::array{
 		right, bottom, .0f,
@@ -139,8 +139,9 @@ void grid2d_render::operator()()
 	auto [ w, h ] = get_app()->get_framebuffer_size();
 
 	// set uniforms
-	m_program.set_uniform("u_projection", get_app()->projection_matrix());
-	m_program.set_uniform("u_view", get_app()->view_matrix());
+	auto cam = get_app()->camera();
+	m_program.set_uniform("u_projection", cam->projection_matrix());
+	m_program.set_uniform("u_view", cam->view_matrix());
 	m_program.set_uniform("u_color", m_grid_color);
 	m_program.set_uniform("u_proj_size", pv.width, pv.height);
 	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });

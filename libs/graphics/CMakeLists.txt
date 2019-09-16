@@ -39,7 +39,6 @@ add_library(
 	./src/component.cpp
 	./src/misc.cpp
 	./src/ball2d-render.cpp
-	./src/square-render.cpp
 	./src/shader.cpp
 	./src/grid2d-render.cpp
 	./src/vao.cpp
@@ -48,10 +47,10 @@ add_library(
 	./src/app.cpp
 	./src/component-manager.cpp
 	./src/buffers.cpp
-	./src/orthographic-zoom.cpp
 	./src/render.cpp
-	./src/translation2d.cpp
 	./src/texture2d.cpp
+	./src/camera.cpp
+	./src/camera2d-controller.cpp
 
 	./include/ug/graphics/program.hpp
 	./include/ug/graphics/misc.hpp
@@ -61,16 +60,14 @@ add_library(
 	./include/ug/graphics/grid2d-render.hpp
 	./include/ug/graphics/component-manager.hpp
 	./include/ug/graphics/component.hpp
-	./include/ug/graphics/square-render.hpp
 	./include/ug/graphics/buffers.hpp
 	./include/ug/graphics/window.hpp
 	./include/ug/graphics/app.hpp
 	./include/ug/graphics/ball2d-render.hpp
-	./include/ug/graphics/orthographic-zoom.hpp
 	./include/ug/graphics/render.hpp
-	./include/ug/graphics/translation2d.hpp
 	./include/ug/graphics/texture2d.hpp
-
+	./include/ug/graphics/camera.hpp
+	./include/ug/graphics/camera2d-controller.hpp
 )
 target_link_libraries(
 	graphics

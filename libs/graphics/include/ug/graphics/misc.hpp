@@ -24,6 +24,11 @@ struct rect2d{
 
 	glm::vec2 center() const;
 	glm::vec2 size() const;
+
+	float left() const;
+	float right() const;
+	float bottom() const;
+	float top() const;
 };
 
 } // end of namespace graphics

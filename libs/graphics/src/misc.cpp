@@ -39,4 +39,24 @@ glm::vec2 rect2d::size() const
 	return { width, height };
 }
 
+float rect2d::left() const
+{
+	return position.x;
+}
+
+float rect2d::right() const
+{
+	return position.x + width;
+}
+
+float rect2d::bottom() const
+{
+	return position.y - height;
+}
+
+float rect2d::top() const
+{
+	return position.y;
+}
+
 } // end of namespace graphics

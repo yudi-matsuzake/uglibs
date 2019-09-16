@@ -13,6 +13,7 @@
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/window.hpp"
 #include "ug/graphics/component-manager.hpp"
+#include "ug/graphics/camera.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -21,9 +22,15 @@
 
 namespace ug::graphics{
 
+using camera_ptr = std::unique_ptr<camera>;
+
 class app : public window {
 public:
-	explicit app(int32_t width, int32_t height, char const* window_title);
+	explicit app(
+		int32_t width,
+		int32_t height,
+		char const* window_title
+	);
 
 	virtual ~app();
 
@@ -37,19 +44,13 @@ public:
 		float a
 	) const;
 
-	glm::mat4 const& projection_matrix() const;
-	void set_projection_matrix(glm::mat4 const& m);
-
-	glm::mat4 const& view_matrix() const;
-	void set_view_matrix(glm::mat4 const& m);
+	ug::graphics::camera const* camera() const;
+	ug::graphics::camera* camera();
 
 	void add_component(std::shared_ptr<component> ptr);
 
 	rect2d const& get_viewport() const;
 	void set_viewport(rect2d const& r);
-
-	rect2d const& get_near_plane() const;
-	void set_near_plane(rect2d const& r);
 
 	double get_delta() const;
 
@@ -98,10 +99,9 @@ protected:
 
 	component_manager m_component_manager;
 	rect2d m_viewport{ {0, 0}, 0, 0 };
-	rect2d m_near_plane{ {0.f, 0.f}, 0, 0};
 
-	glm::mat4 m_view_matrix{ 1.f };
-	glm::mat4 m_projection_matrix; 
+	camera_ptr m_camera = nullptr;
+
 	rect2d m_projected_viewport{ {0.0, 0.0}, 0.0, 0.0};
 };
 
