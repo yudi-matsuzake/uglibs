@@ -82,6 +82,8 @@ public:
 	void on_scroll_input_components(scroll_input const& input);
 
 	rect2d const& get_projected_viewport() const;
+	glm::mat4 const& view_matrix() const;
+	glm::mat4 const& projection_matrix() const;
 
 	bool ui_want_capture_mouse() const;
 	bool ui_want_capture_keyboard() const;
@@ -91,8 +93,8 @@ public:
 protected:
 
 	void set_viewport();
-	void update_projected_viewport();
 	void update_time();
+	void update_cached_data();
 
 	double m_last_time{ get_time() };
 	double m_delta{ 0.0 };
@@ -102,7 +104,11 @@ protected:
 
 	camera_ptr m_camera = nullptr;
 
-	rect2d m_projected_viewport{ {0.0, 0.0}, 0.0, 0.0};
+	struct{
+		rect2d projected_viewport{ {0.0, 0.0}, 0.0, 0.0};
+		glm::mat4 projection_matrix{1.f};
+		glm::mat4 view_matrix{1.f};
+	}m_cached_data;
 };
 
 }

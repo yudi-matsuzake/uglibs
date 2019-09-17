@@ -41,7 +41,7 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	ImGui_ImplGlfw_InitForOpenGL(ptr(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
-	update_projected_viewport();
+	update_cached_data();
 }
 
 app::~app()
@@ -225,7 +225,7 @@ int app::run()
 	while(!should_close()){
 		update_time();
 		update_all();
-		update_projected_viewport();
+		update_cached_data();
 
 		set_viewport();
 		clear();
@@ -241,21 +241,25 @@ int app::run()
 	return EXIT_SUCCESS;
 }
 
-void app::update_projected_viewport()
+void app::update_cached_data()
 {
-	glm::mat4 vp = glm::inverse(
-		m_camera->projection_matrix()*
-		m_camera->view_matrix()
-	);
+	auto p = m_camera->projection_matrix();
+	auto v = m_camera->view_matrix();
+
+	m_cached_data.projection_matrix	= p;
+	m_cached_data.view_matrix	= v;
+
+	glm::mat4 vp = glm::inverse(p*v);
 
 	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
 	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };
 
-	m_projected_viewport = rect2d{
+	m_cached_data.projected_viewport = rect2d{
 		{ ul.x, ul.y },
 		dr.x - ul.x,
 		ul.y - dr.y 
 	};
+
 }
 
 void app::on_key_input_components(key_input const& input)
@@ -276,7 +280,17 @@ void app::on_scroll_input_components(scroll_input const& input)
 
 rect2d const& app::get_projected_viewport() const
 {
-	return m_projected_viewport;
+	return m_cached_data.projected_viewport;
+}
+
+glm::mat4 const& app::view_matrix() const
+{
+	return m_cached_data.view_matrix;
+}
+
+glm::mat4 const& app::projection_matrix() const
+{
+	return m_cached_data.projection_matrix;
 }
 
 bool app::ui_want_capture_mouse() const

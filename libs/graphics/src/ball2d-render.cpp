@@ -132,13 +132,11 @@ void ball2d_render::operator()(ball2d const& b)
 	auto const& pv = get_app()->get_projected_viewport();
 	auto [ w, h ] = get_app()->get_framebuffer_size();
 
-	auto cam = get_app()->camera();
-
 	// set uniforms
 	m_program.set_uniform("u_center", b.c.x, b.c.y);
 	m_program.set_uniform("u_radius", b.r);
-	m_program.set_uniform("u_projection", cam->projection_matrix());
-	m_program.set_uniform("u_view", cam->view_matrix());
+	m_program.set_uniform("u_projection", get_app()->projection_matrix());
+	m_program.set_uniform("u_view", get_app()->view_matrix());
 	m_program.set_uniform("u_color", m_fill_color);
 	m_program.set_uniform("u_proj_size", pv.width, pv.height);
 	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });
