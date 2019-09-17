@@ -15,11 +15,6 @@
 #include "ug/graphics/component-manager.hpp"
 #include "ug/graphics/camera.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "misc/cpp/imgui_stdlib.h"
-
 namespace ug::graphics{
 
 using camera_ptr = std::unique_ptr<camera>;

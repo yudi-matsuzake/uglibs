@@ -34,7 +34,8 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::GetIO().ConfigFlags |=
-		ImGuiConfigFlags_NavEnableKeyboard;
+		ImGuiConfigFlags_NavEnableKeyboard
+		| ImGuiConfigFlags_NavEnableGamepad;
 	// style
 	ImGui::StyleColorsDark();
 	// render

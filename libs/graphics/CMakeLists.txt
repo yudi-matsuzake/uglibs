@@ -117,7 +117,9 @@ endif()
 
 # installing headers
 install(DIRECTORY ./include/ug DESTINATION include)
-install(DIRECTORY ${IMGUI_DIR} DESTINATION include/ug)
+install(FILES ${IMGUI_HEADER} DESTINATION include/ug/imgui)
+
+# FIXME: this will install glad.c instead of installing only the header files
 install(DIRECTORY ${GLAD_DIR} DESTINATION include/ug)
 
 # installation of libraries

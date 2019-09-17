@@ -1,10 +1,13 @@
 set(GLAD_DIR ${CMAKE_SOURCE_DIR}/external/glad)
 
-add_library(glad STATIC
-	${GLAD_DIR}/src/glad.c
-
+set(GLAD_SRC ${GLAD_DIR}/src/glad.c)
+set(GLAD_HEADER 
 	${GLAD_DIR}/include/glad/glad.h
-	${GLAD_DIR}/include/KHR/khrplatform.h
+	${GLAD_DIR}/include/KHR/khrplatform.h)
+
+add_library(glad STATIC
+	${GLAD_SRC}
+	${GLAD_HEADER}
 )
 
 target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
