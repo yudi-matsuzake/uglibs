@@ -51,6 +51,7 @@ add_library(
 	./src/texture2d.cpp
 	./src/camera.cpp
 	./src/camera2d-controller.cpp
+	./src/segment2d-render.cpp
 
 	./include/ug/graphics/program.hpp
 	./include/ug/graphics/misc.hpp
@@ -68,6 +69,7 @@ add_library(
 	./include/ug/graphics/texture2d.hpp
 	./include/ug/graphics/camera.hpp
 	./include/ug/graphics/camera2d-controller.hpp
+	./include/ug/graphics/segment2d-render.hpp
 )
 target_link_libraries(
 	graphics
@@ -111,6 +113,9 @@ option(GRAPHICS_TEST "Add test programs for graphics library" ON)
 if(${GRAPHICS_TEST})
 	add_executable(hello-graphics ./test/hello-graphics.cpp)
 	target_link_libraries(hello-graphics PRIVATE graphics)
+
+	add_executable(hello-segment ./test/hello-segment.cpp)
+	target_link_libraries(hello-segment PRIVATE graphics)
 endif()
 
 # installing ------------------------------------------------------------------
