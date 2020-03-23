@@ -35,8 +35,10 @@ uniform vec2  u_center;
 uniform float u_radius;
 uniform vec4 u_color;
 
+uniform bool u_draw_fill;
 uniform bool u_draw_boundary;
 uniform vec4 u_boundary_color;
+uniform float u_thick;
 
 uniform vec2 u_proj_size;
 uniform vec2 u_resolution;
@@ -53,12 +55,14 @@ void main()
 	vec2 v = p - u_center;
 	float dist = sqrt(dot(v, v));
 
-	if(dist <= u_radius)
-		fragment_color = u_color;
+	if(u_draw_fill){
+		if(dist <= u_radius)
+			fragment_color = u_color;
+	}
 
 	if(u_draw_boundary && u_boundary_color.a > 0.0){
 		vec2 thick2 = u_proj_size/u_resolution;
-		float thick = max(0.0, max(thick2.x, thick2.y));
+		float thick = max(0.0, max(thick2.x, thick2.y))*u_thick;
 
 		float b = abs(dist - u_radius);
 		b = smoothstep(0.0, thick, b);
@@ -142,6 +146,8 @@ void ball2d_render::operator()(ball2d const& b)
 	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });
 	m_program.set_uniform("u_boundary_color", m_boundary_color);
 	m_program.set_uniform("u_draw_boundary", m_draw_boundary);
+	m_program.set_uniform("u_draw_fill", m_draw_fill);
+	m_program.set_uniform("u_thick", m_thick);
 
 	// draw
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
@@ -160,6 +166,16 @@ void ball2d_render::set_boundary_color(glm::vec4 const& v)
 void ball2d_render::set_draw_boundary(bool b)
 {
 	m_draw_boundary = b;
+}
+
+void ball2d_render::set_draw_fill(bool b)
+{
+	m_draw_fill = b;
+}
+
+void ball2d_render::set_thick(float t)
+{
+	m_thick = t;
 }
 
 } // end of namespace graphics

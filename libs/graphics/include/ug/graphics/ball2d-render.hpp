@@ -31,6 +31,8 @@ public:
 	void set_boundary_color(graphics::color const& c);
 	void set_fill_color(graphics::color const& c);
 	void set_draw_boundary(bool b);
+	void set_draw_fill(bool b);
+	void set_thick(float t);
 protected:
 
 	vertex_shader m_vertex_shader;
@@ -48,7 +50,10 @@ protected:
 		1.0, 1.0, 1.0, 1.0
 	};
 
-	bool m_draw_boundary = true;
+	bool m_draw_boundary	= true;
+	bool m_draw_fill	= true;
+
+	float m_thick = 1.0f;
 };
 
 }
