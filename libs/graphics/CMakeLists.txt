@@ -135,6 +135,5 @@ install(TARGETS imgui glad graphics ug-graphics-warnings EXPORT ugConfig
 )
 
 install(EXPORT ugConfig NAMESPACE ug:: DESTINATION share/ug/cmake)
-export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
 # This makes the project importable from the build directory
 export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
