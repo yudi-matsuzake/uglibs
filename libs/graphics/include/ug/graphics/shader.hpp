@@ -11,6 +11,8 @@ namespace ug::graphics{
 template<uint64_t N>
 using static_shader_source = std::array<char const*, N>;
 
+using shader_source = std::vector<std::string>;
+
 class shader{
 public:
 	shader(unsigned int shader_type);
@@ -24,6 +26,8 @@ public:
 	{
 		GL(glShaderSource(m_id, N, source.data(), NULL));
 	}
+
+	void set_source(shader_source const& source);
 
 	void compile() const;
 

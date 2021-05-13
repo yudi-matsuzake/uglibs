@@ -1,4 +1,5 @@
 #include "ug/graphics/shader.hpp"
+#include "ug/graphics/misc.hpp"
 
 namespace ug::graphics{
 
@@ -64,6 +65,19 @@ shader::~shader()
 uint32_t shader::id() const
 {
 	return m_id;
+}
+
+void shader::set_source(shader_source const& source)
+{
+	std::vector<char const*> src_ptr(source.size());
+	rgs::transform(
+		source, begin(src_ptr),
+		[](auto const& str){ return str.data(); }
+	);
+
+	auto const n = static_cast<int>(src_ptr.size());
+
+	GL(glShaderSource(m_id, n, src_ptr.data(), NULL));
 }
 
 void shader::compile() const
