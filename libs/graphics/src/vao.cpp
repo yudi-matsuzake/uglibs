@@ -1,6 +1,5 @@
+#include "ug/graphics/opengl-error.hpp"
 #include "ug/graphics/vao.hpp"
-
-#include "ug/graphics/misc.hpp"
 
 namespace ug::graphics{
 
@@ -66,4 +65,4 @@ vao::attr<double>::attr(std::uint32_t a_n_member, bool a_normalized)
 		a_normalized)
 {}
 
-} // end of namespace graphics
+} // end of namespace ug::graphics

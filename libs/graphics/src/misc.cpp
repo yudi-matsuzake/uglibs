@@ -9,11 +9,11 @@ namespace ug::graphics{
  * =======
  */
 
-void operator*=(rect2d& r, float scalar)
+void operator*=(rect2d& r, float s)
 {
 
-	r.height *= scalar;
-	r.width *= scalar;
+	r.height *= s;
+	r.width *= s;
 }
 
 void operator+=(rect2d& r, glm::vec2 const& v)

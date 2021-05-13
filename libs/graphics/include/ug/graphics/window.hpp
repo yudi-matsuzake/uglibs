@@ -8,13 +8,14 @@
 #include <stdexcept>
 #include <tuple>
 
-#include "ug/graphics/misc.hpp"
-#include "ug/graphics/inputs.hpp"
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_stdlib.h"
+
+#include "ug/graphics/misc.hpp"
+#include "ug/graphics/opengl-error.hpp"
+#include "ug/graphics/inputs.hpp"
 
 namespace ug::graphics{
 
@@ -51,6 +52,7 @@ public:
 	virtual void on_drop_path(path_input const& path);
 	virtual void on_key_input(key_input const& input);
 	virtual void on_scroll_input(scroll_input const& input);
+	virtual void on_mouse_button(mouse_button_input const& input);
 
 	void swap_buffers() const;
 

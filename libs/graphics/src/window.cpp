@@ -55,6 +55,16 @@ static void scroll_callback(
 	a->on_scroll_input(input);
 }
 
+static void mouse_button_callback(
+	GLFWwindow* w,
+	int button,
+	int action,
+	int mods)
+{
+	window* a = static_cast<window*>(glfwGetWindowUserPointer(w));
+	a->on_mouse_button({button, action, mods});
+}
+
 /*
  * auxiliar functions
  * ==================
@@ -106,7 +116,7 @@ window::context::context()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// some arbitrarily preferences
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	/* glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); */
 }
 
 window::context::~context()
@@ -126,11 +136,18 @@ window::window(int32_t width, int32_t height, char const* window_title)
 	glfwSetKeyCallback(ptr(), key_callback);
 	glfwSetScrollCallback(ptr(), scroll_callback);
 	glfwSetDropCallback(ptr(), drop_callback);
+	glfwSetMouseButtonCallback(ptr(), mouse_button_callback);
 
 	glfwMakeContextCurrent(ptr());
 
 	glfwSwapInterval(1);
 	glfwSetInputMode(ptr(), GLFW_STICKY_KEYS, GLFW_TRUE);
+
+	if(!gladLoadGL())
+		throw std::runtime_error("glad could not be loaded");
+
+	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+
 }
 
 bool window::should_close() const
@@ -209,4 +226,7 @@ void window::on_key_input(key_input const&)
 void window::on_scroll_input(scroll_input const&)
 {}
 
-}
+void window::on_mouse_button(mouse_button_input const&)
+{}
+
+} // end of namespace ug::graphics

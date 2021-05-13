@@ -18,4 +18,11 @@ struct scroll_input{
 	double x_offset, y_offset;
 };
 
+struct mouse_button_input{
+	int button;
+	int action;
+	int mods;
+};
+
+
 } // end of namespace ug::graphics

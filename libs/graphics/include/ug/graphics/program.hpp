@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ug/graphics/misc.hpp"
 #include "ug/graphics/shader.hpp"
 
 namespace ug::graphics{
@@ -26,6 +27,7 @@ public:
 	) const;
 	void set_uniform(char const* name, glm::mat4 const& m) const;
 	void set_uniform(char const* name, glm::vec2 const& v) const;
+	void set_uniform(char const* name, glm::vec3 const& v) const;
 	void set_uniform(char const* name, glm::vec4 const& v) const;
 	void set_uniform(char const* name, bool b) const;
 
@@ -36,4 +38,4 @@ protected:
 
 };
 
-} // end of namespace graphics
+} // end of namespace ug::graphics

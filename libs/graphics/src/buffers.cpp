@@ -24,4 +24,4 @@ void buffer::bind() const
 	GL(glBindBuffer(m_target, m_id));
 }
 
-} // end of namespace graphics
+} // end of namespace ug::graphics

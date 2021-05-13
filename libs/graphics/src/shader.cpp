@@ -72,4 +72,4 @@ void shader::compile() const
 	check_shader_compilation(m_id);
 }
 
-}
+} // end of namespace ug::graphics

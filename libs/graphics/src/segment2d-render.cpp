@@ -9,7 +9,7 @@ namespace ug::graphics{
  * =========
  */
 
-static constexpr std::string_view m_vertex_shaders =
+static constexpr auto m_vertex_shaders = std::array{
 R"__(
 #version 330 core
 
@@ -22,9 +22,9 @@ void main()
 {
 	gl_Position = u_projection*u_view*vec4(vscr, 0.0f, 1.f);
 }
-)__";
+)__"};
 
-static constexpr std::string_view m_fragment_shaders =
+static constexpr auto m_fragment_shaders = std::array{
 R"__(
 #version 330 core
 
@@ -37,7 +37,7 @@ void main()
 
 	fragment_color = u_color;
 }
-)__";
+)__"};
 
 /*
  * methods implementation
@@ -48,15 +48,8 @@ segment2d_render::segment2d_render(app* app_ptr)
 	: render(app_ptr)
 {
 
-	m_vertex_shader.set_source(
-		std::cbegin(m_vertex_shaders),
-		std::cend(m_vertex_shaders)
-	);
-
-	m_fragment_shader.set_source(
-		std::cbegin(m_fragment_shaders),
-		std::cend(m_fragment_shaders)
-	);
+	m_vertex_shader.set_source(m_vertex_shaders);
+	m_fragment_shader.set_source(m_fragment_shaders);
 
 	// create and link program
 	m_vertex_shader.compile();

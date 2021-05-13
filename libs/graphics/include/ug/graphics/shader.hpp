@@ -1,13 +1,15 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <algorithm>
 
-#include "ug/graphics/misc.hpp"
+#include "ug/graphics/opengl-error.hpp"
 
 namespace ug::graphics{
 
-using shader_source = std::vector<char>;
+template<uint64_t N>
+using static_shader_source = std::array<char const*, N>;
 
 class shader{
 public:
@@ -17,24 +19,16 @@ public:
 
 	uint32_t id() const;
 
-	template<class I>
-	void set_source(I begin_it, I end_it)
+	template<uint64_t N>
+	void set_source(static_shader_source<N> const& source)
 	{
-		auto d = static_cast<unsigned>(std::distance(begin_it, end_it));
-		m_source.resize(d);
-		std::copy(begin_it, end_it, begin(m_source));
-
-		char* data = m_source.data();
-		auto lenghts = static_cast<int>(m_source.size());
-		GL(glShaderSource(m_id, 1, &data, &lenghts));
+		GL(glShaderSource(m_id, N, source.data(), NULL));
 	}
 
 	void compile() const;
 
 protected:
-
 	uint32_t m_id;
-	shader_source m_source;
 };
 
 class vertex_shader : public shader{
@@ -47,4 +41,4 @@ public:
 	fragment_shader();
 };
 
-}
+} // end of namespace ug::graphics

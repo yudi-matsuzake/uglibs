@@ -101,7 +101,7 @@ target_include_directories(
 
 		# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/glm>
 )
-target_compile_features(graphics PUBLIC cxx_std_17)
+target_compile_features(graphics PUBLIC cxx_std_20)
 
 # include(CTest)
 # include(Catch)

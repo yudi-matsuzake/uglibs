@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "ug/graphics/misc.hpp"
+/* #include "ug/graphics/misc.hpp" */
 #include "ug/graphics/program.hpp"
 
 namespace ug::graphics{
@@ -115,6 +115,13 @@ void program::set_uniform(char const* name, glm::vec2 const& v) const
 	GL(glUniform2fv(id, 1, glm::value_ptr(v)));
 }
 
+void program::set_uniform(char const* name, glm::vec3 const& v) const
+{
+	int32_t id;
+	GL(id = glGetUniformLocation(m_id, name));
+	GL(glUniform3fv(id, 1, glm::value_ptr(v)));
+}
+
 void program::set_uniform(char const* name, glm::vec4 const& v) const
 {
 	int32_t id;
@@ -138,4 +145,4 @@ void program::set_uniform(char const* name, int32_t n) const
 
 
 
-} // end of namespace graphics
+} // end of namespace ug::graphics

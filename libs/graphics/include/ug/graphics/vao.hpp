@@ -38,6 +38,9 @@ public:
 	template<class T>
 	struct attr;
 
+	/*
+	 * TODO: maybe the attribute_layout class can be a std::array
+	 */
 	class attribute_layout : public std::vector<attribute> {
 	protected:
 		uint32_t m_stride = 0;
@@ -109,6 +112,4 @@ struct vao::attr<double> : public vao::attribute {
 	attr(std::uint32_t n_member, bool normalized = false);
 };
 
-
-
-} // end of namespace graphics
+} // end of namespace ug::graphics

@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstddef>
 
-#include "ug/graphics/misc.hpp"
+#include "ug/graphics/opengl-error.hpp"
 
 namespace ug::graphics{
 
@@ -14,9 +14,16 @@ public:
 	virtual ~buffer();
 	void bind() const;
 
+	/**
+	  * sets the buffer data
+	  * 
+	  * @param ptr	the pointer to `size` elements of  `T`
+	  * @param size	is the number of `T`-elements pointed by `ptr`
+	  * @param usage the usage of the buffer object
+	  */
 	template<class T>
 	void set_data(
-		T* ptr,
+		T const* ptr,
 		size_t size,
 		uint32_t usage = GL_STATIC_DRAW) const
 	{
@@ -48,4 +55,4 @@ public:
 	{} 
 };
 
-} // end of namespace graphics
+} // end of namespace ug::graphics
