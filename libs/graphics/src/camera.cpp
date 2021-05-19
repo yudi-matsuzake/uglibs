@@ -1,75 +1,52 @@
 #include "ug/graphics/camera.hpp"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/quaternion.hpp"
+
 namespace ug::graphics{
 
-orthographic_camera::orthographic_camera(rect2d const& r)
-	: m_inverse_view_matrix{1.f},
-	  m_near_plane(r)
+camera::camera(const glm::vec3& pos)
+	: position(pos)
 {}
 
-orthographic_camera::orthographic_camera(
-	float left,
-	float right,
-	float bottom,
-	float top)
-	: orthographic_camera({ {left, top}, right - left, top - bottom})
-{}
-
-void orthographic_camera::translate(glm::vec3 const& v)
+[[nodiscard]] const glm::quat camera::orientation() const
 {
-	m_inverse_view_matrix = glm::translate(m_inverse_view_matrix, v);
-	m_near_plane.position += glm::vec2{ v.x, v.y };
-}
-
-void orthographic_camera::rotate(float r, glm::vec3 const& v)
-{
-	m_inverse_view_matrix = glm::rotate(
-		m_inverse_view_matrix,
-		r,
-		v
+	glm::quat q = glm::angleAxis(
+		x_angle,
+		glm::vec3(1., 0., 0.)
 	);
+
+	q *= glm::angleAxis(y_angle, glm::vec3(.0, 1., 0.));
+	q *= glm::angleAxis(z_angle, glm::vec3(0., 0., 1.));
+
+	return q;
 }
 
-void orthographic_camera::rotate(float r)
+void camera::translate(const glm::vec3& v)
 {
-
-	rotate(r, glm::vec3(0.f, 0.f, 1.f));
+	position += v*orientation();
 }
 
-void orthographic_camera::zoom(float proportion)
+void camera::pitch(float angle)
 {
-	if(proportion <= .0f){
-		throw std::runtime_error(
-			"zoom proportion cannot be equal or greater than zero"
-		);
-	}
-
-	glm::vec3 v = { m_near_plane.width, m_near_plane.height, 0.f };
-
-	v *= 1.f - proportion;
-
-	v *= 1.f/2.f;
-
-	m_near_plane *= proportion;
-
-	translate(v);
+	x_angle += angle;
 }
 
-glm::mat4 orthographic_camera::view_matrix() const
+void camera::yall(float angle)
 {
-	return glm::inverse(m_inverse_view_matrix);
+	y_angle += angle;
 }
 
-glm::mat4 orthographic_camera::projection_matrix() const
+void camera::roll(float angle)
 {
-	return glm::ortho(
-		0.f,
-		m_near_plane.width,
-		0.f,
-		m_near_plane.height,
-		-1.f,
-		1.f
-	);
+	z_angle += angle;
+}
+
+[[nodiscard]] glm::mat4 camera::view() const
+{
+	return glm::inverse(glm::translate(glm::mat4_cast(orientation()), position));
 }
 
 } // end of namespace ug::graphics

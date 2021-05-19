@@ -77,8 +77,8 @@ void segment2d_render::operator()(segment2d const& s)
 	m_vscr_vao.set_attribute_layout({ graphics::vao::attr<float>(2) });
 
 	// set uniforms
-	m_program.set_uniform("u_projection", get_app()->projection_matrix());
-	m_program.set_uniform("u_view", get_app()->view_matrix());
+	m_program.set_uniform("u_projection", get_app()->compute_projection_matrix());
+	m_program.set_uniform("u_view", get_app()->get_view_matrix());
 	m_program.set_uniform("u_color", m_color);
 
 	/* auto const& pv = get_app()->get_projected_viewport(); */

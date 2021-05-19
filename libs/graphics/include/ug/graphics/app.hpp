@@ -17,14 +17,20 @@
 
 namespace ug::graphics{
 
-using camera_ptr = std::unique_ptr<camera>;
-
 class app : public window {
 public:
+
+	enum class projection_type : int8_t {
+		NONE,
+		ORTHOGRAPHIC,
+		PERSPECTIVE
+	};
+
 	explicit app(
 		int32_t width,
 		int32_t height,
-		char const* window_title
+		char const* window_title,
+		app::projection_type proj_type = app::projection_type::ORTHOGRAPHIC
 	);
 
 	virtual ~app();
@@ -39,13 +45,13 @@ public:
 		float a
 	) const;
 
-	ug::graphics::camera const* camera() const;
-	ug::graphics::camera* camera();
-
 	void add_component(std::shared_ptr<component> ptr);
 
 	rect2d const& get_viewport() const;
 	void set_viewport(rect2d const& r);
+
+	ug::graphics::camera const& get_camera() const;
+	ug::graphics::camera& get_camera();
 
 	double get_delta() const;
 
@@ -76,9 +82,23 @@ public:
 	void on_key_input_components(key_input const& input);
 	void on_scroll_input_components(scroll_input const& input);
 
-	rect2d const& get_projected_viewport() const;
-	glm::mat4 const& view_matrix() const;
-	glm::mat4 const& projection_matrix() const;
+	rect2d compute_projected_viewport(
+		std::optional<glm::mat4> const& pm = std::nullopt,
+		std::optional<glm::mat4> const& vm = std::nullopt
+	) const;
+
+	glm::mat4 get_view_matrix() const;
+	[[nodiscard]] glm::mat4 compute_projection_matrix() const;
+
+	/**
+	 * zoom
+	 * @param	proportion proportion of the zoom,
+	 *	to scale the viewport
+	 *	i.e. zoom > 1. would be zoom in
+	 *	i.e. zoom < 1. would be zoom out
+	 **/
+	void zoom(float proportion);
+	float get_zoom_proportion() const;
 
 	bool ui_want_capture_mouse() const;
 	bool ui_want_capture_keyboard() const;
@@ -91,19 +111,17 @@ protected:
 	void update_time();
 	void update_cached_data();
 
+
 	double m_last_time{ get_time() };
 	double m_delta{ 0.0 };
+
+	float m_zoom{ 1.0 };
 
 	component_manager m_component_manager;
 	rect2d m_viewport{ {0, 0}, 0, 0 };
 
-	camera_ptr m_camera = nullptr;
-
-	struct{
-		rect2d projected_viewport{ {0.0, 0.0}, 0.0, 0.0};
-		glm::mat4 projection_matrix{1.f};
-		glm::mat4 view_matrix{1.f};
-	}m_cached_data;
+	ug::graphics::camera m_camera;
+	app::projection_type projection_type = app::projection_type::ORTHOGRAPHIC;
 };
 
 }

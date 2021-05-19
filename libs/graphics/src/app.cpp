@@ -1,4 +1,5 @@
 #include <sstream>
+#include <stdexcept>
 
 #include "ug/graphics/app.hpp"
 
@@ -8,15 +9,18 @@ namespace ug::graphics{
  * app constructors and destructors
  * ================================
  */
-app::app(int32_t width, int32_t height, char const* window_title)
+app::app(
+		int32_t width, int32_t height,
+		char const* window_title,
+		enum ug::graphics::app::projection_type proj_type)
 
 	: window(width, height, window_title),
 	  m_viewport{
-		{0.0, 0.0},
-		static_cast<float>(width),
-		static_cast<float>(height)
+			{0.0, 0.0},
+			static_cast<float>(width),
+			static_cast<float>(height)
 	  },
-	  m_camera(std::make_unique<orthographic_camera>(m_viewport))
+		projection_type(proj_type)
 {
 
 	if(!gladLoadGL())
@@ -41,8 +45,6 @@ app::app(int32_t width, int32_t height, char const* window_title)
 	// render
 	ImGui_ImplGlfw_InitForOpenGL(ptr(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
-
-	update_cached_data();
 }
 
 app::~app()
@@ -70,17 +72,6 @@ void app::set_clear_color(
 {
 	GL(glClearColor(r, g, b, a));
 }
-
-ug::graphics::camera const* app::camera() const
-{
-	return m_camera.get();
-}
-
-ug::graphics::camera* app::camera()
-{
-	return m_camera.get();
-}
-
 
 void app::set_clear_color(graphics::color const& clear) const
 {
@@ -112,6 +103,16 @@ void app::set_viewport()
 		to_int(m_viewport.width),
 		to_int(m_viewport.height)
 	));
+}
+
+ug::graphics::camera const& app::get_camera() const
+{
+	return m_camera;
+}
+
+ug::graphics::camera& app::get_camera()
+{
+	return m_camera;
 }
 
 void app::update_time()
@@ -226,7 +227,6 @@ int app::run()
 	while(!should_close()){
 		update_time();
 		update_all();
-		update_cached_data();
 
 		set_viewport();
 		clear();
@@ -242,25 +242,42 @@ int app::run()
 	return EXIT_SUCCESS;
 }
 
-void app::update_cached_data()
+[[nodiscard]] glm::mat4 app::compute_projection_matrix() const
 {
-	auto p = m_camera->projection_matrix();
-	auto v = m_camera->view_matrix();
+	auto const [ sw, sh ] = this->get_framebuffer_size();
+	auto const screen_width = static_cast<float>(sw);
+	auto const screen_height = static_cast<float>(sh);
 
-	m_cached_data.projection_matrix	= p;
-	m_cached_data.view_matrix	= v;
+	auto vp = get_viewport();
 
-	glm::mat4 vp = glm::inverse(p*v);
+	vp *= 1.f / m_zoom;
 
-	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
-	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };
+	if(projection_type == projection_type::ORTHOGRAPHIC){
+		return glm::ortho(0.f, vp.width, 0.f, vp.height, -1.f, 1.f);
+	}else if(projection_type == projection_type::PERSPECTIVE){
+		return glm::perspective(
+			glm::radians(45.f),
+			screen_width / screen_height,
+			.1f, 100.f
+		);
+	}
+	throw std::runtime_error("Unknown projection type");
+}
 
-	m_cached_data.projected_viewport = rect2d{
-		{ ul.x, ul.y },
-		dr.x - ul.x,
-		ul.y - dr.y 
-	};
+void app::zoom(float proportion)
+{
+	if(proportion <= .0f){
+		throw std::runtime_error(
+			"zoom proportion cannot be equal or smaller than zero"
+		);
+	}
 
+	m_zoom *= proportion;
+}
+
+float app::get_zoom_proportion() const
+{
+	return m_zoom;
 }
 
 void app::on_key_input_components(key_input const& input)
@@ -279,19 +296,28 @@ void app::on_scroll_input_components(scroll_input const& input)
 	}
 }
 
-rect2d const& app::get_projected_viewport() const
+rect2d app::compute_projected_viewport(
+	std::optional<glm::mat4> const& pm,
+	std::optional<glm::mat4> const& vm) const
 {
-	return m_cached_data.projected_viewport;
+	auto const p = pm.has_value() ? pm.value() : compute_projection_matrix();
+	auto const v = vm.has_value() ? vm.value() : get_view_matrix();
+
+	glm::mat4 vp = glm::inverse(p*v);
+
+	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
+	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };
+
+	return rect2d{
+		{ ul.x, ul.y },
+		dr.x - ul.x,
+		ul.y - dr.y 
+	};
 }
 
-glm::mat4 const& app::view_matrix() const
+glm::mat4 app::get_view_matrix() const
 {
-	return m_cached_data.view_matrix;
-}
-
-glm::mat4 const& app::projection_matrix() const
-{
-	return m_cached_data.projection_matrix;
+	return m_camera.view();
 }
 
 bool app::ui_want_capture_mouse() const

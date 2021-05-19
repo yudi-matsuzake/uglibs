@@ -107,8 +107,9 @@ grid2d_render::grid2d_render(app* app_ptr)
 
 void grid2d_render::operator()()
 {
-
-	auto const& pv = get_app()->get_projected_viewport();
+	auto const projection = get_app()->compute_projection_matrix();
+	auto const view = get_app()->get_view_matrix();
+	auto const pv = get_app()->compute_projected_viewport(projection, view);
 	auto left	= pv.left();
 	auto right	= pv.right();
 	auto top	= pv.top();
@@ -132,8 +133,8 @@ void grid2d_render::operator()()
 	auto [ w, h ] = get_app()->get_framebuffer_size();
 
 	// set uniforms
-	m_program.set_uniform("u_projection", get_app()->projection_matrix());
-	m_program.set_uniform("u_view", get_app()->view_matrix());
+	m_program.set_uniform("u_projection", projection);
+	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_color", m_grid_color);
 	m_program.set_uniform("u_proj_size", pv.width, pv.height);
 	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });

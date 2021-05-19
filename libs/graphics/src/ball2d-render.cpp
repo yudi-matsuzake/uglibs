@@ -126,14 +126,16 @@ void ball2d_render::operator()(ball2d const& b)
 
 	m_vscr_vao.set_attribute_layout({ graphics::vao::attr<float>(3) });
 
-	auto const& pv = get_app()->get_projected_viewport();
+	auto const projection = get_app()->compute_projection_matrix();
+	auto const view = get_app()->get_view_matrix();
+	auto const pv = get_app()->compute_projected_viewport(projection, view);
 	auto [ w, h ] = get_app()->get_framebuffer_size();
 
 	// set uniforms
 	m_program.set_uniform("u_center", b.c.x, b.c.y);
 	m_program.set_uniform("u_radius", b.r);
-	m_program.set_uniform("u_projection", get_app()->projection_matrix());
-	m_program.set_uniform("u_view", get_app()->view_matrix());
+	m_program.set_uniform("u_projection", projection);
+	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_color", m_fill_color);
 	m_program.set_uniform("u_proj_size", pv.width, pv.height);
 	m_program.set_uniform("u_resolution", glm::vec<2, float>{ w, h });

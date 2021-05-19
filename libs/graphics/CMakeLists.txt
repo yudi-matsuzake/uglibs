@@ -45,6 +45,7 @@ add_library(
 	./src/program.cpp
 	./src/window.cpp
 	./src/app.cpp
+	./src/app2d.cpp
 	./src/component-manager.cpp
 	./src/buffers.cpp
 	./src/render.cpp
@@ -64,6 +65,7 @@ add_library(
 	./include/ug/graphics/buffers.hpp
 	./include/ug/graphics/window.hpp
 	./include/ug/graphics/app.hpp
+	./include/ug/graphics/app2d.hpp
 	./include/ug/graphics/ball2d-render.hpp
 	./include/ug/graphics/render.hpp
 	./include/ug/graphics/texture2d.hpp

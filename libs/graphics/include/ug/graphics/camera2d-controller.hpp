@@ -5,6 +5,8 @@
 
 namespace ug::graphics{
 
+class app2d;
+
 /**
   * this class is used when a user can control a 2d camera with translation and
   * zoom
@@ -13,8 +15,8 @@ class camera2d_controller : public component{
 public:
 
 	static constexpr auto zoom_proportion		= .1f;
-	static constexpr auto zoom_in_proportion	= 1.f - zoom_proportion;
-	static constexpr auto zoom_out_proportion	= 1.f + zoom_proportion;
+	static constexpr auto zoom_in_proportion	= 1.f + zoom_proportion;
+	static constexpr auto zoom_out_proportion	= 1.f - zoom_proportion;
 
 	static constexpr std::array up_keys{
 		GLFW_KEY_UP,
@@ -44,8 +46,11 @@ public:
 		GLFW_KEY_MINUS
 	};
 
-	camera2d_controller(app* app_ptr);
+	camera2d_controller(app2d* app_ptr);
 	virtual ~camera2d_controller() = default;
+
+	app2d const* get_app2d() const;
+	app2d* get_app2d();
 
 	virtual void on_scroll_input(graphics::scroll_input const& input)
 		override;
@@ -71,12 +76,17 @@ protected:
 	// speed in pixels per second
 	float m_speed = 100.f;
 
+	void update_zoom();
+	void update_translation();
+
 	glm::vec3 build_translation_vector() const;
 
 	bool up() const;
 	bool down() const;
 	bool left() const;
 	bool right() const;
+
+	ug::graphics::app2d* m_app2d = nullptr;
 };
 
 } // end of namespace ug::graphics
