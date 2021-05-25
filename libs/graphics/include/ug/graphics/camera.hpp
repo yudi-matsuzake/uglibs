@@ -13,6 +13,8 @@ public:
 	[[nodiscard]] const glm::quat orientation() const;
 	[[nodiscard]] glm::mat4 view() const;
 
+	glm::vec3 const& position() const;
+
 	void translate(const glm::vec3& v);
 
 	void pitch(float angle);
@@ -20,7 +22,7 @@ public:
 	void roll(float angle);
 
 private:
-	glm::vec3 position = glm::vec3(0., 0., 0.);
+	glm::vec3 m_position = glm::vec3(0., 0., 0.);
 
 	float x_angle = 0.f;
 	float y_angle = 0.f;

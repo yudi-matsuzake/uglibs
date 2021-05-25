@@ -73,7 +73,7 @@ void app::set_clear_color(
 	GL(glClearColor(r, g, b, a));
 }
 
-void app::set_clear_color(graphics::color const& clear) const
+void app::set_clear_color(graphics::color4 const& clear) const
 {
 	set_clear_color(clear.r, clear.g, clear.b, clear.a);
 }

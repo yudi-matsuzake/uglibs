@@ -8,7 +8,7 @@
 namespace ug::graphics{
 
 camera::camera(const glm::vec3& pos)
-	: position(pos)
+	: m_position(pos)
 {}
 
 [[nodiscard]] const glm::quat camera::orientation() const
@@ -24,9 +24,14 @@ camera::camera(const glm::vec3& pos)
 	return q;
 }
 
+glm::vec3 const& camera::position() const
+{
+	return m_position;
+}
+
 void camera::translate(const glm::vec3& v)
 {
-	position += v*orientation();
+	m_position += v*orientation();
 }
 
 void camera::pitch(float angle)
@@ -46,7 +51,8 @@ void camera::roll(float angle)
 
 [[nodiscard]] glm::mat4 camera::view() const
 {
-	return glm::inverse(glm::translate(glm::mat4_cast(orientation()), position));
+	auto const view = glm::translate(glm::mat4_cast(orientation()), m_position);
+	return glm::inverse(view);
 }
 
 } // end of namespace ug::graphics

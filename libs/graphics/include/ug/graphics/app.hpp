@@ -37,7 +37,7 @@ public:
 
 	void clear() const;
 
-	void set_clear_color(graphics::color const& clear) const;
+	void set_clear_color(graphics::color4 const& clear) const;
 	void set_clear_color(
 		float r,
 		float g,
@@ -121,6 +121,7 @@ protected:
 	rect2d m_viewport{ {0, 0}, 0, 0 };
 
 	ug::graphics::camera m_camera;
+public:
 	app::projection_type projection_type = app::projection_type::ORTHOGRAPHIC;
 };
 

@@ -143,7 +143,7 @@ void grid2d_render::operator()()
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 }
 
-void grid2d_render::set_grid_color(color const& c)
+void grid2d_render::set_grid_color(color4 const& c)
 {
 	m_grid_color = c;
 }

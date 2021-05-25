@@ -14,6 +14,8 @@ public:
 	virtual ~buffer();
 	void bind() const;
 
+	buffer(buffer const&) = delete;
+
 	/**
 	  * sets the buffer data
 	  * 

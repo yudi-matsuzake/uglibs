@@ -28,7 +28,7 @@ public:
 	  */
 	void operator()(segment2d const& b);
 
-	void set_color(graphics::color const& c);
+	void set_color(graphics::color4 const& c);
 protected:
 
 	vertex_shader m_vertex_shader;
@@ -39,7 +39,7 @@ protected:
 	vao m_vscr_vao;
 	vbo m_vscr_vbo;
 
-	color m_color = { 1.0, 1.0, 1.0, 1.0 };
+	color4 m_color = { 1.0, 1.0, 1.0, 1.0 };
 };
 
 }

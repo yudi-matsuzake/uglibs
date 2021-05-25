@@ -22,7 +22,7 @@ public:
 	  */
 	void operator()();
 
-	void set_grid_color(color const& c);
+	void set_grid_color(color4 const& c);
 
 protected:
 
@@ -35,7 +35,7 @@ protected:
 	vbo m_vscr_vbo;
 	ebo m_vscr_ebo;
 
-	color m_grid_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	color4 m_grid_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 };
 
 }

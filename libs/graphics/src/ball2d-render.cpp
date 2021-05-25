@@ -148,7 +148,7 @@ void ball2d_render::operator()(ball2d const& b)
 	GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 }
 
-void ball2d_render::set_fill_color(graphics::color const& c)
+void ball2d_render::set_fill_color(graphics::color4 const& c)
 {
 	m_fill_color = c;
 }

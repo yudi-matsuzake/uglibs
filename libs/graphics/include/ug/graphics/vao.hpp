@@ -92,6 +92,8 @@ public:
 	vao();
 	virtual ~vao();
 
+	vao(vao const&) = delete;
+
 	void bind() const;
 
 	uint32_t id() const;

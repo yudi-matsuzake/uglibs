@@ -90,7 +90,7 @@ void segment2d_render::operator()(segment2d const& s)
 	GL(glDrawArrays(GL_LINES, 0, 2));
 }
 
-void segment2d_render::set_color(graphics::color const& c)
+void segment2d_render::set_color(graphics::color4 const& c)
 {
 	m_color = c;
 }

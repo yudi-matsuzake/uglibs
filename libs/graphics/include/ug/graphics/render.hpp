@@ -8,6 +8,7 @@ class render{
 public:
 	render(app* app_ptr);
 
+	app const* get_app() const;
 	app* get_app();
 
 protected:

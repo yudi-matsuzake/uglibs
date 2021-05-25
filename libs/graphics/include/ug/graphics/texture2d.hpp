@@ -44,7 +44,7 @@ public:
 	void set_texture_magnifier_filter(filter_type filter);
 	void set_texture_minifier_filter(filter_type filter);
 
-	void set_border_color(color const& border_color) const;
+	void set_border_color(color4 const& border_color) const;
 
 	void generate_mipmap();
 

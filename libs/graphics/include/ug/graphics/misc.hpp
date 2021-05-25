@@ -25,7 +25,8 @@ namespace acs = ranges::actions;
  * structs and aliases
  * ===================
  */
-using color = glm::vec4;
+using color4 = glm::vec4;
+using color3 = glm::vec3;
 using scalar = double;
 
 struct rect2d{

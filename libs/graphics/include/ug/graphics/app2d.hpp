@@ -44,8 +44,9 @@ protected:
 
 	bool m_show_grid = true;
 
-	ug::graphics::color m_background_color{.0f, .0f, .0f, 1.0f};
-	ug::graphics::color m_grid_color{.5f, .5f, .5f, 1.0f};
+	// TODO: background with alpha value makes any sense at all?
+	ug::graphics::color4 m_background_color{.0f, .0f, .0f, 1.0f};
+	ug::graphics::color4 m_grid_color{.5f, .5f, .5f, 1.0f};
 
 };
 

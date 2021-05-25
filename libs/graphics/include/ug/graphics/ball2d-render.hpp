@@ -28,8 +28,8 @@ public:
 	  */
 	void operator()(ball2d const& b);
 
-	void set_boundary_color(graphics::color const& c);
-	void set_fill_color(graphics::color const& c);
+	void set_boundary_color(graphics::color4 const& c);
+	void set_fill_color(graphics::color4 const& c);
 	void set_draw_boundary(bool b);
 	void set_draw_fill(bool b);
 	void set_thick(float t);
@@ -44,9 +44,9 @@ protected:
 	vbo m_vscr_vbo;
 	ebo m_vscr_ebo;
 
-	color m_fill_color = { 1.0, 1.0, 1.0, 1.0 };
+	color4 m_fill_color = { 1.0, 1.0, 1.0, 1.0 };
 
-	graphics::color m_boundary_color = graphics::color{
+	graphics::color4 m_boundary_color = graphics::color4{
 		1.0, 1.0, 1.0, 1.0
 	};
 

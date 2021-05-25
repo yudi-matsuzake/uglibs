@@ -11,4 +11,9 @@ app* render::get_app()
 	return m_app;
 }
 
+app const* render::get_app() const
+{
+	return m_app;
+}
+
 } // end of namespace graphics

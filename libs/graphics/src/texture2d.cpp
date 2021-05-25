@@ -89,7 +89,7 @@ void texture2d::set_texture_minifier_filter(filter_type filter)
 	));
 }
 
-void texture2d::set_border_color(color const& border_color) const
+void texture2d::set_border_color(color4 const& border_color) const
 {
 	bind();
 	GL(glTexParameterfv(

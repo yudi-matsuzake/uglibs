@@ -53,6 +53,9 @@ add_library(
 	./src/camera.cpp
 	./src/camera2d-controller.cpp
 	./src/segment2d-render.cpp
+	./src/scene.cpp
+	./src/mesh3d-render.cpp
+	./src/mesh3d.cpp
 
 	./include/ug/graphics/program.hpp
 	./include/ug/graphics/misc.hpp
@@ -72,6 +75,9 @@ add_library(
 	./include/ug/graphics/camera.hpp
 	./include/ug/graphics/camera2d-controller.hpp
 	./include/ug/graphics/segment2d-render.hpp
+	./include/ug/graphics/scene.hpp
+	./include/ug/graphics/mesh3d.hpp
+	./include/ug/graphics/mesh3d-render.hpp
 )
 target_link_libraries(
 	graphics
@@ -118,6 +124,9 @@ if(${GRAPHICS_TEST})
 
 	add_executable(hello-segment ./test/hello-segment.cpp)
 	target_link_libraries(hello-segment PRIVATE graphics)
+
+	add_executable(hello-scene ./test/hello-scene.cpp)
+	target_link_libraries(hello-scene PRIVATE graphics)
 endif()
 
 # installing ------------------------------------------------------------------
