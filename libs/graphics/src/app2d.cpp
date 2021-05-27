@@ -2,14 +2,17 @@
 
 namespace ug::graphics{
 
-app2d::app2d(char const* title)
+app2d::app2d(int width, int height, char const* title)
 	: app(width, height, title),
 	  m_grid(this)
 {
-	/* add_component(m_zoom); */
 	add_component(m_camera_controller);
 	m_grid.set_grid_color({ 1.0, 1.0, 1.0, 0.25 });
 }
+
+app2d::app2d(char const* title)
+	: app2d(default_width, default_height, title)
+{}
 
 void app2d::on_key_input(ug::graphics::key_input const& k)
 {
@@ -55,8 +58,13 @@ void app2d::draw_ui()
 
 	bool p_open = true;
 
+	auto [ width, height ] = get_framebuffer_size();
+
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(width, 20), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(
+		ImVec2(static_cast<float>(width), 20.f),
+		ImGuiCond_Always
+	);
 	ImGui::Begin("app2d options", &p_open, window_flags);
 
 	auto fr = static_cast<double>(ImGui::GetIO().Framerate);

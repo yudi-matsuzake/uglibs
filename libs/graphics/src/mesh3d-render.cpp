@@ -113,9 +113,6 @@ void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
 	m_program.set_uniform("u_light_pos", glm::vec3(3., 3., 3.));
 	m_program.set_uniform("u_view_pos", glm::vec3(0., 0., 6.));
 	m_program.set_uniform("u_light_color", glm::vec3(1., 1., 1.));
-	/* m_program.set_uniform("u_light_pos", s.lights.at(0).position); */
-	/* m_program.set_uniform("u_view_pos", s.camera.position()); */
-	/* m_program.set_uniform("u_light_color", glm::vec3(1., 1., 1.)); */
 
 	GL(glDrawElements(
 			GL_TRIANGLES,

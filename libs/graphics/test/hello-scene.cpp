@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <memory>
 
+#include "ug/graphics/app3d.hpp"
 #include "ug/graphics/mesh3d-render.hpp"
 #include "ug/graphics/scene.hpp"
 #include "ug/graphics/inputs.hpp"
@@ -65,7 +66,7 @@ auto make_cube_mesh()
 	);
 }
 
-class hello_scene : public ug::graphics::app{
+class hello_scene : public ug::graphics::app3d{
 private:
 
 	struct input{
@@ -187,29 +188,22 @@ private:
 
 public:
 	hello_scene()
-		: ug::graphics::app(1280, 720, "Hello scene/mesh render")
+		: ug::graphics::app3d(1280, 720, "Hello scene/mesh render")
 	{
+		set_clear_flags(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		GL(glClearColor(0.f, 0.f, 0.f, 1.f));
 		scene.meshes.emplace_back(make_cube_mesh());
-
-		glfwSetFramebufferSizeCallback(this->ptr(), framebuffer_size_callback);
-
-		GL(glEnable(GL_DEPTH_TEST));
-		GL(glEnable(GL_BLEND));
-		GL(glViewport(0, 0, 1280, 720));
-		GL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	}
 
 	void update() override
 	{
-		input in = process_inputs(in);
+		static input in{};
+		in = process_inputs(in);
 		update_camera(in);
 	}
 
 	void draw() override
 	{
-		GL(glClearColor(0.f, 0.f, 0.f, 1.f));
-		GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
 		scene.meshes[0]->transform(
 			glm::rotate(
 				static_cast<float>(this->get_delta()*M_PI),
@@ -234,15 +228,6 @@ private:
 
 	ug::graphics::mesh3d_render mesh_render = ug::graphics::mesh3d_render(this);
 
-	static void framebuffer_size_callback(GLFWwindow* w, int width, int height)
-	{
-		GL(glViewport(0, 0, width, height));
-		hello_scene* app = static_cast<hello_scene*>(glfwGetWindowUserPointer(w));
-		auto vp = app->get_viewport();
-		vp.width = static_cast<float>(width);
-		vp.height = static_cast<float>(height);
-		app->set_viewport(vp);
-	}
 };
 
 int main(int const, char const* const* const)

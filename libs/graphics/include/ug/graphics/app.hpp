@@ -36,6 +36,7 @@ public:
 	virtual ~app();
 
 	void clear() const;
+	void set_clear_flags(GLbitfield clear_flags);
 
 	void set_clear_color(graphics::color4 const& clear) const;
 	void set_clear_color(
@@ -116,6 +117,8 @@ protected:
 	double m_delta{ 0.0 };
 
 	float m_zoom{ 1.0 };
+
+	GLbitfield m_clear_flags = GL_COLOR_BUFFER_BIT;
 
 	component_manager m_component_manager;
 	rect2d m_viewport{ {0, 0}, 0, 0 };

@@ -8,17 +8,19 @@ namespace ug::graphics{
 
 class app2d : public app{
 public:
-	static constexpr auto width = 1280;
-	static constexpr auto height = 720;
-	static constexpr auto fwidth =  static_cast<float>(width);
-	static constexpr auto fheight = static_cast<float>(height);
+	static constexpr auto default_width = 1280;
+	static constexpr auto default_height = 720;
+	static constexpr auto default_fwidth =  static_cast<float>(default_width);
+	static constexpr auto default_fheight = static_cast<float>(default_height);
 
 	static constexpr std::array exit_keys{
 		GLFW_KEY_ESCAPE,
 		GLFW_KEY_Q
 	};
 
+	app2d(int width, int height, char const* title);
 	app2d(char const* title);
+
 	virtual ~app2d() = default;
 
 	virtual void on_key_input(ug::graphics::key_input const& k) override;

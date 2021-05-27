@@ -5,6 +5,16 @@
 
 namespace ug::graphics{
 
+static void framebuffer_size_callback(GLFWwindow* w, int width, int height)
+{
+	GL(glViewport(0, 0, width, height));
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(w));
+	auto vp = a->get_viewport();
+	vp.width = static_cast<float>(width);
+	vp.height = static_cast<float>(height);
+	a->set_viewport(vp);
+}
+
 /*
  * app constructors and destructors
  * ================================
@@ -22,6 +32,7 @@ app::app(
 	  },
 		projection_type(proj_type)
 {
+	glfwSetFramebufferSizeCallback(this->ptr(), framebuffer_size_callback);
 
 	if(!gladLoadGL())
 		throw std::runtime_error("glad could not be loaded");
@@ -30,6 +41,7 @@ app::app(
 
 	GL(glEnable(GL_BLEND));
 	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
+
 
 	/*
 	 * imgui context
@@ -61,7 +73,12 @@ app::~app()
 
 void app::clear() const
 {
-	GL(glClear(GL_COLOR_BUFFER_BIT));
+	GL(glClear(m_clear_flags));
+}
+
+void app::set_clear_flags(GLbitfield clear_flags)
+{
+	m_clear_flags = clear_flags;
 }
 
 void app::set_clear_color(
