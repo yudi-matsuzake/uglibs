@@ -3,8 +3,8 @@
 namespace ug::graphics{
 
 mesh3d::mesh3d(
-	std::vector<mesh3d_attributes_layout> const&& a_attributes,
-	std::vector<uint32_t> const&& a_indices)
+	std::vector<mesh3d_attributes_layout>&& a_attributes,
+	std::vector<uint32_t>&& a_indices)
 	: m_attributes(a_attributes), m_indices(a_indices)
 {
 	vao.bind();

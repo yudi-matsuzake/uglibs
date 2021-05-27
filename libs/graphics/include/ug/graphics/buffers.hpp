@@ -15,6 +15,7 @@ public:
 	void bind() const;
 
 	buffer(buffer const&) = delete;
+	buffer(buffer&&) = default;
 
 	/**
 	  * sets the buffer data

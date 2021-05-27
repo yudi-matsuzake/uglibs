@@ -93,6 +93,7 @@ public:
 	virtual ~vao();
 
 	vao(vao const&) = delete;
+	vao(vao&&) = default;
 
 	void bind() const;
 

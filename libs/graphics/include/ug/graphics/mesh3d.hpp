@@ -16,8 +16,8 @@ class mesh3d{
 public:
 
 	explicit mesh3d(
-		std::vector<mesh3d_attributes_layout> const&& attributes,
-		std::vector<uint32_t> const&& indices);
+		std::vector<mesh3d_attributes_layout>&& attributes,
+		std::vector<uint32_t>&& indices);
 
 	void bind() const;
 
