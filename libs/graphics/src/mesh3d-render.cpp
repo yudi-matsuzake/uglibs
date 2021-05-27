@@ -95,24 +95,15 @@ void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
 	mesh.bind();
 
 	auto const view = s.camera.view();
-
-	auto const [ sw, sh ] = get_app()->get_framebuffer_size();
-	auto const screen_width = static_cast<float>(sw);
-	auto const screen_height = static_cast<float>(sh);
-
-	auto const projection = glm::perspective(
-		glm::radians(45.f),
-		screen_width / screen_height,
-		.1f, 100.f
-	);
-
+	auto const projection = get_app()->compute_projection_matrix();
+	auto const& light = s.lights.at(0);
 
 	m_program.set_uniform("u_model", mesh.model_matrix() );
 	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_projection", projection);
-	m_program.set_uniform("u_light_pos", glm::vec3(3., 3., 3.));
-	m_program.set_uniform("u_view_pos", glm::vec3(0., 0., 6.));
-	m_program.set_uniform("u_light_color", glm::vec3(1., 1., 1.));
+	m_program.set_uniform("u_view_pos", s.camera.position());
+	m_program.set_uniform("u_light_pos", light.position);
+	m_program.set_uniform("u_light_color", light.color);
 
 	GL(glDrawElements(
 			GL_TRIANGLES,

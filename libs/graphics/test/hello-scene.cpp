@@ -220,7 +220,7 @@ private:
 		{},
 		std::vector{
 			ug::graphics::light3d{
-				glm::vec3{ 1.f, 1.f, 1.f },
+				glm::vec3{ 3.f, 3.f, 3.f },
 				ug::graphics::color3{ 1.f, 1.f, 1.f }
 			}
 		}
