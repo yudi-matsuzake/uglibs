@@ -107,7 +107,7 @@ void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
 
 	GL(glDrawElements(
 			GL_TRIANGLES,
-			static_cast<int>(mesh.attributes().size()),
+			static_cast<int>(mesh.indices().size()),
 			GL_UNSIGNED_INT,
 			0
 	));

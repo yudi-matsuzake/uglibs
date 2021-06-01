@@ -190,7 +190,6 @@ public:
 	hello_scene()
 		: ug::graphics::app3d(1280, 720, "Hello scene/mesh render")
 	{
-		set_clear_flags(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		GL(glClearColor(0.f, 0.f, 0.f, 1.f));
 		scene.meshes.emplace_back(make_cube_mesh());
 	}

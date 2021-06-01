@@ -13,6 +13,7 @@ app3d::app3d(
 	GL(glEnable(GL_BLEND));
 	GL(glViewport(0, 0, 1280, 720));
 	GL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	set_clear_flags(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 

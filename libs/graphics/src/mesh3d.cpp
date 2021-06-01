@@ -42,7 +42,7 @@ std::vector<uint32_t> const& mesh3d::indices() const
 
 void mesh3d::transform(glm::mat4 const& t)
 {
-	model = t*model;
+	model = model*t;
 }
 
 } // end of namespace ug::graphics

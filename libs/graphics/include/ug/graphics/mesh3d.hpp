@@ -36,7 +36,7 @@ private:
 
 	std::vector<mesh3d_attributes_layout>	m_attributes;
 	std::vector<uint32_t>	m_indices;
-	glm::mat4 model = glm::mat4(1.);
+	glm::mat4 model = glm::mat4(1.f);
 };
 
 
