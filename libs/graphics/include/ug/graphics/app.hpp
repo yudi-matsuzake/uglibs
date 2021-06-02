@@ -62,14 +62,17 @@ public:
 
 	virtual int32_t run();
 
-	void update_components() const;
-	void update_all();
-
 	virtual void update();
 	virtual void draw();
+	virtual void finally();
 
+	void update_components() const;
 	void draw_components() const;
+	void finally_components() const;
+
+	void update_all();
 	void draw_all();
+	void finally_all();
 
 	virtual void draw_ui();
 	virtual void draw_components_ui();

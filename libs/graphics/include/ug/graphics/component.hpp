@@ -21,6 +21,7 @@ public:
 	virtual void update();
 	virtual void draw();
 	virtual void draw_ui();
+	virtual void finally();
 
 	virtual void on_key_input(key_input const&);
 	virtual void on_scroll_input(scroll_input const&);

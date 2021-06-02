@@ -181,8 +181,10 @@ void app::on_scroll_input(scroll_input const& input)
 }
 
 void app::update()
-{
-}
+{}
+
+void app::finally()
+{}
 
 void app::update_components() const
 {
@@ -192,10 +194,24 @@ void app::update_components() const
 	}
 }
 
+void app::finally_components() const
+{
+	for(auto&& [ id, ptr ] : m_component_manager){
+		if(auto c = ptr.lock())
+			c->finally();
+	}
+}
+
 void app::update_all()
 {
 	update();
 	update_components();
+}
+
+void app::finally_all()
+{
+	finally();
+	finally_components();
 }
 
 void app::draw()
@@ -254,6 +270,8 @@ int app::run()
 
 		swap_buffers();
 		poll_events();
+
+		finally_all();
 	}
 
 	return EXIT_SUCCESS;
