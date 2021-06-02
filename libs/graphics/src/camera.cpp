@@ -4,6 +4,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/quaternion.hpp"
+#include <glm/ext/quaternion_geometric.hpp>
+#include <glm/geometric.hpp>
+#include <glm/gtx/transform.hpp>
 
 namespace ug::graphics{
 
@@ -11,17 +14,21 @@ camera::camera(const glm::vec3& pos)
 	: m_position(pos)
 {}
 
-[[nodiscard]] const glm::quat camera::orientation() const
+camera::camera(glm::vec3 const& pos, glm::vec3 const& dir)
+	: m_position(pos), m_direction(dir)
+{}
+
+[[nodiscard]] glm::vec3 camera::compute_right_axis() const
 {
-	glm::quat q = glm::angleAxis(
-		x_angle,
-		glm::vec3(1., 0., 0.)
-	);
+	static constexpr auto up = glm::vec3{ 0.f, 1.f, 0.f };
+	return glm::normalize(glm::cross(m_direction, up));
+}
 
-	q *= glm::angleAxis(y_angle, glm::vec3(.0, 1., 0.));
-	q *= glm::angleAxis(z_angle, glm::vec3(0., 0., 1.));
-
-	return q;
+[[nodiscard]] glm::vec3 camera::compute_up_axis(
+	std::optional<glm::vec3> const& right) const
+{
+	auto const r = right.has_value() ? right.value() : compute_right_axis();
+	return glm::normalize(glm::cross(r, m_direction));
 }
 
 glm::vec3 const& camera::position() const
@@ -29,30 +36,21 @@ glm::vec3 const& camera::position() const
 	return m_position;
 }
 
-void camera::translate(const glm::vec3& v)
-{
-	m_position += v*orientation();
-}
-
-void camera::pitch(float angle)
-{
-	x_angle += angle;
-}
-
-void camera::yall(float angle)
-{
-	y_angle += angle;
-}
-
-void camera::roll(float angle)
-{
-	z_angle += angle;
-}
-
 [[nodiscard]] glm::mat4 camera::view() const
 {
-	auto const view = glm::translate(glm::mat4_cast(orientation()), m_position);
-	return glm::inverse(view);
+	return glm::lookAt(m_position, m_position + m_direction, compute_up_axis());
+}
+
+void camera::translate(glm::vec3 const& offset)
+{
+	auto const right = compute_right_axis();
+	auto const up = compute_up_axis(right);
+	m_position += offset.x * right + offset.y * up + offset.z * -m_direction;
+}
+
+void camera::aim_to(glm::vec3 const& p)
+{
+	m_direction = glm::normalize(p - m_position);
 }
 
 } // end of namespace ug::graphics

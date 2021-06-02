@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "ug/graphics/misc.hpp"
 
 namespace ug::graphics{
@@ -8,25 +10,24 @@ class camera{
 public:
 	camera() = default;
 
-	camera(const glm::vec3&);
+	explicit camera(glm::vec3 const&);
 
-	[[nodiscard]] const glm::quat orientation() const;
-	[[nodiscard]] glm::mat4 view() const;
+	explicit camera(glm::vec3 const&, glm::vec3 const&);
 
 	glm::vec3 const& position() const;
+	glm::vec3 const& direction() const;
 
-	void translate(const glm::vec3& v);
-
-	void pitch(float angle);
-	void yall(float angle);
-	void roll(float angle);
+	[[nodiscard]] glm::mat4 view() const;
+	void translate(glm::vec3 const& v);
+	void aim_to(glm::vec3 const& p);
 
 private:
-	glm::vec3 m_position = glm::vec3(0., 0., 0.);
+	[[nodiscard]] glm::vec3 compute_right_axis() const;
+	[[nodiscard]] glm::vec3 compute_up_axis(
+		std::optional<glm::vec3> const& right = std::nullopt) const;
 
-	float x_angle = 0.f;
-	float y_angle = 0.f;
-	float z_angle = 0.f;
+	glm::vec3 m_position = glm::vec3{0.f, 0.f, 1.f};
+	glm::vec3 m_direction = glm::vec3{0.f, 0.f, -1.f};
 };
 
 } // end of namespace ug::graphics
