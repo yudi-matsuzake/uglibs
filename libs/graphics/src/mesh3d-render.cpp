@@ -101,7 +101,7 @@ void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
 	m_program.set_uniform("u_model", mesh.model_matrix() );
 	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_projection", projection);
-	m_program.set_uniform("u_view_pos", s.camera.position());
+	m_program.set_uniform("u_view_pos", s.camera.position);
 	m_program.set_uniform("u_light_pos", light.position);
 	m_program.set_uniform("u_light_color", light.color);
 
