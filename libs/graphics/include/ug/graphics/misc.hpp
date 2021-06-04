@@ -8,7 +8,6 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtx/transform.hpp"
 
-#include "range/v3/all.hpp"
 #include "fmt/format.h"
 #include "fmt/ostream.h"
 
@@ -16,10 +15,6 @@
 
 
 namespace ug::graphics{
-
-namespace rgs = ranges;
-namespace vws = ranges::views;
-namespace acs = ranges::actions;
 
 /*
  * structs and aliases

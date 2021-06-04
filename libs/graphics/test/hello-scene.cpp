@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <cstdlib>
 #include <memory>
+#include <numeric>
 
 #include "ug/graphics/app3d.hpp"
 #include "ug/graphics/mesh3d-render.hpp"

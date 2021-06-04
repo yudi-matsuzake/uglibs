@@ -70,8 +70,9 @@ uint32_t shader::id() const
 void shader::set_source(shader_source const& source)
 {
 	std::vector<char const*> src_ptr(source.size());
-	rgs::transform(
-		source, begin(src_ptr),
+	std::transform(
+		begin(source), end(source),
+		begin(src_ptr),
 		[](auto const& str){ return str.data(); }
 	);
 
