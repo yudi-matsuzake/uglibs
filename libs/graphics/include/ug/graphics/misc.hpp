@@ -8,9 +8,6 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtx/transform.hpp"
 
-#include "fmt/format.h"
-#include "fmt/ostream.h"
-
 #include "ug/graphics/opengl-error.hpp"
 
 
