@@ -58,12 +58,7 @@ auto make_cube_mesh()
 			{ {  .5f,  .5f,  .5f }, { .0f,  1.0f,  .0f }, { .5f, .25f, 1.f, 1.f } },
 			{ { -.5f,  .5f,  .5f }, { .0f,  1.0f,  .0f }, { .5f, .25f, 1.f, 1.f } },
 			{ { -.5f,  .5f, -.5f }, { .0f,  1.0f,  .0f }, { .5f, .25f, 1.f, 1.f } }
-		},
-		[]{
-			std::vector<uint32_t> v(36);
-			std::iota(v.begin(), v.end(), 0U);
-			return v;
-		}()
+		}
 	);
 }
 

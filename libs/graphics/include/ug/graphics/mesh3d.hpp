@@ -15,9 +15,7 @@ struct mesh3d_attributes_layout{
 class mesh3d{
 public:
 
-	explicit mesh3d(
-		std::vector<mesh3d_attributes_layout>&& attributes,
-		std::vector<uint32_t>&& indices);
+	explicit mesh3d(std::vector<mesh3d_attributes_layout>&& attributes);
 
 	void bind() const;
 
@@ -25,17 +23,13 @@ public:
 
 	std::vector<mesh3d_attributes_layout> const& attributes() const;
 
-	std::vector<uint32_t> const& indices() const;
-
 	void transform(glm::mat4 const&);
 
 private:
 	ug::graphics::vao vao;
 	ug::graphics::vbo vbo;
-	ug::graphics::ebo ebo;
 
 	std::vector<mesh3d_attributes_layout>	m_attributes;
-	std::vector<uint32_t>	m_indices;
 	glm::mat4 model = glm::mat4(1.f);
 };
 

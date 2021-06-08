@@ -89,7 +89,9 @@ mesh3d_render::mesh3d_render(app* app_ptr)
 	: render(app_ptr), m_program(make_program())
 {}
 
-void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
+void mesh3d_render::operator()(
+	scene const& s,
+	mesh3d const& mesh)
 {
 	m_program.use();
 	mesh.bind();
@@ -105,12 +107,8 @@ void mesh3d_render::operator()(scene const& s, mesh3d const& mesh)
 	m_program.set_uniform("u_light_pos", light.position);
 	m_program.set_uniform("u_light_color", light.color);
 
-	GL(glDrawElements(
-			GL_TRIANGLES,
-			static_cast<int>(mesh.indices().size()),
-			GL_UNSIGNED_INT,
-			0
-	));
+	auto count = static_cast<int32_t>(mesh.attributes().size());
+	GL(glDrawArrays(GL_TRIANGLES, 0, count));
 }
 
 } // end of namespace ug::graphics
