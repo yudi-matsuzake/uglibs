@@ -42,26 +42,37 @@ uniform vec3 u_light_pos;
 uniform vec3 u_view_pos;
 uniform vec3 u_light_color;
 
+uniform float u_ambient_light_strength;
+uniform float u_specular_strength;
+uniform bool u_specular_lighting;
+uniform bool u_diffuse_lighting;
+
 void main()
 {
-	// ambient
-	float ambient_strength = 0.1;
-	vec3 ambient = ambient_strength * u_light_color;
-
-	// diffuse
+	vec3 light = vec3(0.f, 0.f, 0.f);
 	vec3 norm = normalize(normal);
 	vec3 lightDir = normalize(u_light_pos - frag_pos);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * u_light_color;
+
+	// ambient
+	light += u_ambient_light_strength * u_light_color;
+
+	// diffuse
+	if(u_diffuse_lighting){
+		float diff = max(dot(norm, lightDir), 0.0);
+		vec3 diffuse = diff * u_light_color;
+		light += diffuse;
+	}
 
 	// specular
-	float specular_strength = 0.5;
-	vec3 view_dir = normalize(u_view_pos - frag_pos);
-	vec3 reflect_dir = reflect(-lightDir, norm);  
-	float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
-	vec3 specular = specular_strength * spec * u_light_color;  
+	if(u_specular_lighting){
+		vec3 view_dir = normalize(u_view_pos - frag_pos);
+		vec3 reflect_dir = reflect(-lightDir, norm);  
+		float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
+		vec3 specular = u_specular_strength * spec * u_light_color;  
+		light += specular;
+	}
 
-	vec3 result = (ambient + diffuse + specular) * v_color.rgb;
+	vec3 result = clamp(light, 0.f, 1.f) * v_color.rgb;
 	frag_color = vec4(result, v_color.a);
 } 
 )__"};
@@ -104,8 +115,14 @@ void mesh3d_render::operator()(
 	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_projection", projection);
 	m_program.set_uniform("u_view_pos", s.camera.position);
+
 	m_program.set_uniform("u_light_pos", light.position);
 	m_program.set_uniform("u_light_color", light.color);
+
+	m_program.set_uniform("u_ambient_light_strength", ambient_light_strength);
+	m_program.set_uniform("u_diffuse_lighting", diffuse_lighting);
+	m_program.set_uniform("u_specular_lighting", specular_lighting);
+	m_program.set_uniform("u_specular_strength", specular_strength);
 
 	auto count = static_cast<int32_t>(mesh.attributes().size());
 	GL(glDrawArrays(GL_TRIANGLES, 0, count));
