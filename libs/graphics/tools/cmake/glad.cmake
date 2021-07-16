@@ -1,4 +1,4 @@
-set(GLAD_DIR ${CMAKE_SOURCE_DIR}/external/glad)
+set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/glad)
 
 set(GLAD_SRC ${GLAD_DIR}/src/glad.c)
 set(GLAD_HEADER 
