@@ -113,10 +113,6 @@ target_include_directories(
 )
 target_compile_features(graphics PUBLIC cxx_std_20)
 
-# include(CTest)
-# include(Catch)
-# catch_discover_tests(shrep-tests)
-
 # test programs
 option(GRAPHICS_TEST "Add test programs for graphics library" ON)
 
