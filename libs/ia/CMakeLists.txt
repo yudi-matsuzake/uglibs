@@ -42,7 +42,7 @@ if(ENABLE_TESTING)
 
 	include(CTest)
 	include(Catch)
-	catch_discover_tests(ia-tests)
+	catch_discover_tests(ia-tests TEST_PREFIX "ia-")
 endif()
 
 if(ENABLE_PCH)

@@ -36,7 +36,7 @@ if(ENABLE_TESTING)
 
 	include(CTest)
 	include(Catch)
-	catch_discover_tests(gmt-tests)
+	catch_discover_tests(gmt-tests TEST_PREFIX "gmt-")
 endif()
 
 if(ENABLE_PCH)

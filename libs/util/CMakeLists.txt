@@ -40,7 +40,7 @@ if(ENABLE_TESTING)
 
 	include(CTest)
 	include(Catch)
-	catch_discover_tests(util-tests)
+	catch_discover_tests(util-tests TEST_PREFIX "util-")
 endif()
 
 if(ENABLE_PCH)
