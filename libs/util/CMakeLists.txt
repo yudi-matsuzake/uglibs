@@ -4,6 +4,8 @@ project(util DESCRIPTION "util c++ library" VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
+find_package(OpenCV REQUIRED)
+
 add_library(util
 	./include/util/run-length-container.hpp
 	./include/util/io.hpp
@@ -18,6 +20,8 @@ add_library(util
 	./src/io.cpp)
 
 add_library(util::util ALIAS util)
+target_include_directories(util PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(util PUBLIC ${OpenCV_LIBS})
 
 target_include_directories(
 	util PUBLIC
