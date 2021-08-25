@@ -11,10 +11,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 add_library(gmt INTERFACE)
 add_library(gmt::gmt ALIAS gmt)
 
-if(NOT util_SOURCE_DIR)
-	find_package(util REQUIRED)
-endif()
-
 target_include_directories(
 	gmt INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -23,7 +19,11 @@ target_include_directories(
 target_compile_features(gmt INTERFACE cxx_std_20)
 
 if(ENABLE_TESTING)
+	if(NOT util_SOURCE_DIR)
+		find_package(util REQUIRED)
+	endif()
 	find_package(Catch2 REQUIRED)
+
 	enable_testing()
 	add_executable(
 		gmt-tests
@@ -59,7 +59,7 @@ set_property(TARGET gmt PROPERTY VERSION ${PROJECT_VERSION})
 set_property(TARGET gmt PROPERTY SOVERSION ${PROJECT_VERSION_MAJOR})
 set_property(TARGET gmt
 	APPEND PROPERTY
-	COMPATIBLE_INTERFACE_STRING gmt_MAJOR_VERSION)
+	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
 install(TARGETS gmt EXPORT gmtTargets
 	LIBRARY DESTINATION lib
