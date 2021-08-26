@@ -8,7 +8,7 @@
 #include <optional>
 #include <compare>
 
-namespace util{
+namespace containers{
 
 /**
   * represents a run length item
@@ -392,8 +392,8 @@ public:
 		* `index`
 		*/
 	constexpr auto add_rl_item_at(
-			uint64_t index,
-			util::run_length_item<T> const& rl_item)
+		uint64_t index,
+		containers::run_length_item<T> const& rl_item)
 	{
 			base().emplace_back(rl_item);
 			rotate(base().rbegin(), base().rend() - static_cast<int64_t>(index));

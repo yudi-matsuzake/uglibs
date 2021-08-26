@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 void semantic_equal(
-		util::run_length_container<char> const& rlc,
+		containers::run_length_container<char> const& rlc,
 		std::vector<char> const& gt)
 {
 	REQUIRE(rlc.size() == gt.size());
@@ -18,7 +18,7 @@ void semantic_equal(
 
 template<class F>
 void vector_comparison(
-		util::run_length_container<char>& rlc,
+		containers::run_length_container<char>& rlc,
 		std::vector<char>& gt,
 		F&& f)
 {
@@ -29,9 +29,9 @@ void vector_comparison(
 
 template<class F>
 void run_length_check(
-		util::run_length_container<char>& rlc,
+		containers::run_length_container<char>& rlc,
 		std::vector<char>& gt,
-		std::vector<util::run_length_item<char>> const& rl_gt,
+		std::vector<containers::run_length_item<char>> const& rl_gt,
 		F&& f)
 {
 	f(rlc);
@@ -49,7 +49,7 @@ void run_length_check(
 TEST_CASE("sorting", "[run-length-container]")
 {
 	constexpr auto N = 30;
-	util::run_length_container<char> rlc;
+	containers::run_length_container<char> rlc;
 	std::vector<char> gt;
 
 	// push back 
@@ -74,7 +74,7 @@ TEST_CASE("sorting", "[run-length-container]")
 
 TEST_CASE("simple operations", "[run-length-container]")
 {
-	util::run_length_container<char> rlc;
+	containers::run_length_container<char> rlc;
 	std::vector<char> gt;
 
 	// push back 
@@ -207,7 +207,7 @@ TEST_CASE("iterators", "[run-length-container]")
 {
 
 	constexpr auto N = 50;
-	util::run_length_container<char> rlc;
+	containers::run_length_container<char> rlc;
 	std::vector<char> gt;
 
 	// push back 
@@ -245,7 +245,7 @@ TEST_CASE("iterators", "[run-length-container]")
 
 TEST_CASE("random tests", "[run-length-container]")
 {
-	util::run_length_container<char> rlc;
+	containers::run_length_container<char> rlc;
 	std::vector<char> gt;
 
 	constexpr auto N = 100;
