@@ -1,6 +1,6 @@
 #include "catch2/catch.hpp"
 
-#include "util/run-length-container.hpp"
+#include "containers/run-length-container.hpp"
 #include "util/misc-adaptors.hpp"
 
 #include <stdexcept>
@@ -72,7 +72,7 @@ TEST_CASE("sorting", "[run-length-container]")
 
 }
 
-TEST_CASE("Simple operations", "[run-length-container]")
+TEST_CASE("simple operations", "[run-length-container]")
 {
 	util::run_length_container<char> rlc;
 	std::vector<char> gt;
@@ -203,7 +203,7 @@ TEST_CASE("Simple operations", "[run-length-container]")
 }
 
 
-TEST_CASE("Iterators", "[run-length-container]")
+TEST_CASE("iterators", "[run-length-container]")
 {
 
 	constexpr auto N = 50;
@@ -243,7 +243,7 @@ TEST_CASE("Iterators", "[run-length-container]")
 
 }
 
-TEST_CASE("Random tests", "[run-length-container]")
+TEST_CASE("random tests", "[run-length-container]")
 {
 	util::run_length_container<char> rlc;
 	std::vector<char> gt;

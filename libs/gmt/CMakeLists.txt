@@ -32,7 +32,7 @@ if(ENABLE_TESTING)
 		./tests/mat.cpp
 		./tests/cross-product.cpp)
 
-	target_link_libraries(gmt-tests gmt util::util)
+	target_link_libraries(gmt-tests gmt util::util Catch2::Catch2)
 
 	include(CTest)
 	include(Catch)

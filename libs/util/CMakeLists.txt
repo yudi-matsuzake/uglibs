@@ -7,7 +7,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 find_package(OpenCV REQUIRED)
 
 add_library(util
-	./include/util/run-length-container.hpp
 	./include/util/io.hpp
 	./include/util/misc.hpp
 	./include/util/container-operations.hpp
@@ -37,10 +36,9 @@ if(ENABLE_TESTING)
 		util-tests
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp
-		./tests/misc-adaptors.cpp
-		./tests/run-length-container.cpp)
+		./tests/misc-adaptors.cpp)
 
-	target_link_libraries(util-tests util)
+	target_link_libraries(util-tests util Catch2::Catch2)
 
 	include(CTest)
 	include(Catch)
@@ -51,7 +49,6 @@ if(ENABLE_PCH)
 	target_precompile_headers(
 		project_options
 		INTERFACE
-		./include/util/run-length-container.hpp
 		./include/util/io.hpp
 		./include/util/misc.hpp
 		./include/util/container-operations.hpp
