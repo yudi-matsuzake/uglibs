@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <bits/stdint-uintn.h>
 #include <stdexcept>
 #include <iterator>
@@ -27,19 +26,10 @@ constexpr bool operator==(
 	return a.value == b.value && a.count == b.count;
 }
 
-template<class T>
-constexpr std::ostream& operator<<(
-	std::ostream& out,
-	run_length_item<T> const& e)
-{
-	out << e.count << ' ' << e.value;
-	return out;
-}
-
 /**
   * represents a run-length container for sparse arrays, with the same interface
-	* as possible as the std::vector
-	*/
+  * as possible as the std::vector
+  */
 template<class T, class Alloc = std::allocator<run_length_item<T>>>
 class run_length_container : private std::vector<run_length_item<T>, Alloc> {
 public:
@@ -215,10 +205,9 @@ public:
 		using pointer = rl_iterator<RLC>;
 
 
-	static_assert(
-			uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
-			"For the sentinel iterator work properly, we must have the maximum value"
-			" of uint64_t be the same value as uint64_t{0} - 1");
+	static_assert(uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
+		"For the sentinel iterator work properly, we must have the maximum value"
+		" of uint64_t be the same value as uint64_t{0} - 1");
 
 	static constexpr auto sentinel_value = std::numeric_limits<uint64_t>::max();
 
@@ -406,21 +395,21 @@ public:
 
 	/**
 	  * sets the element at index `index` to `e`
-		*
-		* beginning case
-		* 	the element is in the begining of the rl item
-		* 	and it is not the first rl item
-		* 	and `e` is equal to the value of previous rl item
-		*
-		* ending case
-		* 	the element is in the ending of the rl item
-		* 	and it is not the last rl item
-		* 	and `e` is equal to the value of next rl item
-		*
-		* add case
-		*
-		* split
-		*/
+	  *
+	  * beginning case
+	  * 	the element is in the begining of the rl item
+	  * 	and it is not the first rl item
+	  * 	and `e` is equal to the value of previous rl item
+	  *
+	  * ending case
+	  * 	the element is in the ending of the rl item
+	  * 	and it is not the last rl item
+	  * 	and `e` is equal to the value of next rl item
+	  *
+	  * add case
+	  *
+	  * split
+	  */
 	constexpr void set(uint64_t index, T const& e)
 	{
 		auto const rli = find_rl_index(index);

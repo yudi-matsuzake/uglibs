@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 void semantic_equal(
-		containers::run_length_container<char> const& rlc,
-		std::vector<char> const& gt)
+	containers::run_length_container<char> const& rlc,
+	std::vector<char> const& gt)
 {
 	REQUIRE(rlc.size() == gt.size());
 	for(auto i=0UL; i<gt.size(); ++i){
@@ -18,9 +18,9 @@ void semantic_equal(
 
 template<class F>
 void vector_comparison(
-		containers::run_length_container<char>& rlc,
-		std::vector<char>& gt,
-		F&& f)
+	containers::run_length_container<char>& rlc,
+	std::vector<char>& gt,
+	F&& f)
 {
 	f(rlc);
 	f(gt);
@@ -212,11 +212,10 @@ TEST_CASE("iterators", "[run-length-container]")
 
 	// push back 
 	vector_comparison(rlc, gt,
-			[c = util::make_random_sparse_char_array<N>('a', 'd', 5)](auto& v)
-			{
-				for(auto&& i : c)
-					v.push_back(i);
-			}
+		[c = util::make_random_sparse_char_array<N>('a', 'd', 5)](auto& v)
+		{
+			for(auto&& i : c) v.push_back(i);
+		}
 	);
 
 	REQUIRE(std::equal(begin(rlc), end(rlc), begin(gt)));

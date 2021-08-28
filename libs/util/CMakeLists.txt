@@ -8,6 +8,7 @@ find_package(OpenCV REQUIRED)
 
 add_library(util
 	./include/util/io.hpp
+	./include/util/bit.hpp
 	./include/util/misc.hpp
 	./include/util/container-operations.hpp
 	./include/util/misc-adaptors.hpp
@@ -36,6 +37,7 @@ if(ENABLE_TESTING)
 		util-tests
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp
+		./tests/bits.cpp
 		./tests/misc-adaptors.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2)

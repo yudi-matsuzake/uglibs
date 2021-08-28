@@ -28,6 +28,7 @@ if(ENABLE_TESTING)
 	add_executable(
 		containers-tests
 		tests/containers-tests.cpp
+		tests/tight-integer-container.cpp
 		tests/run-length-container.cpp)
 
 	target_link_libraries(containers-tests containers util::util)
