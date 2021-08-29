@@ -27,8 +27,8 @@ endif()
 # find_package(Catch2 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
-# find_package(glm REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
 
 # ug graphics library
 add_library(
@@ -91,6 +91,7 @@ target_link_libraries(
 		glad
 		${OpenCV_LIBS}
 		stdc++fs
+		glm
 )
 target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
