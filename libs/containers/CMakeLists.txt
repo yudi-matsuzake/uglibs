@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(containers
-	DESCRIPTION "containers is a library of containers; the aim is not to substitute the std:: containers but tto complement it"
+	DESCRIPTION "containers is a library of containers; the aim is not to substitute the std:: containers but to complement it"
 	VERSION 0.0.1
 	LANGUAGES CXX)
 
@@ -31,7 +31,7 @@ if(ENABLE_TESTING)
 		tests/tight-integer-container.cpp
 		tests/run-length-container.cpp)
 
-	target_link_libraries(containers-tests containers util::util)
+	target_link_libraries(containers-tests Catch2::Catch2 containers util::util)
 
 	include(CTest)
 	include(Catch)
