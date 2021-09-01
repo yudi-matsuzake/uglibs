@@ -2,8 +2,65 @@
 
 #include "util/bit.hpp"
 
+template<class T>
+[[nodiscard]] constexpr auto set_all(util::bit_index_order order) noexcept
+{
+	auto x = T{0};
+	constexpr auto n = util::number_of_bits<T>();
+	for(auto i=T{0}; i<n; ++i)
+		x = util::set_bit(x, i, order);
+	return x;
+}
+
+template<class T>
+[[nodiscard]] constexpr bool all_is(
+	T n,
+	std::integral auto b,
+	util::bit_index_order order)
+{
+	constexpr auto n_bits = util::number_of_bits<T>();
+	for(auto i=T{0}; i<n_bits; ++i)
+		if(!(util::get_bit(n, i, order) == b))
+			return false;
+	return true;
+}
+
+template<class T>
+constexpr auto test_type()
+{
+	using namespace util;
+	constexpr auto r = bit_order::rightmost{};
+	constexpr auto l = bit_order::leftmost{};
+
+	STATIC_REQUIRE(all_is<T>(set_all<T>(r), T{1}, r));
+	STATIC_REQUIRE(all_is<T>(set_all<T>(l), T{1}, l));
+}
+
+TEST_CASE("number of bits", "[util]")
+{
+	STATIC_REQUIRE(util::number_of_bits<int8_t>() == 8);
+	STATIC_REQUIRE(util::number_of_bits<uint8_t>() == 8);
+	STATIC_REQUIRE(util::number_of_bits<int16_t>() == 16);
+	STATIC_REQUIRE(util::number_of_bits<uint16_t>() == 16);
+	STATIC_REQUIRE(util::number_of_bits<int32_t>() == 32);
+	STATIC_REQUIRE(util::number_of_bits<uint32_t>() == 32);
+	STATIC_REQUIRE(util::number_of_bits<int64_t>() == 64);
+	STATIC_REQUIRE(util::number_of_bits<uint64_t>() == 64);
+	STATIC_REQUIRE(util::number_of_bits<bool>() == 1);
+}
+
 TEST_CASE("set bit tests", "[util]")
 {
+
+	test_type<int8_t>();
+	test_type<uint8_t>();
+	test_type<int16_t>();
+	test_type<uint16_t>();
+	test_type<int32_t>();
+	test_type<uint32_t>();
+	test_type<int64_t>();
+	test_type<uint64_t>();
+
 	STATIC_REQUIRE(util::set_bit(0b0000, 0) == 0b0001);
 	STATIC_REQUIRE(util::set_bit(0b0000, 1) == 0b0010);
 	STATIC_REQUIRE(util::set_bit(0b0000, 2) == 0b0100);
@@ -91,3 +148,21 @@ TEST_CASE("set bit to tests", "[util]")
 	STATIC_REQUIRE(util::set_bit(0b000000000000, 3, 0) == 0b000000000000);
 
 }
+
+TEST_CASE("get bits test", "[util]")
+{
+	STATIC_REQUIRE(util::get_bit(0b0110, 0) == 0);
+	STATIC_REQUIRE(util::get_bit(0b0110, 1) == 1);
+	STATIC_REQUIRE(util::get_bit(0b0110, 2) == 1);
+	STATIC_REQUIRE(util::get_bit(0b0110, 3) == 0);
+
+	STATIC_REQUIRE(util::get_bit(0b11110010, 0) == 0);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 1) == 1);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 2) == 0);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 3) == 0);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 4) == 1);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 5) == 1);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 6) == 1);
+	STATIC_REQUIRE(util::get_bit(0b11110010, 7) == 1);
+}
+
