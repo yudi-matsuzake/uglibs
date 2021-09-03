@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <concepts>
 #include <variant>
+#include <span>
 
 #include "util/misc.hpp"
 
@@ -101,7 +102,7 @@ auto set_bit(
 		{
 			return clear_bit(x, n) | (b << n);
 		},
-		[&, n=s - n](bit_order::leftmost)
+		[&, n=(s - n)](bit_order::leftmost)
 		{
 			return clear_bit(x, n) | (b << n);
 		},
@@ -129,34 +130,5 @@ auto get_bit(
 		[&](bit_order::leftmost){ return (x >> (s - n)) & 1; },
 	}, order);
 }
-
-/**
-  * this class points to a bit in memory and wraps it to handle
-  * like a int reference
-  */
-template<std::integral T>
-class element_bit_reference{
-public:
-	template<std::integral U>
-	auto& operator=(element_bit_reference<U> const& e)
-	{
-		return *this;
-	}
-
-	template<std::integral U>
-	auto& operator=(element_bit_reference<U>&& e)
-	{
-		return *this;
-	}
-
-	/* auto get_value() */
-	/* { */
-	/* 	return */ 
-	/* } */
-
-private:
-	T* m_ptr = nullptr;
-	uint64_t m_bit_index;
-};
 
 } // end of namespace util

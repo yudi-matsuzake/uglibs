@@ -1,0 +1,105 @@
+#pragma once
+
+#include "util/bit.hpp"
+
+namespace util{
+
+/**
+  * this class points to a bit in memory and wraps it to handle
+  * like a int reference
+  */
+template<std::integral T>
+class element_bit_reference{
+public:
+	static constexpr auto n_bits_per_element = util::number_of_bits<T>();
+
+	element_bit_reference() noexcept = default;
+
+	template<uint64_t N>
+	constexpr explicit 
+	element_bit_reference(std::span<T, N> s, uint64_t index = 0)
+		noexcept
+		: m_data(s), bit_index{index}
+	{}
+
+	constexpr explicit
+		element_bit_reference(T& s, uint64_t index = 0) noexcept
+		: m_data(&s, 1), bit_index{index}
+	{}
+
+	constexpr auto n_bit_indices() const
+	{
+		return m_data.size() * n_bits_per_element;
+	}
+
+	template<std::integral U>
+	constexpr auto& operator=(U e)
+		requires (not std::is_const_v<T>)
+	{
+		auto&& [ v, b ] = compute_indices();
+		m_data[v] = set_bit(m_data[v], b, e, bit_order::leftmost{});
+		return *this;
+	}
+
+	constexpr auto& operator=(element_bit_reference const& e)
+		requires (not std::is_const_v<T>)
+	{
+		auto&& [ v, b ] = compute_indices();
+		m_data[v] = set_bit(
+			m_data[v],
+			b,
+			e.get_bit_value(),
+			bit_order::leftmost{});
+
+		return *this;
+	}
+
+	template<std::integral U>
+	constexpr auto& operator=(element_bit_reference<U> const& e)
+		requires (not std::is_const_v<T>)
+	{
+		auto&& [ v, b ] = compute_indices();
+		m_data[v] = set_bit(
+			m_data[v],
+			b,
+			e.get_bit_value(),
+			bit_order::leftmost{});
+		return *this;
+	}
+
+	constexpr auto get_bit_value() const
+	{
+		auto&& [ v, b ] = compute_indices();
+		return get_bit(m_data[v], b, bit_order::leftmost{});
+	}
+
+	template<std::integral Q>
+	constexpr bool operator==(element_bit_reference<Q> const& rhs)
+	{
+		return get_bit_value() == rhs.get_bit_value();
+	}
+
+	template<std::integral Q>
+	constexpr bool operator!=(element_bit_reference<Q> const& rhs)
+	{
+		return !(get_bit_value() == rhs.get_bit_value());
+	}
+
+private:
+	constexpr auto compute_indices() const
+	{
+		auto const vector_index = bit_index / n_bits_per_element;
+		auto const index = bit_index % n_bits_per_element;
+		return std::tuple{ vector_index, index };
+	}
+
+	std::span<T> m_data = nullptr;
+public:
+	uint64_t bit_index = 0;
+};
+
+/* template<std::integral T> */
+/* element_bit_reference(std::span<T>, uint64_t) */
+/* 	-> element_bit_reference<T>; */
+
+} // end of namespace util

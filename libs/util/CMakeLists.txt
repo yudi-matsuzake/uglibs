@@ -16,6 +16,7 @@ add_library(util
 	./include/util/concepts.hpp
 	./include/util/cv-adaptors.hpp
 	./include/util/static-vector.hpp
+	./include/util/bit-adaptors.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -38,6 +39,7 @@ if(ENABLE_TESTING)
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp
 		./tests/bits.cpp
+		./tests/bit-adaptors.cpp
 		./tests/misc-adaptors.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2)
