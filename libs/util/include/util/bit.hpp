@@ -65,10 +65,13 @@ auto clear_bit(
 	std::integral auto n, 
 	bit_index_order order = bit_order::rightmost{}) noexcept
 {
+	using x_type = decltype(x);
 	using T = decltype(decltype(x){} & decltype(n){});
+	constexpr auto s = number_of_bits<x_type>() - 1;
+
 	return std::visit(util::visitor{
 		[&](bit_order::rightmost){ return x & ~(T{1} << n); },
-		[&](bit_order::leftmost){ return x & ~(T{1} << n); }
+		[&](bit_order::leftmost){ return x & ~(T{1} << (s - n)); }
 	}, order);
 }
 
@@ -84,16 +87,24 @@ auto clear_bit(
 auto set_bit(
 	std::integral auto x,
 	std::integral auto n,
-	std::integral auto b,
+	std::integral auto bit_value,
 	bit_index_order order = bit_order::rightmost{}) noexcept
 {
-	b = b & 1;
 
-	using T = decltype(decltype(x){} | decltype(n){});
+	using x_type = decltype(x);
+	constexpr auto s = number_of_bits<x_type>() - 1;
+
+	x_type b = bit_value & 1;
 
 	return std::visit(util::visitor{
-		[&](bit_order::rightmost){ return clear_bit(x, n) | (b << n); },
-		[&](bit_order::leftmost){ return clear_bit(x, n) | (b << n); },
+		[&](bit_order::rightmost)
+		{
+			return clear_bit(x, n) | (b << n);
+		},
+		[&, n=s - n](bit_order::leftmost)
+		{
+			return clear_bit(x, n) | (b << n);
+		},
 	}, order);
 }
 
@@ -110,9 +121,12 @@ auto get_bit(
 	std::integral auto n,
 	bit_index_order order = bit_order::rightmost{}) noexcept
 {
+	using x_type = decltype(x);
+	constexpr auto s = number_of_bits<x_type>() - 1;
+
 	return std::visit(util::visitor{
 		[&](bit_order::rightmost){ return (x >> n) & 1; },
-		[&](bit_order::leftmost){ return (x >> n) & 1; },
+		[&](bit_order::leftmost){ return (x >> (s - n)) & 1; },
 	}, order);
 }
 

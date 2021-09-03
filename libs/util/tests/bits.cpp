@@ -2,14 +2,26 @@
 
 #include "util/bit.hpp"
 
+template<class T, class F, class Init>
+[[nodiscard]] constexpr auto for_all_bits(
+	util::bit_index_order order, F f, Init init) noexcept
+{
+	auto x = init;
+	for(auto i=T{0}; i<util::number_of_bits<T>(); ++i)
+		x = f(x, i, order);
+	return x;
+}
+
 template<class T>
 [[nodiscard]] constexpr auto set_all(util::bit_index_order order) noexcept
 {
-	auto x = T{0};
-	constexpr auto n = util::number_of_bits<T>();
-	for(auto i=T{0}; i<n; ++i)
-		x = util::set_bit(x, i, order);
-	return x;
+	return for_all_bits<T>(order, util::set_bit<T, T>, T{0});
+}
+
+template<class T>
+[[nodiscard]] constexpr auto clear_all(util::bit_index_order order) noexcept
+{
+	return for_all_bits<T>(order, util::clear_bit<T, T>, set_all<T>(order));
 }
 
 template<class T>
@@ -26,7 +38,42 @@ template<class T>
 }
 
 template<class T>
-constexpr auto test_type()
+constexpr auto make_bits_array(util::bit_index_order order)
+{
+	constexpr uint64_t x = 0b1010011101101010110110100100110100111010111111111000010011010011;
+
+	constexpr auto n = util::number_of_bits<T>();
+	std::array<bool, n> a;
+
+	T y = 0;
+
+	for(int i=0; i<n; ++i){
+		a[i] = util::get_bit(x, i, order) == 1;
+		y = util::set_bit(y, i, a[i], order);
+	}
+
+	return std::tuple{ a, y };
+}
+
+template<class T>
+[[nodiscard]] constexpr
+bool test_set_and_get(util::bit_index_order order) noexcept
+{
+	T x = {};
+
+	auto [ bits, y ] = make_bits_array<T>(order);
+
+	for(int i=0; i<util::number_of_bits<T>(); ++i){
+		x = util::set_bit(x, i, bits[i], order);
+		if(util::get_bit(x, i, order) != bits[i])
+			return false;
+	}
+
+	return x == y;
+}
+
+template<class T>
+constexpr auto test_type() noexcept
 {
 	using namespace util;
 	constexpr auto r = bit_order::rightmost{};
@@ -34,6 +81,12 @@ constexpr auto test_type()
 
 	STATIC_REQUIRE(all_is<T>(set_all<T>(r), T{1}, r));
 	STATIC_REQUIRE(all_is<T>(set_all<T>(l), T{1}, l));
+
+	STATIC_REQUIRE(clear_all<T>(r) == T{0});
+	STATIC_REQUIRE(clear_all<T>(l) == T{0});
+
+	STATIC_REQUIRE(test_set_and_get<T>(r));
+	STATIC_REQUIRE(test_set_and_get<T>(l));
 }
 
 TEST_CASE("number of bits", "[util]")
