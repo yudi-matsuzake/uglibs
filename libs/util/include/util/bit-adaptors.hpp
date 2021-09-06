@@ -17,13 +17,13 @@ public:
 
 	template<uint64_t N>
 	constexpr explicit 
-	element_bit_reference(std::span<T, N> s, uint64_t index = 0)
+	element_bit_reference(std::span<T, N> s, int64_t index = 0)
 		noexcept
 		: m_data(s), bit_index{index}
 	{}
 
 	constexpr explicit
-		element_bit_reference(T& s, uint64_t index = 0) noexcept
+		element_bit_reference(T& s, int64_t index = 0) noexcept
 		: m_data(&s, 1), bit_index{index}
 	{}
 
@@ -73,6 +73,24 @@ public:
 		return get_bit(m_data[v], b, bit_order::leftmost{});
 	}
 
+	constexpr auto get_data() const
+	{
+		return m_data;
+	}
+
+	constexpr bool is_same_reference(element_bit_reference const& o) const
+	{
+		return (this == &o)
+			|| (m_data.data() == o.m_data.data()
+			    && bit_index == o.bit_index);
+	}
+
+	template<std::integral Q>
+	constexpr bool operator==(Q rhs)
+	{
+		return get_bit_value() == rhs;
+	}
+
 	template<std::integral Q>
 	constexpr bool operator==(element_bit_reference<Q> const& rhs)
 	{
@@ -95,7 +113,7 @@ private:
 
 	std::span<T> m_data = nullptr;
 public:
-	uint64_t bit_index = 0;
+	int64_t bit_index = 0;
 };
 
 /* template<std::integral T> */

@@ -204,7 +204,6 @@ public:
 		using reference = element_wrapper<RLC>;
 		using pointer = rl_iterator<RLC>;
 
-
 	static_assert(uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
 		"For the sentinel iterator work properly, we must have the maximum value"
 		" of uint64_t be the same value as uint64_t{0} - 1");

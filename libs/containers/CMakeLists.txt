@@ -28,6 +28,7 @@ if(ENABLE_TESTING)
 	add_executable(
 		containers-tests
 		tests/containers-tests.cpp
+		tests/bit-container-adaptor.cpp
 		tests/tight-integer-container.cpp
 		tests/run-length-container.cpp)
 
@@ -42,6 +43,7 @@ if(ENABLE_PCH)
 	target_precompile_headers(
 		project_options
 		INTERFACE
+		include/containers/run-length-container.hpp
 		include/containers/run-length-container.hpp
 )
 endif()
