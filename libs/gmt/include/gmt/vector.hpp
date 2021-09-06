@@ -8,7 +8,6 @@
 #include <numeric>
 
 #include "point.hpp"
-#include "misc.hpp"
 
 namespace gmt{
 

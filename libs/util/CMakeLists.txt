@@ -9,7 +9,6 @@ find_package(OpenCV REQUIRED)
 add_library(util
 	./include/util/io.hpp
 	./include/util/bit.hpp
-	./include/util/misc.hpp
 	./include/util/container-operations.hpp
 	./include/util/misc-adaptors.hpp
 	./include/util/unsigned-integer.hpp

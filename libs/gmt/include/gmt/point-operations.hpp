@@ -1,11 +1,15 @@
 #pragma once
 
-#include "gmt/misc.hpp"
+#include <ranges>
+
 #include "gmt/point-promotion.hpp"
 
 namespace gmt{
 
+namespace rgs = std::ranges;
+
 namespace detail{
+
 	template<class OutputType,
 		rgs::input_range R0,
 		rgs::input_range R1,

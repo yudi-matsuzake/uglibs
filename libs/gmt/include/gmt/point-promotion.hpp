@@ -4,7 +4,6 @@
   */
 #pragma once
 
-#include "gmt/misc.hpp"
 #include "util/misc.hpp"
 
 namespace gmt{

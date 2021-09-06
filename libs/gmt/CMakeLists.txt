@@ -44,7 +44,6 @@ if(ENABLE_PCH)
 		project_options
 		INTERFACE
 		./include/gmt/mat.hpp
-		./include/gmt/misc.hpp
 		./include/gmt/point-operations.hpp
 		./include/gmt/sphere.hpp
 		./include/gmt/point.hpp
