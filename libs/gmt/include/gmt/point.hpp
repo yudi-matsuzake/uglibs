@@ -5,7 +5,6 @@
 #pragma once
 
 #include <concepts>
-#include <ranges>
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -58,11 +57,10 @@ public:
 template<class ToPointType, class PointType>
 constexpr auto point_convert(PointType&& p)
 {
-	namespace rgs = std::ranges;
 	using T = typename ToPointType::element_type;
 
 	ToPointType q;
-	rgs::transform(p, begin(q), util::make_static_cast<T>());
+	std::ranges::transform(p, begin(q), util::make_static_cast<T>());
 	return q;
 }
 

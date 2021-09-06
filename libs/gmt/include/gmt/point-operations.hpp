@@ -6,32 +6,30 @@
 
 namespace gmt{
 
-namespace rgs = std::ranges;
-
 namespace detail{
 
 	template<class OutputType,
-		rgs::input_range R0,
-		rgs::input_range R1,
+		std::ranges::input_range R0,
+		std::ranges::input_range R1,
 		class BinaryOperator>
 	[[nodiscard]] constexpr OutputType
 		binary_transform(R0 a, R1 b, BinaryOperator f)
 		requires std::default_initializable<OutputType>
 	{
 		OutputType r{};
-		rgs::transform(a, b, begin(r), f);
+		std::ranges::transform(a, b, begin(r), f);
 		return r;
 	}
 
 	template<class OutputType,
-		rgs::input_range R0,
+		std::ranges::input_range R0,
 		class BinaryOperator>
 	[[nodiscard]] constexpr OutputType
 		unary_transform(R0 a, BinaryOperator f)
 		requires std::default_initializable<OutputType>
 	{
 		OutputType r;
-		rgs::transform(a, std::begin(r), f);
+		std::ranges::transform(a, std::begin(r), f);
 		return r;
 	}
 }
@@ -149,7 +147,7 @@ public:
 	static constexpr T all(Scalar&& s)
 	{
 		T r;
-		rgs::fill(r, s);
+		std::ranges::fill(r, s);
 		return r;
 	}
 };

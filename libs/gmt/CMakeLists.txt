@@ -16,6 +16,8 @@ target_include_directories(
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
+target_link_libraries(gmt INTERFACE)
+
 target_compile_features(gmt INTERFACE cxx_std_20)
 
 if(ENABLE_TESTING)
