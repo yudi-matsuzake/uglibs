@@ -18,8 +18,6 @@ namespace ranges = std::ranges;
 template<class T = uint32_t>
 class seq_iterator{
 public:
-	using iterator_category = std::random_access_iterator_tag;
-	using value_type = T;
 	using difference_type = int64_t;
 
 	constexpr seq_iterator() : m_infinity(true)
@@ -120,23 +118,39 @@ struct seq_adaptor{
 		return last;
 	}
 
-	constexpr auto cbegin() const noexcept
-	{
-		return first;
-	}
-
-	constexpr auto cend() const noexcept
-	{
-		return last;
-	}
-
 	seq_iterator<T> first = seq_iterator<T>(0);
 	seq_iterator<T> last = seq_iterator<T>();
 };
 
-template<class T, class ... Ts>
+template<std::input_or_output_iterator T, std::input_or_output_iterator ... Ts>
 class zip_iterator{
+private:
+
+	template<uint64_t index, uint64_t ... indices>
+	constexpr auto impl_equal(
+		zip_iterator<T, Ts...> const& other,
+		std::index_sequence<index, indices...>) const
+	{
+		if(std::get<index>(m_iterators)
+			!= std::get<index>(other.m_iterators)){
+			return false;
+		}
+
+		if constexpr(sizeof...(indices) > 0){
+			return impl_equal(
+				other,
+				std::index_sequence<indices...>{});
+		}else{
+			return true;
+		}
+	}
 public:
+
+	using difference_type = int64_t;
+
+	constexpr explicit zip_iterator()
+	{}
+
 	constexpr explicit zip_iterator(T&& t, Ts&& ... ts)
 		: m_iterators(
 			std::make_tuple<T, Ts...>(
@@ -180,12 +194,23 @@ public:
 
 	constexpr auto operator==(zip_iterator<T, Ts...> const& other) const
 	{
-		return std::get<0>(m_iterators) == std::get<0>(other.m_iterators);
+		return impl_equal(
+			other,
+			std::make_index_sequence<sizeof...(Ts) + 1>{}
+		);
 	}
 
 	constexpr auto operator!=(zip_iterator<T, Ts...> const& other) const
 	{
 		return !(*this == other);
+	}
+
+	friend constexpr difference_type operator-(
+		zip_iterator const& lhs,
+		zip_iterator const& rhs)
+	{
+		// TODO: get the minimal for ALL iterators in the tuple
+		return std::get<0>(lhs.m_iterators) - std::get<0>(rhs.m_iterators);
 	}
 
 protected:
@@ -196,7 +221,7 @@ template<class T, class ... Ts>
 class zip_adaptor{
 public:
 	using iterator_type = zip_iterator<T, Ts...>;
-public:
+
 	constexpr explicit zip_adaptor(
 		ranges::subrange<T>&& t,
 		ranges::subrange<Ts>&& ... ts)
@@ -271,7 +296,3 @@ constexpr auto seq(T&& ... a)
 }
 
 } // end of namespace util
-
-template <std::integral T>
-constexpr bool std::ranges::enable_borrowed_range<
-	util::seq_adaptor<T>> = true;

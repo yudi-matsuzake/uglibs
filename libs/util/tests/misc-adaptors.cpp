@@ -79,6 +79,8 @@ TEST_CASE(
 			return tmp;
 		};
 
+		static_assert(ranges::range<util::zip_adaptor<int*>>);
+
 		constexpr std::array aa = generate(1);
 		constexpr std::array ba = generate(2);
 
@@ -94,18 +96,6 @@ TEST_CASE(
 		STATIC_REQUIRE(sum_of_diff == (n*(n-1))/2);
 	}
 
-	/* SECTION("zip set"){ */
-
-	/* 	std::array<int32_t, a.size()> tmp; */
-
-	/* 	for(auto& [ ai, ti ] : zip(a, tmp)) */
-	/* 		ti = ai*ai; */
-
-	/* 	for(auto&& [ ai, ti ] : zip(a, tmp)) */
-	/* 		REQUIRE(ti == ai*ai); */
-
-	/* } */
-
 	SECTION("seq adaptor"){
 		constexpr int n = 10;
 		constexpr auto sum_formula = (n*(n-1))/2;
@@ -119,8 +109,6 @@ TEST_CASE(
 
 		STATIC_REQUIRE(sum_formula == sum_iter);
 
-		STATIC_REQUIRE(ranges::enable_borrowed_range<
-			std::remove_cv_t<util::seq_adaptor<int>>>);
 		STATIC_REQUIRE(std::semiregular<util::seq_adaptor<int>>);
 		STATIC_REQUIRE(std::input_or_output_iterator<
 			util::seq_iterator<uint32_t>>);
