@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 
+#include <ranges>
 #include <vector>
 #include <list>
 
@@ -11,6 +12,7 @@ TEST_CASE(
 {
 
 	using namespace util;
+	namespace ranges = std::ranges;
 
 	constexpr std::array a{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	constexpr std::array b{9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
@@ -20,14 +22,14 @@ TEST_CASE(
 		auto m = a.size()/2;
 		auto mid = a[m];
 
-		for(auto&& i : range(a.begin() + m, a.end()))
+		for(auto&& i : ranges::subrange(a.begin() + m, a.end()))
 			REQUIRE(i == mid++);
 
 	}
 
 	SECTION("zip iterator"){
-		auto ra = make_range(a);
-		auto rb = make_range(b);
+		auto ra = ranges::subrange(a);
+		auto rb = ranges::subrange(b);
 		auto it0 = zip_iterator(ra.begin(), rb.begin());
 		auto it1 = it0;
 		REQUIRE(it0 == it1);
@@ -83,13 +85,13 @@ TEST_CASE(
 		constexpr auto sum_of_diff = [&aa, &ba]
 		{
 			auto diff = 0;
-			for(auto&& [ aav, bav ] : zip(make_range(aa), make_range(ba)))
+			for(auto&& [ aav, bav ] : zip(aa, ba))
 				diff += bav - aav;
 			return diff;
 		}();
 
 
-		REQUIRE(sum_of_diff == (n*(n-1))/2);
+		STATIC_REQUIRE(sum_of_diff == (n*(n-1))/2);
 	}
 
 	/* SECTION("zip set"){ */
@@ -117,11 +119,19 @@ TEST_CASE(
 
 		STATIC_REQUIRE(sum_formula == sum_iter);
 
-		std::vector<int> v{15};
-		std::iota(begin(v), end(v), 0);
+		STATIC_REQUIRE(ranges::enable_borrowed_range<
+			std::remove_cv_t<util::seq_adaptor<int>>>);
+		STATIC_REQUIRE(std::semiregular<util::seq_adaptor<int>>);
+		STATIC_REQUIRE(std::input_or_output_iterator<
+			util::seq_iterator<uint32_t>>);
 
-		for(auto&& [i, value] : zip(seq(v.size()), make_range(v)))
-			REQUIRE(i == static_cast<uint64_t>(value));
+		static_assert(ranges::range<util::seq_adaptor<int>>);
+
+		auto const ints = ranges::iota_view{ 0, 10 };
+		for(auto&& [i, value] : zip(seq<int>(10), ints)){
+			INFO(i << " == " << value);
+			REQUIRE(i == value);
+		}
 	}
 
 }

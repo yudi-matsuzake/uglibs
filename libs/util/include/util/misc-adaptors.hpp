@@ -13,60 +13,36 @@
 
 namespace util{
 
-template<class T>
-class range
-{
-public:
-	constexpr explicit range(T a_begin, T a_end)
-		: m_begin(a_begin), m_end(a_end)
-	{}
-
-	constexpr auto begin() noexcept
-	{
-		return m_begin;
-	}
-
-	constexpr auto end() noexcept
-	{
-		return m_end;
-	}
-
-	constexpr auto begin() const noexcept
-	{
-		return m_begin;
-	}
-
-	constexpr auto end() const noexcept
-	{
-		return m_end;
-	}
-
-protected:
-	T m_begin;
-	T m_end;
-};
-
-template<class T>
-constexpr auto make_range(T&& unknown)
-{
-	return range{ std::begin(unknown), std::end(unknown) };
-}
+namespace ranges = std::ranges;
 
 template<class T = uint32_t>
 class seq_iterator{
 public:
-	constexpr seq_iterator()
-		: m_infinity(true)
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type = T;
+	using difference_type = int64_t;
+
+	constexpr seq_iterator() : m_infinity(true)
 	{}
 
-	constexpr seq_iterator(T b)
-		: m_counter(b)
+	constexpr seq_iterator(T b) : m_counter(b)
 	{}
+
+	constexpr auto& operator+=(seq_iterator rhs)
+	{
+		m_infinity = rhs.m_infinity;
+		m_counter += rhs.m_counter;
+		return *this;
+	}
+
+	constexpr auto& operator+=(T rhs)
+	{
+		return *this += seq_iterator(rhs);
+	}
 
 	constexpr auto& operator++()
 	{
-		m_counter++;
-		return *this;
+		return *this += 1;
 	}
 
 	constexpr auto operator++(int)
@@ -78,7 +54,7 @@ public:
 
 	constexpr auto& operator--()
 	{
-		m_counter--;
+		m_counter += -1;
 		return *this;
 	}
 
@@ -89,7 +65,18 @@ public:
 		return copy;
 	}
 
-	constexpr T operator*()
+	friend constexpr difference_type const& operator-(
+		seq_iterator const& lhs,
+		seq_iterator const& rhs)
+	{
+		if(lhs.m_infinity)
+			return std::numeric_limits<difference_type>::max();
+		if(rhs.m_infinity)
+			return std::numeric_limits<difference_type>::min();
+		return lhs.m_counter - rhs.m_counter;
+	}
+
+	constexpr T const& operator*()
 	{
 		return m_counter;
 	}
@@ -112,29 +99,39 @@ protected:
 };
 
 template<class T = uint32_t>
-class seq_adaptor : public range<seq_iterator<T>> {
-public:
-
-	constexpr seq_adaptor()
-		: range<seq_iterator<T>>(
-			seq_iterator<T>(0),
-			seq_iterator<T>()
-		  )
-	{}
+struct seq_adaptor{
+	constexpr seq_adaptor() = default;
 
 	constexpr seq_adaptor(T e)
-		: range<seq_iterator<T>>(
-			seq_iterator<T>(0),
-			seq_iterator<T>(e)
-		  )
+		: first(seq_iterator<T>(0)), last(seq_iterator<T>(e))
 	{}
 
 	constexpr seq_adaptor(T b, T e)
-		: range<seq_iterator<T>>(
-			seq_iterator<T>(b),
-			seq_iterator<T>(e)
-		  )
+		: first(seq_iterator<T>(b)), last(seq_iterator<T>(e))
 	{}
+
+	constexpr auto begin() noexcept
+	{
+		return first;
+	}
+
+	constexpr auto end() noexcept
+	{
+		return last;
+	}
+
+	constexpr auto cbegin() const noexcept
+	{
+		return first;
+	}
+
+	constexpr auto cend() const noexcept
+	{
+		return last;
+	}
+
+	seq_iterator<T> first = seq_iterator<T>(0);
+	seq_iterator<T> last = seq_iterator<T>();
 };
 
 template<class T, class ... Ts>
@@ -200,7 +197,9 @@ class zip_adaptor{
 public:
 	using iterator_type = zip_iterator<T, Ts...>;
 public:
-	constexpr explicit zip_adaptor(range<T>&& t, range<Ts>&& ... ts)
+	constexpr explicit zip_adaptor(
+		ranges::subrange<T>&& t,
+		ranges::subrange<Ts>&& ... ts)
 		: m_ranges(std::make_tuple(t, ts...))
 	{}
 
@@ -245,19 +244,23 @@ public:
 	}
 
 protected:
-	std::tuple<range<T>, range<Ts> ... > m_ranges;
+	using range_tuple = std::tuple<
+		ranges::subrange<T>,
+		ranges::subrange<Ts>...>;
+
+	range_tuple m_ranges;
 };
 
 /*
  * adaptors function
  */
 
-template<class T, class ... Ts>
+template<ranges::range T, ranges::range ... Ts>
 constexpr auto zip(T&& a, Ts&& ... as)
 {
 	return zip_adaptor{
-		make_range(std::forward<T>(a)),
-		make_range(std::forward<Ts>(as)) ...
+		ranges::subrange(ranges::begin(a), ranges::end(a)),
+		ranges::subrange(ranges::begin(as), ranges::end(as)) ...
 	};
 }
 
@@ -267,4 +270,8 @@ constexpr auto seq(T&& ... a)
 	return seq_adaptor{ a... };
 }
 
-}
+} // end of namespace util
+
+template <std::integral T>
+constexpr bool std::ranges::enable_borrowed_range<
+	util::seq_adaptor<T>> = true;

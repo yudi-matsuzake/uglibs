@@ -14,26 +14,28 @@
 
 namespace util::cop{
 
-template<class I, class S, class O>
-void mult(I begin, I end, S const& scalar, O output)
-{
-	for(auto&& i : util::range(begin, end))
-		*output++ = i * scalar;
-}
+namespace ranges = std::ranges;
 
-template<class I, class S, class O>
-void div(I begin, I end, S const& scalar, O output)
-{
-	for(auto&& i : util::range(begin, end))
-		*output++ = i / scalar;
-}
+/* template<class I, class S, class O> */
+/* void mult(I begin, I end, S const& scalar, O output) */
+/* { */
+/* 	for(auto&& i : util::range(begin, end)) */
+/* 		*output++ = i * scalar; */
+/* } */
 
-template<class I, class S, class O>
-void sum(I begin, I end, S const& scalar, O output)
-{
-	for(auto&& i : util::range(begin, end))
-		*output++ = i + scalar;
-}
+/* template<class I, class S, class O> */
+/* void div(I begin, I end, S const& scalar, O output) */
+/* { */
+/* 	for(auto&& i : util::range(begin, end)) */
+/* 		*output++ = i / scalar; */
+/* } */
+
+/* template<class I, class S, class O> */
+/* void sum(I begin, I end, S const& scalar, O output) */
+/* { */
+/* 	for(auto&& i : util::range(begin, end)) */
+/* 		*output++ = i + scalar; */
+/* } */
 
 /**
   * computes the square distance from p to q of type T
@@ -127,7 +129,7 @@ public:
 
 			out << c.m_begin;
 
-			for(auto&& i : util::range(it_begin, last))
+			for(auto&& i : ranges::subrange(it_begin, last))
 				out << i << c.m_sep;
 
 			out << *last <<  c.m_end;

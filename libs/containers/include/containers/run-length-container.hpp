@@ -198,11 +198,11 @@ public:
 	template<class RLC>
 	class rl_iterator : public run_length_consistent_type<RLC> {
 	public:
-		using iterator_category = std::random_access_iterator_tag;
-		using value_type = T;
-		using difference_type = int64_t;
-		using reference = element_wrapper<RLC>;
-		using pointer = rl_iterator<RLC>;
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type = T;
+	using difference_type = int64_t;
+	using reference = element_wrapper<RLC>;
+	using pointer = rl_iterator<RLC>;
 
 	static_assert(uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
 		"For the sentinel iterator work properly, we must have the maximum value"
