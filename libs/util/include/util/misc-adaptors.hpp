@@ -8,6 +8,7 @@
 #include <optional>
 #include <tuple>
 #include <utility>
+#include <limits>
 
 #include "util/misc.hpp"
 
