@@ -5,7 +5,7 @@
 #include <variant>
 #include <span>
 
-#include "util/misc.hpp"
+#include "util/meta.hpp"
 
 namespace util{
 
@@ -47,7 +47,7 @@ auto set_bit(
 
 	constexpr auto s = number_of_bits<x_type>() - 1;
 
-	return std::visit(util::visitor{
+	return std::visit(visitor{
 		[x, n](bit_order::rightmost){ return x | (T{1} << n); },
 		[x, n](bit_order::leftmost){ return x | (T{1} << (s - n)); }
 	}, order);
@@ -70,7 +70,7 @@ auto clear_bit(
 	using T = decltype(decltype(x){} & decltype(n){});
 	constexpr auto s = number_of_bits<x_type>() - 1;
 
-	return std::visit(util::visitor{
+	return std::visit(visitor{
 		[&](bit_order::rightmost){ return x & ~(T{1} << n); },
 		[&](bit_order::leftmost){ return x & ~(T{1} << (s - n)); }
 	}, order);
@@ -97,7 +97,7 @@ auto set_bit(
 
 	x_type b = bit_value & 1;
 
-	return std::visit(util::visitor{
+	return std::visit(visitor{
 		[&](bit_order::rightmost)
 		{
 			return clear_bit(x, n) | (b << n);
@@ -125,7 +125,7 @@ auto get_bit(
 	using x_type = decltype(x);
 	constexpr auto s = number_of_bits<x_type>() - 1;
 
-	return std::visit(util::visitor{
+	return std::visit(visitor{
 		[&](bit_order::rightmost){ return (x >> n) & 1; },
 		[&](bit_order::leftmost){ return (x >> (s - n)) & 1; },
 	}, order);

@@ -9,8 +9,10 @@
 #include <tuple>
 #include <utility>
 #include <limits>
+#include <cstdint>
+#include <ranges>
 
-#include "util/misc.hpp"
+#include "util/meta.hpp"
 
 namespace util{
 
@@ -64,7 +66,7 @@ public:
 		return copy;
 	}
 
-	friend constexpr difference_type const& operator-(
+	friend constexpr difference_type operator-(
 		seq_iterator const& lhs,
 		seq_iterator const& rhs)
 	{

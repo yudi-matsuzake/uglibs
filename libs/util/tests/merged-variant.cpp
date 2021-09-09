@@ -1,9 +1,9 @@
 
 #include <catch2/catch.hpp>
 
-#include "util/misc.hpp"
+#include "util/meta.hpp"
 
-TEST_CASE("merged_variant", "[merged-variant]")
+TEST_CASE("merged_variant", "[util]")
 {
 	using v0 = std::variant<int, float, std::string>;
 	using v1 = std::variant<long, double, char>;
