@@ -98,4 +98,40 @@ constexpr auto tuple_transform(T&& tuple, F&& f) {
 	);
 }
 
+template<class ... Ts>
+using tuple_cat_invoke_result_t = typename std::invoke_result_t<
+	decltype(std::tuple_cat<Ts...>),
+	Ts...
+>;
+
+/**
+  * pairwise tuple is a tuple that arranges the elements in a pairwise manner
+  * given a pair-type, for instance:
+  *
+  * for instance:
+  * pairwise_tuple<std::pair, int, double, std::string, float>
+  * ==
+  * std::tuple<std::pair<int, double>, std::pair<std::string, float>>
+  */
+template<template<class...> class P, class ... Ts>
+struct pairwise_tuple;
+
+template<template<class...> class P>
+struct pairwise_tuple<P>{
+	using type = std::tuple<>;
+};
+
+template<template<class...> class P, class F, class S, class ... Ts>
+struct pairwise_tuple<P, F, S, Ts ... >{
+	static_assert(
+		sizeof ... (Ts) % 2 == 0,
+		"pairwise tuple must have a even number of types"
+	);
+
+	using type = tuple_cat_invoke_result_t<
+		std::tuple<P<F, S>>,
+		typename pairwise_tuple<P, Ts...>::type
+	>;
+};
+
 } // end of namespace util

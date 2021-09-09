@@ -16,6 +16,7 @@ add_library(util
 	./include/util/cv-adaptors.hpp
 	./include/util/static-vector.hpp
 	./include/util/bit-adaptors.hpp
+	./include/util/meta.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -37,6 +38,7 @@ if(ENABLE_TESTING)
 		util-tests
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp
+		./tests/pairwise-tuple.cpp
 		./tests/bits.cpp
 		./tests/bit-adaptors.cpp
 		./tests/misc-adaptors.cpp)

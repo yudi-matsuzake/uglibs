@@ -30,10 +30,10 @@ void vector_comparison(
 
 template<class F>
 void run_length_check(
-		containers::run_length_container<char>& rlc,
-		std::vector<char>& gt,
-		std::vector<containers::run_length_item<char>> const& rl_gt,
-		F&& f)
+	containers::run_length_container<char>& rlc,
+	std::vector<char>& gt,
+	std::vector<containers::run_length_item<char>> const& rl_gt,
+	F&& f)
 {
 	f(rlc);
 	f(gt);
