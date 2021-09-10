@@ -78,5 +78,5 @@ TEST_CASE("element_bit_reference simple tests", "[util]")
 {
 	STATIC_REQUIRE(test_get_value_int());
 	STATIC_REQUIRE(test_get_value_array());
-	REQUIRE(test_set_value_int());
+	STATIC_REQUIRE(test_set_value_int());
 }

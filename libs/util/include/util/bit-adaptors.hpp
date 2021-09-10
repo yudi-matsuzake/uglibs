@@ -13,7 +13,17 @@ class element_bit_reference{
 public:
 	static constexpr auto n_bits_per_element = util::number_of_bits<T>();
 
-	element_bit_reference() noexcept = default;
+	constexpr element_bit_reference() noexcept = default;
+	constexpr element_bit_reference(element_bit_reference&&)
+		noexcept = default;
+	constexpr element_bit_reference(element_bit_reference const&)
+		noexcept = default;
+
+	constexpr element_bit_reference& operator=(element_bit_reference const&)
+		noexcept = default;
+
+	constexpr element_bit_reference& operator=(element_bit_reference&&)
+		noexcept = default;
 
 	template<uint64_t N>
 	constexpr explicit 
@@ -103,6 +113,11 @@ public:
 		return !(get_bit_value() == rhs.get_bit_value());
 	}
 
+	operator T() const
+	{
+		return get_bit_value();
+	}
+
 private:
 	constexpr auto compute_indices() const
 	{
@@ -111,13 +126,28 @@ private:
 		return std::tuple{ vector_index, index };
 	}
 
-	std::span<T> m_data = nullptr;
+	std::span<T> m_data;
 public:
 	int64_t bit_index = 0;
 };
 
-/* template<std::integral T> */
-/* element_bit_reference(std::span<T>, uint64_t) */
-/* 	-> element_bit_reference<T>; */
-
 } // end of namespace util
+
+template<class T, template<class> class TQ, template<class> class TU>
+struct std::basic_common_reference<
+	util::element_bit_reference<T>,
+	T,
+	TQ,
+	TU>{
+	using type = util::element_bit_reference<T>;
+};
+
+template<class T, template<class> class TQ, template<class> class TU>
+struct std::basic_common_reference<
+	T,
+	util::element_bit_reference<T>,
+	TQ,
+	TU>{
+	using type = util::element_bit_reference<T>;
+};
+

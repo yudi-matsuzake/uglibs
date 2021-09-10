@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+/* #include <vector> */
 
 #include "util/bit-adaptors.hpp"
 
@@ -24,12 +24,22 @@ public:
 		using reference = bit_reference;
 		using pointer = iterator;
 
+		constexpr iterator() noexcept = default;
+		constexpr iterator(iterator const&) noexcept = default;
+		constexpr iterator(iterator&&) noexcept = default;
+
 		template<uint64_t N>
 		constexpr explicit iterator(
 			std::span<T, N> s,
 			uint64_t bit_index) noexcept
 			: m_reference(s, bit_index)
 		{}
+
+		constexpr iterator& operator=(iterator const&) noexcept
+			= default;
+
+		constexpr iterator& operator=(iterator&&) noexcept
+			= default;
 
 		constexpr auto operator*() const
 		{
@@ -135,15 +145,15 @@ public:
 		: m_data(a_data)
 	{}
 
-	constexpr explicit
-	bit_container_adaptor(std::vector<T>& a_data) noexcept
-		: m_data(a_data.data(), a_data.size())
-	{}
+	/* constexpr explicit */
+	/* bit_container_adaptor(std::vector<T>& a_data) noexcept */
+	/* 	: m_data(a_data.data(), a_data.size()) */
+	/* {} */
 
-	constexpr explicit
-	bit_container_adaptor(std::vector<T> const& a_data) noexcept
-		: m_data(a_data.data(), a_data.size())
-	{}
+	/* constexpr explicit */
+	/* bit_container_adaptor(std::vector<T> const& a_data) noexcept */
+	/* 	: m_data(a_data.data(), a_data.size()) */
+	/* {} */
 
 	constexpr explicit
 	bit_container_adaptor(T& a_data) noexcept
