@@ -19,7 +19,7 @@ TEST_CASE("pairwise tuple tests", "[util]")
 			util::pairwise_tuple<
 				std::pair,
 				int, double,
-				std::string, float>::type,
+				std::string, float>,
 
 			std::tuple<
 				std::pair<int, double>,
@@ -32,7 +32,7 @@ TEST_CASE("pairwise tuple tests", "[util]")
 			util::pairwise_tuple<
 				std::pair,
 				std::string, double,
-				std::string, float>::type,
+				std::string, float>,
 
 			std::tuple<
 				std::pair<std::string, double>,
@@ -46,7 +46,7 @@ TEST_CASE("pairwise tuple tests", "[util]")
 			util::pairwise_tuple<
 				std::tuple,
 				int, double,
-				std::string, float>::type,
+				std::string, float>,
 
 			std::tuple<
 				std::tuple<int, double>,
@@ -59,7 +59,7 @@ TEST_CASE("pairwise tuple tests", "[util]")
 			util::pairwise_tuple<
 				std::tuple,
 				std::string, double,
-				std::string, float>::type,
+				std::string, float>,
 
 			std::tuple<
 				std::tuple<std::string, double>,

@@ -17,6 +17,10 @@ TEST_CASE(
 	constexpr std::array a{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	constexpr std::array b{9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 
+	static_assert(std::is_same_v<
+		std::iter_reference_t<int*>,
+		int&>);
+
 	SECTION("range"){
 
 		auto m = a.size()/2;
@@ -40,15 +44,19 @@ TEST_CASE(
 		it0--;
 		REQUIRE(it0 != it1);
 
-		auto [va, vb]  = *it0;
+		{
+			auto [va, vb]  = *it0;
 
-		REQUIRE(va == 1);
-		REQUIRE(vb == 8);
+			REQUIRE(va == 1);
+			REQUIRE(vb == 8);
+		}
 
-		std::tie(va, vb) = *it1;
+		{
+			auto [va, vb] = *it1;
 
-		REQUIRE(va == 0);
-		REQUIRE(vb == 9);
+			REQUIRE(va == 0);
+			REQUIRE(vb == 9);
+		}
 	}
 
 	SECTION("zip adaptor"){
@@ -79,7 +87,7 @@ TEST_CASE(
 			return tmp;
 		};
 
-		static_assert(ranges::range<util::zip_adaptor<int*>>);
+		static_assert(ranges::range<util::zip_adaptor<int[3]>>);
 
 		constexpr std::array aa = generate(1);
 		constexpr std::array ba = generate(2);
@@ -94,6 +102,14 @@ TEST_CASE(
 
 
 		STATIC_REQUIRE(sum_of_diff == (n*(n-1))/2);
+
+		std::array s = { 1, 2, 3, 4 };
+
+		for(auto&& t : zip(s, std::array{ 4, 3, 2, 1 })){
+			auto&& [a, b] = t;
+			a = b;
+		}
+		REQUIRE(ranges::equal(s, std::array{ 4, 3, 2, 1 }));
 	}
 
 	SECTION("seq adaptor"){
@@ -120,6 +136,12 @@ TEST_CASE(
 			INFO(i << " == " << value);
 			REQUIRE(i == value);
 		}
+	}
+
+	SECTION("enumerate adaptor"){
+		/* for(auto&& [i, value] : enumerate(seq<int>(10))){ */
+		/* 	REQUIRE(i == value); */
+		/* } */
 	}
 
 }

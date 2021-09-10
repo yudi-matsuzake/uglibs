@@ -10,6 +10,7 @@
 #include <utility>
 #include <limits>
 #include <cstdint>
+#include <iterator>
 #include <ranges>
 
 #include "util/meta.hpp"
@@ -150,6 +151,10 @@ private:
 public:
 
 	using difference_type = int64_t;
+	using reference = std::tuple<
+		std::iter_reference_t<T>,
+		std::iter_reference_t<Ts> ...
+	>;
 
 	constexpr explicit zip_iterator()
 	{}
@@ -191,8 +196,11 @@ public:
 
 	constexpr auto operator*()
 	{
-		auto t = tuple_transform(m_iterators, [](auto&& i) { return *i; });
-		return t;
+		return tuple_transform(
+			m_iterators,
+			[](auto&& i) -> std::iter_reference_t<decltype(i)>
+			{ return *i; }
+		);
 	}
 
 	constexpr auto operator==(zip_iterator<T, Ts...> const& other) const
@@ -220,18 +228,22 @@ protected:
 	std::tuple<T, Ts...> m_iterators;
 };
 
-template<class T, class ... Ts>
+template<ranges::range T, ranges::range ... Ts>
 class zip_adaptor{
 public:
-	using iterator_type = zip_iterator<T, Ts...>;
+	using iterator_type = zip_iterator<
+		ranges::iterator_t<T>,
+		ranges::iterator_t<Ts>...>;
 
-	constexpr explicit zip_adaptor(
-		ranges::subrange<T>&& t,
-		ranges::subrange<Ts>&& ... ts)
-		: m_ranges(std::make_tuple(t, ts...))
+	using sentinel_type = zip_iterator<
+		ranges::sentinel_t<T>,
+		ranges::sentinel_t<Ts> ...>;
+
+	constexpr explicit zip_adaptor(T&& t, Ts&& ... ts)
+		: m_ranges{ t, ts ... }
 	{}
 
-	constexpr auto begin() noexcept
+	constexpr iterator_type begin() noexcept
 	{
 		return std::make_from_tuple<iterator_type>(
 			tuple_transform(
@@ -241,7 +253,7 @@ public:
 		);
 	}
 
-	constexpr auto end() noexcept
+	constexpr sentinel_type end() noexcept
 	{
 		return std::make_from_tuple<iterator_type>(
 			tuple_transform(
@@ -251,7 +263,7 @@ public:
 		);
 	}
 
-	constexpr auto begin() const noexcept
+	constexpr iterator_type begin() const noexcept
 	{
 		return std::make_from_tuple<iterator_type>(
 			tuple_transform(
@@ -261,7 +273,7 @@ public:
 		);
 	}
 
-	constexpr auto end() const noexcept
+	constexpr sentinel_type end() const noexcept
 	{
 		return std::make_from_tuple<iterator_type>(
 			tuple_transform(
@@ -272,9 +284,7 @@ public:
 	}
 
 protected:
-	using range_tuple = std::tuple<
-		ranges::subrange<T>,
-		ranges::subrange<Ts>...>;
+	using range_tuple = std::tuple<T, Ts...>;
 
 	range_tuple m_ranges;
 };
@@ -286,10 +296,7 @@ protected:
 template<ranges::range T, ranges::range ... Ts>
 constexpr auto zip(T&& a, Ts&& ... as)
 {
-	return zip_adaptor{
-		ranges::subrange(ranges::begin(a), ranges::end(a)),
-		ranges::subrange(ranges::begin(as), ranges::end(as)) ...
-	};
+	return zip_adaptor<T, Ts...>{ std::forward<T>(a), std::forward<Ts>(as) ...  };
 }
 
 template<class ... T>
@@ -297,5 +304,11 @@ constexpr auto seq(T&& ... a)
 {
 	return seq_adaptor{ a... };
 }
+
+/* template<ranges::range ... Ts> */
+/* constexpr auto enumerate(Ts&& ... a) */
+/* { */
+/* 	return zip(ranges::views::iota(0), a ...); */
+/* } */
 
 } // end of namespace util

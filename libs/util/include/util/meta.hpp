@@ -82,8 +82,14 @@ constexpr void tuple_foreach(T&& tuple, F&& f) {
 }
 
 template <class T, class F, std::uint64_t ...I>
-constexpr auto tuple_transform(T&& tuple, F&& f, std::index_sequence<I...>) {
-	return std::make_tuple(f(std::get<I>(std::forward<T>(tuple))) ... );
+constexpr auto tuple_transform(T&& tuple, F&& f, std::index_sequence<I...>)
+{
+	using tuple_type = std::tuple<
+		std::invoke_result_t<
+			F, std::tuple_element_t<I, std::remove_reference_t<T>>
+		> ... 
+	>;
+	return tuple_type{ f(std::get<I>(std::forward<T>(tuple))) ... };
 }
 
 template <class T, class F>
@@ -104,34 +110,39 @@ using tuple_cat_invoke_result_t = typename std::invoke_result_t<
 	Ts...
 >;
 
-/**
-  * pairwise tuple is a tuple that arranges the elements in a pairwise manner
-  * given a pair-type, for instance:
-  *
-  * for instance:
-  * pairwise_tuple<std::pair, int, double, std::string, float>
-  * ==
-  * std::tuple<std::pair<int, double>, std::pair<std::string, float>>
-  */
+namespace detail{
+	/**
+	  * pairwise tuple is a tuple that arranges the elements in a pairwise manner
+	  * given a pair-type, for instance:
+	  *
+	  * for instance:
+	  * pairwise_tuple<std::pair, int, double, std::string, float>
+	  * ==
+	  * std::tuple<std::pair<int, double>, std::pair<std::string, float>>
+	  */
+	template<template<class...> class P, class ... Ts>
+	struct pairwise_tuple_impl;
+
+	template<template<class...> class P>
+	struct pairwise_tuple_impl<P>{
+		using type = std::tuple<>;
+	};
+
+	template<template<class...> class P, class F, class S, class ... Ts>
+	struct pairwise_tuple_impl<P, F, S, Ts ... >{
+		static_assert(
+			sizeof ... (Ts) % 2 == 0,
+			"pairwise tuple must have a even number of types"
+		);
+
+		using type = tuple_cat_invoke_result_t<
+			std::tuple<P<F, S>>,
+			typename pairwise_tuple_impl<P, Ts...>::type
+		>;
+	};
+} // end of namespace detail
+
 template<template<class...> class P, class ... Ts>
-struct pairwise_tuple;
-
-template<template<class...> class P>
-struct pairwise_tuple<P>{
-	using type = std::tuple<>;
-};
-
-template<template<class...> class P, class F, class S, class ... Ts>
-struct pairwise_tuple<P, F, S, Ts ... >{
-	static_assert(
-		sizeof ... (Ts) % 2 == 0,
-		"pairwise tuple must have a even number of types"
-	);
-
-	using type = tuple_cat_invoke_result_t<
-		std::tuple<P<F, S>>,
-		typename pairwise_tuple<P, Ts...>::type
-	>;
-};
+using pairwise_tuple = typename detail::pairwise_tuple_impl<P, Ts ...>::type;
 
 } // end of namespace util
