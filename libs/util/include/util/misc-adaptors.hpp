@@ -126,26 +126,79 @@ struct seq_adaptor{
 	seq_iterator<T> last = seq_iterator<T>();
 };
 
-template<std::input_or_output_iterator T, std::input_or_output_iterator ... Ts>
+template<
+	bool sentinel_flag,
+	std::input_or_output_iterator T,
+	std::input_or_output_iterator ... Ts>
 class zip_iterator{
 private:
 
 	template<uint64_t index, uint64_t ... indices>
-	constexpr auto impl_equal(
-		zip_iterator<T, Ts...> const& other,
-		std::index_sequence<index, indices...>) const
+	friend constexpr auto impl_equal(
+		zip_iterator<sentinel_flag, T, Ts...> const& lhs,
+		zip_iterator<true, T, Ts...> const& rhs,
+		std::index_sequence<index, indices...>)
 	{
-		if(std::get<index>(m_iterators)
-			!= std::get<index>(other.m_iterators)){
+		if(std::get<index>(lhs.m_iterators)
+			== std::get<index>(rhs.get_iterators())){
+			return true;
+		}
+
+		if constexpr(sizeof...(indices) > 0){
+			return impl_equal(
+				lhs,
+				rhs,
+				std::index_sequence<indices...>{});
+		}else{
+			return false;
+		}
+	}
+
+	template<uint64_t index, uint64_t ... indices>
+	friend constexpr auto impl_equal(
+		zip_iterator<sentinel_flag, T, Ts...> const& lhs,
+		zip_iterator<false, T, Ts...> const& rhs,
+		std::index_sequence<index, indices...>)
+	{
+		if(std::get<index>(lhs.m_iterators)
+			!= std::get<index>(rhs.get_iterators())){
 			return false;
 		}
 
 		if constexpr(sizeof...(indices) > 0){
 			return impl_equal(
-				other,
+				lhs,
+				rhs,
 				std::index_sequence<indices...>{});
 		}else{
 			return true;
+		}
+	}
+
+	template<
+		uint64_t index,
+		bool r_sentinel,
+		uint64_t ... indices>
+	friend constexpr auto impl_difference(
+		zip_iterator<sentinel_flag, T, Ts...> const& lhs,
+		zip_iterator<r_sentinel, T, Ts...> const& rhs,
+		std::index_sequence<index, indices...>)
+	{
+		// TODO: return the std::common type of the differences
+
+		auto const d = std::get<index>(lhs.m_iterators)
+			- std::get<index>(rhs.get_iterators());
+
+		if constexpr(sizeof...(indices) > 0){
+			auto const min = impl_difference(
+				lhs,
+				rhs,
+				std::index_sequence<indices...>{}
+			);
+
+			return d < min ? d : min;
+		}else{
+			return d;
 		}
 	}
 public:
@@ -155,6 +208,10 @@ public:
 		std::iter_reference_t<T>,
 		std::iter_reference_t<Ts> ...
 	>;
+	
+	static constexpr auto n_iterators = sizeof...(Ts) + 1;
+	static constexpr auto iterators_sequence = std::make_index_sequence<
+		n_iterators>{};
 
 	constexpr explicit zip_iterator()
 	{}
@@ -203,25 +260,35 @@ public:
 		);
 	}
 
-	constexpr auto operator==(zip_iterator<T, Ts...> const& other) const
+	template<bool other_sentinel_flag>
+	constexpr auto operator==(
+		zip_iterator<other_sentinel_flag, T, Ts...> const& other) const
 	{
-		return impl_equal(
-			other,
-			std::make_index_sequence<sizeof...(Ts) + 1>{}
-		);
+		return impl_equal(*this, other, iterators_sequence);
 	}
 
-	constexpr auto operator!=(zip_iterator<T, Ts...> const& other) const
+	template<bool other_sentinel_flag>
+	constexpr auto operator!=(
+		zip_iterator<other_sentinel_flag, T, Ts...> const& other) const
 	{
 		return !(*this == other);
 	}
 
+	template<bool r_sentinel>
 	friend constexpr difference_type operator-(
-		zip_iterator const& lhs,
-		zip_iterator const& rhs)
+		zip_iterator<sentinel_flag, T, Ts ...> const& lhs,
+		zip_iterator<r_sentinel, T, Ts ...> const& rhs)
 	{
-		// TODO: get the minimal for ALL iterators in the tuple
-		return std::get<0>(lhs.m_iterators) - std::get<0>(rhs.m_iterators);
+		return impl_difference(
+			lhs,
+			rhs,
+			iterators_sequence
+		);
+	}
+
+	constexpr std::tuple<T, Ts...> const& get_iterators() const
+	{
+		return m_iterators;
 	}
 
 protected:
@@ -232,10 +299,12 @@ template<ranges::range T, ranges::range ... Ts>
 class zip_adaptor{
 public:
 	using iterator_type = zip_iterator<
+		false,
 		ranges::iterator_t<T>,
 		ranges::iterator_t<Ts>...>;
 
 	using sentinel_type = zip_iterator<
+		true,
 		ranges::sentinel_t<T>,
 		ranges::sentinel_t<Ts> ...>;
 
@@ -255,7 +324,7 @@ public:
 
 	constexpr sentinel_type end() noexcept
 	{
-		return std::make_from_tuple<iterator_type>(
+		return std::make_from_tuple<sentinel_type>(
 			tuple_transform(
 				m_ranges,
 				[](auto&& i){ return std::end(i); }
@@ -275,7 +344,7 @@ public:
 
 	constexpr sentinel_type end() const noexcept
 	{
-		return std::make_from_tuple<iterator_type>(
+		return std::make_from_tuple<sentinel_type>(
 			tuple_transform(
 				m_ranges,
 				[](auto&& i){ return std::end(i); }
