@@ -156,8 +156,7 @@ TEST_CASE("seq adaptor", "[util]")
 
 	static_assert(ranges::range<util::seq_adaptor<int>>);
 
-	auto const ints = ranges::iota_view{ 0, 10 };
-	for(auto&& [i, value] : zip(seq<int>(10), ints)){
+	for(auto&& [i, value] : zip(seq<int>(10), ranges::views::iota(0, 10))){
 		INFO(i << " == " << value);
 		REQUIRE(i == value);
 	}

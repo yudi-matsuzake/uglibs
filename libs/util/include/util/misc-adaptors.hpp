@@ -128,8 +128,8 @@ struct seq_adaptor{
 
 template<
 	bool sentinel_flag,
-	std::input_or_output_iterator T,
-	std::input_or_output_iterator ... Ts>
+	std::weakly_incrementable T,
+	std::weakly_incrementable ... Ts>
 class zip_iterator{
 private:
 
@@ -272,6 +272,16 @@ public:
 		zip_iterator<other_sentinel_flag, T, Ts...> const& other) const
 	{
 		return !(*this == other);
+	}
+
+	constexpr auto operator==(std::unreachable_sentinel_t) const
+	{
+		return false;
+	}
+
+	constexpr auto operator!=(std::unreachable_sentinel_t) const
+	{
+		return true;
 	}
 
 	template<bool r_sentinel>
