@@ -19,113 +19,6 @@ namespace util{
 
 namespace ranges = std::ranges;
 
-template<class T = uint32_t>
-class seq_iterator{
-public:
-	using difference_type = int64_t;
-
-	constexpr seq_iterator() : m_infinity(true)
-	{}
-
-	constexpr seq_iterator(T b) : m_counter(b)
-	{}
-
-	constexpr auto& operator+=(seq_iterator rhs)
-	{
-		m_infinity = rhs.m_infinity;
-		m_counter += rhs.m_counter;
-		return *this;
-	}
-
-	constexpr auto& operator+=(T rhs)
-	{
-		return *this += seq_iterator(rhs);
-	}
-
-	constexpr auto& operator++()
-	{
-		return *this += 1;
-	}
-
-	constexpr auto operator++(int)
-	{
-		auto copy = *this;
-		++(*this);
-		return copy;
-	}
-
-	constexpr auto& operator--()
-	{
-		m_counter += -1;
-		return *this;
-	}
-
-	constexpr auto operator--(int)
-	{
-		auto copy = *this;
-		--(*this);
-		return copy;
-	}
-
-	friend constexpr difference_type operator-(
-		seq_iterator const& lhs,
-		seq_iterator const& rhs)
-	{
-		if(lhs.m_infinity)
-			return std::numeric_limits<difference_type>::max();
-		if(rhs.m_infinity)
-			return std::numeric_limits<difference_type>::min();
-		return lhs.m_counter - rhs.m_counter;
-	}
-
-	constexpr T const& operator*()
-	{
-		return m_counter;
-	}
-
-	constexpr bool operator==(seq_iterator const& other) const
-	{
-		return !m_infinity &&
-			!other.m_infinity &&
-			m_counter == other.m_counter;
-	}
-
-	constexpr bool operator!=(seq_iterator const& other) const
-	{
-		return !(*this == other);
-	}
-
-protected:
-	T m_counter = T{0};
-	bool m_infinity = false;
-};
-
-template<class T = uint32_t>
-struct seq_adaptor{
-	constexpr seq_adaptor() = default;
-
-	constexpr seq_adaptor(T e)
-		: first(seq_iterator<T>(0)), last(seq_iterator<T>(e))
-	{}
-
-	constexpr seq_adaptor(T b, T e)
-		: first(seq_iterator<T>(b)), last(seq_iterator<T>(e))
-	{}
-
-	constexpr auto begin() noexcept
-	{
-		return first;
-	}
-
-	constexpr auto end() noexcept
-	{
-		return last;
-	}
-
-	seq_iterator<T> first = seq_iterator<T>(0);
-	seq_iterator<T> last = seq_iterator<T>();
-};
-
 template<
 	bool sentinel_flag,
 	std::weakly_incrementable T,
@@ -378,16 +271,16 @@ constexpr auto zip(T&& a, Ts&& ... as)
 	return zip_adaptor<T, Ts...>{ std::forward<T>(a), std::forward<Ts>(as) ...  };
 }
 
-template<class ... T>
-constexpr auto seq(T&& ... a)
+template<ranges::range ... Ts>
+constexpr auto enumerate(Ts&& ... a)
 {
-	return seq_adaptor{ a... };
-}
+	auto const sizes = std::array{ ( ranges::size(a), ...) };
+	using sizes_t = decltype(sizes)::size_type;
 
-/* template<ranges::range ... Ts> */
-/* constexpr auto enumerate(Ts&& ... a) */
-/* { */
-/* 	return zip(ranges::views::iota(0), a ...); */
-/* } */
+	return zip(
+		ranges::views::iota(sizes_t{0}, ranges::min(sizes)),
+		a ...
+	);
+}
 
 } // end of namespace util

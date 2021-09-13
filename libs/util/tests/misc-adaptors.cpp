@@ -136,37 +136,13 @@ TEST_CASE("zip iterator", "[util]")
 
 }
 
-TEST_CASE("seq adaptor", "[util]")
-{
-	constexpr int n = 10;
-	constexpr auto sum_formula = (n*(n-1))/2;
-	constexpr auto sum_iter = []
-	{
-		auto s = 0;
-		for(auto&& c : seq(10))
-			s += c;
-		return s;
-	}();
-
-	STATIC_REQUIRE(sum_formula == sum_iter);
-
-	STATIC_REQUIRE(std::semiregular<util::seq_adaptor<int>>);
-	STATIC_REQUIRE(std::input_or_output_iterator<
-		util::seq_iterator<uint32_t>>);
-
-	static_assert(ranges::range<util::seq_adaptor<int>>);
-
-	for(auto&& [i, value] : zip(seq<int>(10), ranges::views::iota(0, 10))){
-		INFO(i << " == " << value);
-		REQUIRE(i == value);
-	}
-}
-
 TEST_CASE("enumerate adaptor ", "[util]")
 {
 	SECTION("enumerate adaptor"){
-		/* for(auto&& [i, value] : enumerate(seq<int>(10))){ */
-		/* 	REQUIRE(i == value); */
-		/* } */
+		auto const a = std::array{1, 2, 3, 4, 5};
+
+		for(auto&& [i, value] : enumerate(a)){
+			REQUIRE(a[i] == value);
+		}
 	}
 }
