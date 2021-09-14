@@ -11,26 +11,25 @@
 #include <limits>
 #include <cstdint>
 #include <iterator>
-#include <ranges>
 
-#include "range/v3/all.hpp"
+#include "range/v3/view/zip.hpp"
+#include "range/v3/view/iota.hpp"
+#include "range/v3/algorithm/min.hpp"
 
 #include "util/meta.hpp"
 
 
 namespace util{
 
-namespace rgs = std::ranges;
-
-template<rgs::range ... Ts>
-constexpr auto enumerate(Ts&& ... a)
+template<ranges::range ... Ts>
+auto enumerate(Ts&& ... a)
 {
-	auto const sizes = std::array{ ( rgs::size(a), ...) };
+	auto const sizes = std::array{ (ranges::size(std::forward<Ts>(a)), ...) };
 	using sizes_t = decltype(sizes)::size_type;
 
 	return ranges::views::zip(
 		ranges::views::iota(sizes_t{0}, ranges::min(sizes)),
-		a ...
+		std::forward<Ts>(a) ...
 	);
 }
 

@@ -1,21 +1,20 @@
 #include "catch2/catch.hpp"
+#include <ranges>
 
 #include "containers/bit-container-adaptor.hpp"
+#include "range/v3/all.hpp"
 
 namespace rgs = std::ranges;
 
-constexpr auto make_array()
+auto make_array()
 {
-	constexpr auto N = 1 << util::number_of_bits<uint8_t>();
-
-	auto a = std::array<uint8_t, N>{};
 
 	constexpr auto min = std::numeric_limits<uint8_t>::min();
 	constexpr auto max = std::numeric_limits<uint8_t>::max();
-	std::generate_n(
-		a.begin(),
-		N,
-		[v = min]() mutable { return v++; });
+	constexpr auto N = max - min;
+	auto a = std::array<uint8_t, N>{};
+
+	rgs::copy(rgs::views::iota(min, max), a.begin());
 	return a;
 }
 
@@ -30,17 +29,31 @@ constexpr bool simple_element_test()
 	});
 }
 
+bool check_elements(ranges::range auto a, ranges::range auto bit_container)
+{
+	auto to_bits = [](auto const& a)
+	{
+		return containers::bit_container_adaptor(a);
+	};
+
+	auto const all_bits = a
+		| ranges::views::transform(to_bits)
+		| ranges::to<std::vector>;
+
+	return ranges::equal(bit_container, all_bits | ranges::views::join);
+}
+
 TEST_CASE("bit container adaptor related tests", "[containers]")
 {
-	static constexpr auto a = make_array();
-	constexpr auto c = containers::bit_container_adaptor(std::span(a));
-	using c_type = decltype(c);
-
-	c_type::iterator it;
-
-	it = c.begin();
-
-	static_assert(rgs::range<c_type>);
 	STATIC_REQUIRE(simple_element_test());
 
+	auto a = make_array();
+	auto c = containers::bit_container_adaptor(std::span(a));
+
+	using c_type = decltype(c);
+	c_type::iterator it;
+	it = c.begin();
+	STATIC_REQUIRE(rgs::range<c_type>);
+
+	REQUIRE(check_elements(a, c));
 }
