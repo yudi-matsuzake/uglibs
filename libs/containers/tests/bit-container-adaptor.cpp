@@ -2,7 +2,7 @@
 
 #include "containers/bit-container-adaptor.hpp"
 
-namespace ranges = std::ranges;
+namespace rgs = std::ranges;
 
 constexpr auto make_array()
 {
@@ -24,7 +24,7 @@ constexpr bool simple_element_test()
 	uint8_t x = 0b10011100;
 	auto c = containers::bit_container_adaptor(x);
 
-	return ranges::all_of(c, [i = 0, x](auto bit) mutable
+	return rgs::all_of(c, [i = 0, x](auto bit) mutable
 	{
 		return bit == util::get_bit(x, i++, util::bit_order::leftmost{});
 	});
@@ -40,7 +40,7 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 
 	it = c.begin();
 
-	static_assert(ranges::range<c_type>);
+	static_assert(rgs::range<c_type>);
 	STATIC_REQUIRE(simple_element_test());
 
 }

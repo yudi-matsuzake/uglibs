@@ -5,6 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
 find_package(OpenCV REQUIRED)
+find_package(range-v3 REQUIRED)
 
 add_library(util
 	./include/util/io.hpp
@@ -22,7 +23,7 @@ add_library(util
 
 add_library(util::util ALIAS util)
 target_include_directories(util PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(util PUBLIC ${OpenCV_LIBS})
+target_link_libraries(util PUBLIC ${OpenCV_LIBS} range-v3::range-v3)
 
 target_include_directories(
 	util PUBLIC
