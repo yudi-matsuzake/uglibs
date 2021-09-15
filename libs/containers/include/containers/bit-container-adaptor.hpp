@@ -105,9 +105,11 @@ public:
 			if(!a.m_reference.is_same_reference(b.m_reference))
 				return false;
 
-			return (a.m_reference.bit_index < 0 &&
-				b.m_reference.bit_index < 0) ||
-				(a.m_reference.bit_index >= max &&
+			return (a.m_reference.bit_index
+				== a.m_reference.bit_index)
+				|| (a.m_reference.bit_index < 0 &&
+				b.m_reference.bit_index < 0)
+				|| (a.m_reference.bit_index >= max &&
 				b.m_reference.bit_index >= max);
 		}
 

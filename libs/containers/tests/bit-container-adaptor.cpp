@@ -6,13 +6,14 @@
 
 namespace rgs = std::ranges;
 
+template<std::integral T>
 auto make_array()
 {
 
-	constexpr auto min = std::numeric_limits<uint8_t>::min();
-	constexpr auto max = std::numeric_limits<uint8_t>::max();
+	constexpr auto min = std::numeric_limits<T>::min();
+	constexpr auto max = std::numeric_limits<T>::max();
 	constexpr auto N = max - min;
-	auto a = std::array<uint8_t, N>{};
+	auto a = std::array<T, N>{};
 
 	rgs::copy(rgs::views::iota(min, max), a.begin());
 	return a;
@@ -47,8 +48,12 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 {
 	STATIC_REQUIRE(simple_element_test());
 
-	auto a = make_array();
+	using T = uint8_t;
+	auto a = make_array<T>();
 	auto c = containers::bit_container_adaptor(std::span(a));
+	constexpr auto n_bits_per_element = util::number_of_bits<T>();
+
+	REQUIRE(a.size()*n_bits_per_element == (c.end() - c.begin()));
 
 	using c_type = decltype(c);
 	c_type::iterator it;
@@ -56,4 +61,13 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 	STATIC_REQUIRE(rgs::range<c_type>);
 
 	REQUIRE(check_elements(a, c));
+
+	auto b = c.begin() + (42 * n_bits_per_element);
+	auto bits_c42 = rgs::subrange(b, b + n_bits_per_element);
+	auto const v42 = T{42};
+
+	auto bits_42 = containers::bit_container_adaptor(v42);
+
+	REQUIRE(rgs::size(bits_c42) == rgs::size(bits_42));
+	REQUIRE(rgs::equal(bits_c42, bits_42));
 }

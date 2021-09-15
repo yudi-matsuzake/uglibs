@@ -6,8 +6,11 @@
 #include <limits>
 
 #include "util/bit.hpp"
+#include "containers/bit-container-adaptor.hpp"
 
 namespace containers{
+
+namespace rgs = std::ranges;
 
 template<class T>
 static constexpr auto number_of_bits = std::numeric_limits<T>::digits;
@@ -98,40 +101,109 @@ public:
 	static constexpr auto number_of_bits_per_element = N;
 	static constexpr bool is_signed = std::is_same_v<S, signed_flag>;
 
-	template<class TightContainer>
-	class element_wrapper{
-	private:
-		constexpr auto compute_bit_index()
-		{
-			return number_of_bits_per_element * m_tight_index;
-		}
-
-		constexpr auto compute_underlying_index(auto bit_index)
-		{
-		}
-
-		constexpr void set_value(underlying_integer_t x)
-		{
-			auto const bi = compute_bit_index();
-		}
-
-	public:
-		auto& operator=(element_wrapper&& e)
-		{
-			return *this;
-		}
-
-	private:
-		TightContainer* m_container_ptr = nullptr;
-		uint64_t m_tight_index = 0;
-	};
-
 	static constexpr auto underlying_integer_size = sizeof(
 		underlying_integer_t);
 
 	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
 		std::make_unsigned_t<underlying_integer_t>
 	>::digits;
+
+	template<class TightContainer>
+	class tight_element_reference{
+	private:
+		constexpr auto compute_bit_index() const
+		{
+			return number_of_bits_per_element * m_tight_index;
+		}
+
+		/* constexpr auto compute_underlying_index(auto bit_index) */
+		/* { */
+		/* } */
+
+		constexpr auto tight_container_bits() const noexcept
+		{
+			return bit_container_adaptor(std::span(
+				m_container_ptr->m_data.data(),
+				m_container_ptr->m_data.size()
+			));
+		}
+
+		constexpr auto tight_container_bits() noexcept
+		{
+			return bit_container_adaptor(std::span(
+				m_container_ptr->m_data.data(),
+				m_container_ptr->m_data.size()
+			));
+		}
+
+		constexpr auto get_element_bit_range() noexcept
+		{
+			auto tcb = tight_container_bits();
+			auto b = tcb.begin() + compute_bit_index();
+			return rgs::subrange(b, b + number_of_bits_per_element);
+		}
+
+		constexpr auto get_element_bit_range() const noexcept
+		{
+			auto tcb = tight_container_bits();
+			auto b = tcb.begin() + compute_bit_index();
+			return rgs::subrange(b, b + number_of_bits_per_element);
+		}
+
+	public:
+		constexpr tight_element_reference() = default;
+
+		constexpr tight_element_reference(
+			TightContainer* a_ptr,
+			uint64_t index) noexcept
+			: m_container_ptr(a_ptr),
+			  m_tight_index(index)
+		{}
+
+		[[nodiscard]] constexpr
+		underlying_integer_t get_value() const noexcept
+		{
+			underlying_integer_t v;
+			auto v_bits = bit_container_adaptor(v);
+			auto e_bits = get_element_bit_range();
+			rgs::copy(e_bits, v_bits);
+			return v;
+		}
+
+		constexpr operator underlying_integer_t() const noexcept
+		{
+			return get_value();
+		}
+
+		constexpr auto& operator=(underlying_integer_t v) noexcept
+		{
+			auto e_bits = get_element_bit_range();
+			auto v_bits = bit_container_adaptor(v);
+			rgs::copy(v_bits, e_bits);
+			return *this;
+		}
+
+		/* constexpr auto& operator=(tight_element_reference const& e) */
+		/* 	noexcept */
+		/* { */
+		/* 	return *this; */
+		/* } */
+
+		/* constexpr bool operator==(tight_element_reference const& e) */
+		/* 	noexcept */
+		/* { */
+		/* 	return *this; */
+		/* } */
+
+		/* constexpr auto operator<=>(tight_element_reference const& e) */
+		/* 	noexcept */
+		/* { */
+		/* } */
+
+	private:
+		TightContainer* m_container_ptr = nullptr;
+		uint64_t m_tight_index = 0;
+	};
 
 	/**
 	  * resize the container to hold n_elements with N bits
@@ -188,6 +260,19 @@ public:
 	constexpr auto empty() const
 	{
 		return m_size == 0;
+	}
+
+	/**
+	  * access element at index `index`
+	  */
+	constexpr auto operator[](uint64_t index)
+	{
+		return tight_element_reference{ this, index };
+	}
+
+	constexpr auto operator[](uint64_t index) const
+	{
+		return tight_element_reference{ this, index };
 	}
 
 private:

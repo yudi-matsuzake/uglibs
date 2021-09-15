@@ -13,9 +13,12 @@ TEST_CASE("simple tests", "[tight-integers-container]")
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<33>::type) == 8);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<64>::type) == 8);
 
-	constexpr auto n_bits = 9;
-	containers::tight_integer_container<n_bits> v;
-	assert(v.empty() == true);
+	constexpr auto integer_bit_size = 9;
+	using tight_container_t = containers::tight_integer_container<
+		integer_bit_size>;
+	tight_container_t v;
+
+	REQUIRE(v.empty() == true);
 
 	v.resize(10);
 	v.clear();
@@ -37,5 +40,7 @@ TEST_CASE("simple tests", "[tight-integers-container]")
 		REQUIRE(v.empty() == (i == 0UL));
 	}
 
+	/* v[0] = 42; */
+	/* REQUIRE(v[0] == 42); */
 }
 
