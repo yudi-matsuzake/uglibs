@@ -19,12 +19,6 @@ public:
 	constexpr element_bit_reference(element_bit_reference const&)
 		noexcept = default;
 
-	constexpr element_bit_reference& operator=(element_bit_reference const&)
-		noexcept = default;
-
-	constexpr element_bit_reference& operator=(element_bit_reference&&)
-		noexcept = default;
-
 	template<uint64_t N>
 	constexpr explicit 
 	element_bit_reference(std::span<T, N> s, int64_t index = 0)
@@ -42,8 +36,7 @@ public:
 		return m_data.size() * n_bits_per_element;
 	}
 
-	template<std::integral U>
-	constexpr auto& operator=(U e)
+	constexpr auto& operator=(T e) const noexcept
 		requires (not std::is_const_v<T>)
 	{
 		auto&& [ v, b ] = compute_indices();
@@ -51,30 +44,16 @@ public:
 		return *this;
 	}
 
-	constexpr auto& operator=(element_bit_reference const& e)
+	constexpr auto& operator=(element_bit_reference const& e) const noexcept
 		requires (not std::is_const_v<T>)
 	{
-		auto&& [ v, b ] = compute_indices();
-		m_data[v] = set_bit(
-			m_data[v],
-			b,
-			e.get_bit_value(),
-			bit_order::leftmost{});
-
-		return *this;
+		return *this = e.get_bit_value();
 	}
 
-	template<std::integral U>
-	constexpr auto& operator=(element_bit_reference<U> const& e)
+	constexpr auto& operator=(element_bit_reference&& e) const noexcept
 		requires (not std::is_const_v<T>)
 	{
-		auto&& [ v, b ] = compute_indices();
-		m_data[v] = set_bit(
-			m_data[v],
-			b,
-			e.get_bit_value(),
-			bit_order::leftmost{});
-		return *this;
+		return *this = e.get_bit_value();
 	}
 
 	constexpr auto get_bit_value() const
@@ -116,6 +95,20 @@ public:
 	operator T() const
 	{
 		return get_bit_value();
+	}
+
+	constexpr void real_assignment(element_bit_reference const& other)
+		noexcept
+	{
+		m_data = other.m_data;
+		bit_index = other.bit_index;
+	}
+
+	constexpr void real_assignment(element_bit_reference&& other)
+		noexcept
+	{
+		m_data = other.m_data;
+		bit_index = other.bit_index;
 	}
 
 private:

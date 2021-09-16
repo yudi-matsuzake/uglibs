@@ -64,7 +64,7 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 
 	auto b = c.begin() + (42 * n_bits_per_element);
 	auto bits_c42 = rgs::subrange(b, b + n_bits_per_element);
-	auto const v42 = T{42};
+	auto v42 = T{42};
 
 	auto bits_42 = containers::bit_container_adaptor(v42);
 

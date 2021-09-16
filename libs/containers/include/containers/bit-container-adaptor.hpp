@@ -35,11 +35,17 @@ public:
 			: m_reference(s, bit_index)
 		{}
 
-		constexpr iterator& operator=(iterator const&) noexcept
-			= default;
+		constexpr iterator& operator=(iterator const& other) noexcept
+		{
+			m_reference.real_assignment(other.m_reference);
+			return *this;
+		}
 
-		constexpr iterator& operator=(iterator&&) noexcept
-			= default;
+		constexpr iterator& operator=(iterator&& other) noexcept
+		{
+			m_reference.real_assignment(std::move(other.m_reference));
+			return *this;
+		}
 
 		constexpr auto operator*() const
 		{
@@ -146,16 +152,6 @@ public:
 	bit_container_adaptor(std::array<T, N>& a_data) noexcept
 		: m_data(a_data)
 	{}
-
-	/* constexpr explicit */
-	/* bit_container_adaptor(std::vector<T>& a_data) noexcept */
-	/* 	: m_data(a_data.data(), a_data.size()) */
-	/* {} */
-
-	/* constexpr explicit */
-	/* bit_container_adaptor(std::vector<T> const& a_data) noexcept */
-	/* 	: m_data(a_data.data(), a_data.size()) */
-	/* {} */
 
 	constexpr explicit
 	bit_container_adaptor(T& a_data) noexcept
