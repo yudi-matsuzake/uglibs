@@ -10,7 +10,10 @@ namespace vws = std::ranges::views;
 
 TEST_CASE("underlying integer", "[tight-integers-container]")
 {
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<1>::type) == 1);
+	using bin_container_t = containers::underlying_integer<
+		1, containers::unsigned_flag>::type;
+
+	STATIC_REQUIRE(sizeof(bin_container_t) == 1);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<8>::type) == 1);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<9>::type) == 2);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<16>::type) == 2);
@@ -18,7 +21,6 @@ TEST_CASE("underlying integer", "[tight-integers-container]")
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<32>::type) == 4);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<33>::type) == 8);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<64>::type) == 8);
-
 }
 
 TEST_CASE(
@@ -75,19 +77,10 @@ TEST_CASE("unsigned bit size = 9", "[tight-integers-container]")
 	constexpr underint_t n_values = tight_container_t::max_value() + 1;
 	v.resize(n_values);
 
-	for(auto i : vws::iota(underint_t{0}, n_values)){
-		v[i] = i;
-		REQUIRE(v[i] == i);
-	}
-
-	/* STATIC_REQUIRE(rgs::range<tight_container_t>); */
-
-	/* auto seq = vws::iota(0UL, v.size()) | */
-	/* 	vws::transform(util::make_static_cast<short>()); */
-
-	/* rgs::copy(seq, rgs::begin(v)); */
-	/* REQUIRE(rgs::equal(seq, v)); */
-
+	STATIC_REQUIRE(rgs::range<tight_container_t>);
+	auto const values = vws::iota(underint_t{0}, n_values);
+	rgs::copy(values, v.begin());
+	REQUIRE(rgs::equal(v, values));
 }
 
 TEST_CASE("signed bit size = 9", "[tight-integers-container]")
@@ -112,10 +105,7 @@ TEST_CASE("signed bit size = 9", "[tight-integers-container]")
 	constexpr underint_t n_values = (max - min) + 1;
 	v.resize(n_values);
 
-	for(auto i : vws::iota(underint_t{0}, n_values)){
-		auto value = min + i;
-		v[i] = value;
-		REQUIRE(v[i] == value);
-	}
-
+	auto const values = vws::iota(min, max + 1);
+	rgs::copy(values, v.begin());
+	REQUIRE(rgs::equal(v, values));
 }

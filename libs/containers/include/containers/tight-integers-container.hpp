@@ -38,6 +38,10 @@ struct underlying_integer
 		N > 0 && N <= number_of_bits<uint64_t>,
 		"underlying_integer integer only supports 1 to 64 bits");
 
+	static_assert(
+		N > 1 || is_unsigned,
+		"underlying_integer does not support binary signed integer");
+
 	static_assert(is_signed xor is_unsigned);
 
 	using unsigned_type = std::conditional_t<
@@ -138,27 +142,14 @@ public:
 		return -(tighter_container::max_value() + 1);
 	}
 
-	template<class TightContainer>
 	class tight_element_reference{
 	private:
 		constexpr auto compute_bit_index() const
 		{
-			return number_of_bits_per_element * m_tight_index;
+			return number_of_bits_per_element * tight_index;
 		}
-
-		/* constexpr auto compute_underlying_index(auto bit_index) */
-		/* { */
-		/* } */
 
 		constexpr auto tight_container_bits() const noexcept
-		{
-			return bit_container_adaptor(std::span(
-				m_container_ptr->m_data.data(),
-				m_container_ptr->m_data.size()
-			));
-		}
-
-		constexpr auto tight_container_bits() noexcept
 		{
 			return bit_container_adaptor(std::span(
 				m_container_ptr->m_data.data(),
@@ -173,13 +164,6 @@ public:
 			return rgs::subrange(b, b + number_of_bits_per_element);
 		}
 
-		constexpr auto get_element_bit_range() noexcept
-		{
-			auto tcb = tight_container_bits();
-			auto b = tcb.begin() + compute_bit_index();
-			return rgs::subrange(b, b + number_of_bits_per_element);
-		}
-
 		/**
 		  * our number region from a element
 		  * is the N bits of this element if the element is unsigned
@@ -187,11 +171,6 @@ public:
 		  *
 		  */
 		constexpr auto get_element_number_region_bits() const noexcept
-		{
-			return get_element_bit_range() | vws::drop(int{is_signed});
-		}
-
-		constexpr auto get_element_number_region_bits() noexcept
 		{
 			return get_element_bit_range() | vws::drop(int{is_signed});
 		}
@@ -218,13 +197,7 @@ public:
 			return get_element_bit_range().begin();
 		}
 
-		constexpr auto get_sign_iterator() noexcept
-			requires is_signed
-		{
-			return get_element_bit_range().begin();
-		}
-
-		constexpr void set_sign_bit(underlying_integer_t v) noexcept
+		constexpr void set_sign_bit(underlying_integer_t v) const noexcept
 		{
 			v = static_cast<underlying_integer_t>(v&1);
 			*get_sign_iterator() = v;
@@ -235,7 +208,7 @@ public:
 			return *get_sign_iterator();
 		}
 
-		constexpr void from_underlying_integer(underlying_integer_t x)
+		constexpr void from_underlying_integer(underlying_integer_t x) const
 		{
 			auto e_bits = get_element_number_region_bits();
 			auto v_bits = get_number_region_from_underlying_type(x);
@@ -267,10 +240,10 @@ public:
 		constexpr tight_element_reference() = default;
 
 		constexpr tight_element_reference(
-			TightContainer* a_ptr,
-			uint64_t index) noexcept
+			tight_integer_container* a_ptr,
+			int64_t index) noexcept
 			: m_container_ptr(a_ptr),
-			  m_tight_index(index)
+			  tight_index(index)
 		{}
 
 		[[nodiscard]] constexpr
@@ -284,33 +257,131 @@ public:
 			return get_value();
 		}
 
-		constexpr auto& operator=(underlying_integer_t v) noexcept
+		constexpr auto& operator=(underlying_integer_t v) const noexcept
 		{
 			from_underlying_integer(v);
 			return *this;
 		}
 
-		/* constexpr auto& operator=(tight_element_reference const& e) */
-		/* 	noexcept */
-		/* { */
-		/* 	return *this; */
-		/* } */
+		constexpr
+		bool operator==(tight_element_reference const& other) const
+			noexcept
+		{
+			auto const both_are_end =
+				[siz = m_container_ptr->size(),
+				i = tight_index,
+				o = other.tight_index]
+			{
+				return  i >= siz && o >= siz;
+			};
 
-		/* constexpr bool operator==(tight_element_reference const& e) */
-		/* 	noexcept */
-		/* { */
-		/* 	return *this; */
-		/* } */
+			auto const both_before_begin =
+				[i = tight_index, o = other.tight_index]
+			{
+				return  i < 0 && o < 0;
+			};
 
-		/* constexpr auto operator<=>(tight_element_reference const& e) */
-		/* 	noexcept */
-		/* { */
-		/* } */
+			return m_container_ptr == other.m_container_ptr
+				&& (tight_index == other.tight_index
+				|| both_before_begin()
+				|| both_are_end());
+		}
+
+		constexpr
+		bool operator!=(tight_element_reference const& other) const
+			noexcept
+		{
+			return !(*this == other);
+		}
 
 	private:
-		TightContainer* m_container_ptr = nullptr;
-		uint64_t m_tight_index = 0;
+		tight_integer_container* m_container_ptr = nullptr;
+	public:
+		int64_t tight_index = 0;
 	};
+
+	class iterator{
+	public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = tight_element_reference;
+		using difference_type = int64_t;
+		using reference = tight_element_reference;
+		using pointer = iterator;
+
+		constexpr iterator() noexcept = default;
+
+		explicit constexpr
+		iterator(tight_integer_container* a_ptr, uint64_t index)
+			noexcept
+			: m_reference(a_ptr, index)
+		{}
+
+		constexpr reference operator*() const
+		{
+			return m_reference;
+		}
+
+		constexpr iterator& operator++()
+		{
+			return (*this) += 1;
+		}
+
+		constexpr iterator& operator--()
+		{
+			return (*this) += -1;
+		}
+
+		constexpr iterator operator++(int) const
+		{
+			auto it = *this;
+			++(*this);
+			return it;
+		}
+
+		constexpr iterator operator--(int)
+		{
+			auto it = *this;
+			--(*this);
+			return it;
+		}
+
+		friend constexpr iterator operator+(iterator a, int64_t scalar)
+		{
+			return a += scalar;
+		}
+
+		friend constexpr iterator operator-(iterator a, int64_t scalar)
+		{
+			return a += (-scalar);
+		}
+
+		constexpr iterator& operator+=(int64_t scalar)
+		{
+			m_reference.tight_index += scalar;
+			return *this;
+		}
+
+		friend constexpr int64_t operator-(iterator a, iterator b)
+		{
+			auto const a_index = a.m_reference.tight_index;
+			auto const b_index = b.m_reference.tight_index;
+			return a_index - b_index;
+		}
+
+		friend constexpr bool operator==(iterator a, iterator b)
+		{
+			return a.m_reference == b.m_reference;
+		}
+
+		friend constexpr bool operator!=(iterator a, iterator b)
+		{
+			return !(a == b);
+		}
+
+	private:
+		tight_element_reference m_reference;
+	};
+
 
 	/**
 	  * resize the container to hold n_elements with N bits
@@ -372,14 +443,62 @@ public:
 	/**
 	  * access element at index `index`
 	  */
-	constexpr auto operator[](uint64_t index)
+	constexpr auto operator[](int64_t index)
 	{
 		return tight_element_reference{ this, index };
 	}
 
-	constexpr auto operator[](uint64_t index) const
+	constexpr auto operator[](int64_t index) const
 	{
 		return tight_element_reference{ this, index };
+	}
+
+	constexpr auto begin()
+		noexcept
+	{
+		return iterator{ this, 0 };
+	}
+
+	constexpr auto end()
+		noexcept
+	{
+		return iterator(this, size());
+	}
+
+	constexpr auto begin() const
+		noexcept
+	{
+		return iterator{ this, 0 };
+	}
+
+	constexpr auto end() const
+		noexcept
+	{
+		return iterator{ this, size() };
+	}
+
+	constexpr auto rbegin()
+		noexcept
+	{
+		return iterator{ this, size() - 1 };
+	}
+
+	constexpr auto rend()
+		noexcept
+	{
+		return iterator{ this, -1 };
+	}
+
+	constexpr auto rbegin() const
+		noexcept
+	{
+		return iterator{ this, size() - 1 };
+	}
+
+	constexpr auto rend() const
+		noexcept
+	{
+		return iterator{ this, -1 };
 	}
 
 private:
