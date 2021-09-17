@@ -7,6 +7,7 @@
 
 namespace rgs = std::ranges;
 namespace vws = std::ranges::views;
+namespace acs = ranges::actions;
 
 TEST_CASE("underlying integer", "[tight-integers-container]")
 {
@@ -61,51 +62,57 @@ TEST_CASE(
 
 }
 
-TEST_CASE("unsigned bit size = 9", "[tight-integers-container]")
+template<size_t N, class S>
+static auto test_edge_case_for()
 {
-	constexpr auto integer_bit_size = 9;
+	constexpr auto integer_bit_size = N;
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size,
-		containers::unsigned_flag>;
+		integer_bit_size, S>;
 
 	using underint_t = tight_container_t::underlying_integer_t;
 
+	constexpr bool is_signed = std::is_same_v<
+		S, containers::signed_flag>;
+
 	tight_container_t v;
-
-	STATIC_REQUIRE(tight_container_t::min_value() == underint_t{ 0 });
-	STATIC_REQUIRE(tight_container_t::max_value() == underint_t{ 511 });
-	constexpr underint_t n_values = tight_container_t::max_value() + 1;
-	v.resize(n_values);
-
 	STATIC_REQUIRE(rgs::range<tight_container_t>);
-	auto const values = vws::iota(underint_t{0}, n_values);
-	rgs::copy(values, v.begin());
-	REQUIRE(rgs::equal(v, values));
+
+	constexpr auto max = is_signed
+		? ((1 << (N - 1)) - 1)
+		: ((1 << N) - 1);
+
+	constexpr auto min = is_signed
+		? (-(max+1))
+		: 0;
+
+	STATIC_REQUIRE(tight_container_t::min_value() == min);
+	STATIC_REQUIRE(tight_container_t::max_value() == max);
+	constexpr int64_t n_edge_values = 100;
+	v.resize(n_edge_values * 2);
+
+	auto make_array = [](auto&& v)
+	{
+		std::array<underint_t, n_edge_values> a;
+		rgs::copy_n(v.begin(), n_edge_values, a.begin());
+		return a;
+	};
+
+	auto const values = std::vector{
+		make_array(vws::iota(min, min + n_edge_values)),
+		make_array(vws::iota(max - n_edge_values + 1, max + 1))
+	};
+
+	rgs::copy(values | vws::join, v.begin());
+	REQUIRE(rgs::equal(v, values | vws::join));
 }
 
-TEST_CASE("signed bit size = 9", "[tight-integers-container]")
+TEST_CASE("bit size checks", "[tight-integers-container]")
 {
-	constexpr auto integer_bit_size = 9;
-	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size,
-		containers::signed_flag>;
+	test_edge_case_for<7, containers::unsigned_flag>();
+	test_edge_case_for<8, containers::unsigned_flag>();
+	test_edge_case_for<9, containers::unsigned_flag>();
 
-	using underint_t = tight_container_t::underlying_integer_t;
-
-	STATIC_REQUIRE(std::numeric_limits<int8_t>::min() == -128);
-	STATIC_REQUIRE(std::numeric_limits<int8_t>::max() == 127);
-
-	STATIC_REQUIRE(tight_container_t::min_value() == underint_t{ -256 });
-	STATIC_REQUIRE(tight_container_t::max_value() == underint_t{ +255 });
-
-	tight_container_t v;
-
-	constexpr underint_t min = tight_container_t::min_value();
-	constexpr underint_t max = tight_container_t::max_value();
-	constexpr underint_t n_values = (max - min) + 1;
-	v.resize(n_values);
-
-	auto const values = vws::iota(min, max + 1);
-	rgs::copy(values, v.begin());
-	REQUIRE(rgs::equal(v, values));
+	test_edge_case_for<7, containers::signed_flag>();
+	test_edge_case_for<8, containers::signed_flag>();
+	test_edge_case_for<9, containers::signed_flag>();
 }
