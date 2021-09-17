@@ -11,6 +11,7 @@
 namespace containers{
 
 namespace rgs = std::ranges;
+namespace vws = std::views;
 
 template<class T>
 static constexpr auto number_of_bits = std::numeric_limits<T>::digits;
@@ -30,9 +31,7 @@ template<uint8_t N, class S = signed_flag>
 struct underlying_integer
 {
 
-	static constexpr auto is_signed =
-		(std::is_same_v<S, signed_flag> or std::is_same_v<S, void>);
-
+	static constexpr auto is_signed = std::is_same_v<S, signed_flag>;
 	static constexpr auto is_unsigned = std::is_same_v<S, unsigned_flag>;
 
 	static_assert(
@@ -95,11 +94,13 @@ private:
 	}
 
 public:
+
 	using container_t = Container;
 	using underlying_integer_t = typename container_t::value_type;
 
 	static constexpr auto number_of_bits_per_element = N;
 	static constexpr bool is_signed = std::is_same_v<S, signed_flag>;
+	static constexpr bool is_unsigned = !is_signed;
 
 	static constexpr auto underlying_integer_size = sizeof(
 		underlying_integer_t);
@@ -107,6 +108,35 @@ public:
 	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
 		std::make_unsigned_t<underlying_integer_t>
 	>::digits;
+
+	static constexpr underlying_integer_t min_value()
+		requires is_unsigned
+	{
+		return 0;
+	}
+
+	static constexpr underlying_integer_t max_value()
+		requires is_unsigned
+	{
+		return (1 << N) - 1;
+	}
+
+	static constexpr underlying_integer_t max_value()
+		requires is_signed
+	{
+		using tighter_container = tight_integer_container<
+			N - 1, unsigned_flag>;
+
+		return tighter_container::max_value();
+	}
+
+	static constexpr underlying_integer_t min_value()
+		requires is_signed
+	{
+		using tighter_container = tight_integer_container<
+			N - 1, unsigned_flag>;
+		return -(tighter_container::max_value() + 1);
+	}
 
 	template<class TightContainer>
 	class tight_element_reference{
@@ -136,6 +166,13 @@ public:
 			));
 		}
 
+		constexpr auto get_element_bit_range() const noexcept
+		{
+			auto tcb = tight_container_bits();
+			auto b = tcb.begin() + compute_bit_index();
+			return rgs::subrange(b, b + number_of_bits_per_element);
+		}
+
 		constexpr auto get_element_bit_range() noexcept
 		{
 			auto tcb = tight_container_bits();
@@ -143,11 +180,87 @@ public:
 			return rgs::subrange(b, b + number_of_bits_per_element);
 		}
 
-		constexpr auto get_element_bit_range() const noexcept
+		/**
+		  * our number region from a element
+		  * is the N bits of this element if the element is unsigned
+		  * is the N-1 last bits of this element if the element is signed
+		  *
+		  */
+		constexpr auto get_element_number_region_bits() const noexcept
 		{
-			auto tcb = tight_container_bits();
-			auto b = tcb.begin() + compute_bit_index();
-			return rgs::subrange(b, b + number_of_bits_per_element);
+			return get_element_bit_range() | vws::drop(int{is_signed});
+		}
+
+		constexpr auto get_element_number_region_bits() noexcept
+		{
+			return get_element_bit_range() | vws::drop(int{is_signed});
+		}
+
+		/**
+		  * our number region from a underlying_integer type
+		  * is the last N bits for unsigned and the last
+		  * N-1 bits for signed
+		  */
+		constexpr auto get_number_region_from_underlying_type(
+			underlying_integer_t& x) const noexcept
+		{
+			auto c = bit_container_adaptor(x);
+			auto const n =
+				bits_per_underlying_integer
+				- (N - int{is_signed});
+
+			return rgs::subrange(rgs::begin(c) + n, rgs::end(c));
+		}
+
+		constexpr auto get_sign_iterator() const noexcept
+			requires is_signed
+		{
+			return get_element_bit_range().begin();
+		}
+
+		constexpr auto get_sign_iterator() noexcept
+			requires is_signed
+		{
+			return get_element_bit_range().begin();
+		}
+
+		constexpr void set_sign_bit(underlying_integer_t v) noexcept
+		{
+			v = static_cast<underlying_integer_t>(v&1);
+			*get_sign_iterator() = v;
+		}
+
+		constexpr underlying_integer_t get_sign_bit() const noexcept
+		{
+			return *get_sign_iterator();
+		}
+
+		constexpr void from_underlying_integer(underlying_integer_t x)
+		{
+			auto e_bits = get_element_number_region_bits();
+			auto v_bits = get_number_region_from_underlying_type(x);
+			rgs::copy(v_bits, e_bits.begin());
+			if constexpr (is_signed){
+				if(x < underlying_integer_t{0})
+					set_sign_bit(1);
+				else
+					set_sign_bit(0);
+			}
+		}
+
+		[[nodiscard]] constexpr
+		underlying_integer_t to_undelying_integer() const
+		{
+			underlying_integer_t v = 0;
+			if constexpr (is_signed){
+				if(get_sign_bit())
+					v = ~0;
+			}
+
+			auto v_bits = get_number_region_from_underlying_type(v);
+			auto e_bits = get_element_number_region_bits();
+			rgs::copy(e_bits, v_bits.begin());
+			return v;
 		}
 
 	public:
@@ -163,11 +276,7 @@ public:
 		[[nodiscard]] constexpr
 		underlying_integer_t get_value() const noexcept
 		{
-			underlying_integer_t v;
-			auto v_bits = bit_container_adaptor(v);
-			auto e_bits = get_element_bit_range();
-			rgs::copy(e_bits, v_bits);
-			return v;
+			return to_undelying_integer();
 		}
 
 		constexpr operator underlying_integer_t() const noexcept
@@ -177,9 +286,7 @@ public:
 
 		constexpr auto& operator=(underlying_integer_t v) noexcept
 		{
-			auto e_bits = get_element_bit_range();
-			auto v_bits = bit_container_adaptor(v);
-			rgs::copy(v_bits, e_bits);
+			from_underlying_integer(v);
 			return *this;
 		}
 

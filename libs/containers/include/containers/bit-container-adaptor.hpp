@@ -168,42 +168,42 @@ public:
 		return *(begin() + index);
 	}
 
-	constexpr auto begin()
+	constexpr auto begin() noexcept
 	{
 		return iterator{ m_data, 0 };
 	}
 
-	constexpr auto end()
+	constexpr auto end() noexcept
 	{
 		return iterator{ m_data, size() };
 	}
 
-	constexpr auto begin() const
+	constexpr auto begin() const noexcept
 	{
 		return iterator{ m_data, 0 };
 	}
 
-	constexpr auto end() const
+	constexpr auto end() const noexcept
 	{
 		return iterator{ m_data, size() };
 	}
 
-	constexpr auto rbegin()
+	constexpr auto rbegin() noexcept
 	{
 		return iterator{ m_data, size() };
 	}
 
-	constexpr auto rend()
+	constexpr auto rend() noexcept
 	{
 		return iterator{ m_data, -1 };
 	}
 
-	constexpr auto rbegin() const
+	constexpr auto rbegin() const noexcept
 	{
 		return iterator{ m_data, size() };
 	}
 
-	constexpr auto rend() const
+	constexpr auto rend() const noexcept
 	{
 		return iterator{ m_data, -1 };
 	}
