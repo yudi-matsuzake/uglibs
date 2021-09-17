@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 
+#include <numeric>
 #include <ranges>
 
 #include "util/misc-adaptors.hpp"
@@ -77,33 +78,33 @@ static auto test_edge_case_for()
 	tight_container_t v;
 	STATIC_REQUIRE(rgs::range<tight_container_t>);
 
-	constexpr auto max = is_signed
-		? ((1 << (N - 1)) - 1)
-		: ((1 << N) - 1);
+	constexpr auto min = tight_container_t::min_value();
+	constexpr auto max = tight_container_t::max_value();
 
-	constexpr auto min = is_signed
-		? (-(max+1))
-		: 0;
-
-	STATIC_REQUIRE(tight_container_t::min_value() == min);
-	STATIC_REQUIRE(tight_container_t::max_value() == max);
 	constexpr int64_t n_edge_values = 100;
 	v.resize(n_edge_values * 2);
 
-	auto make_array = [](auto&& v)
+	auto make_array = [](underint_t b)
 	{
 		std::array<underint_t, n_edge_values> a;
-		rgs::copy_n(v.begin(), n_edge_values, a.begin());
+		std::iota(a.begin(), a.end(), b);
 		return a;
 	};
 
-	auto const values = std::vector{
-		make_array(vws::iota(min, min + n_edge_values)),
-		make_array(vws::iota(max - n_edge_values + 1, max + 1))
+	auto const test_intervals = std::vector{
+		make_array(min),
+		make_array(max - n_edge_values - 1)
 	};
 
-	rgs::copy(values | vws::join, v.begin());
-	REQUIRE(rgs::equal(v, values | vws::join));
+	auto const values = test_intervals | vws::join;
+
+	rgs::copy(values, v.begin());
+	INFO("min: " << min);
+	INFO("max: " << max);
+	INFO("values size: " << test_intervals.size() * n_edge_values);
+	INFO("v size: " << rgs::size(v));
+	INFO("values size: " << test_intervals.size() * n_edge_values);
+	REQUIRE(rgs::equal(v, values));
 }
 
 TEST_CASE("bit size checks", "[tight-integers-container]")
@@ -112,7 +113,29 @@ TEST_CASE("bit size checks", "[tight-integers-container]")
 	test_edge_case_for<8, containers::unsigned_flag>();
 	test_edge_case_for<9, containers::unsigned_flag>();
 
+	test_edge_case_for<15, containers::unsigned_flag>();
+	test_edge_case_for<16, containers::unsigned_flag>();
+	test_edge_case_for<17, containers::unsigned_flag>();
+
+	test_edge_case_for<31, containers::unsigned_flag>();
+	test_edge_case_for<32, containers::unsigned_flag>();
+	test_edge_case_for<33, containers::unsigned_flag>();
+
+	test_edge_case_for<63, containers::unsigned_flag>();
+	test_edge_case_for<64, containers::unsigned_flag>();
+
 	test_edge_case_for<7, containers::signed_flag>();
 	test_edge_case_for<8, containers::signed_flag>();
 	test_edge_case_for<9, containers::signed_flag>();
+
+	test_edge_case_for<15, containers::signed_flag>();
+	test_edge_case_for<16, containers::signed_flag>();
+	test_edge_case_for<17, containers::signed_flag>();
+
+	test_edge_case_for<31, containers::signed_flag>();
+	test_edge_case_for<32, containers::signed_flag>();
+	test_edge_case_for<33, containers::signed_flag>();
+
+	test_edge_case_for<63, containers::signed_flag>();
+	test_edge_case_for<64, containers::signed_flag>();
 }

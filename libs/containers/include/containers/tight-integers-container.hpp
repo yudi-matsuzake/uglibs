@@ -122,7 +122,11 @@ public:
 	static constexpr underlying_integer_t max_value()
 		requires is_unsigned
 	{
-		return (1 << N) - 1;
+		auto n = bits_per_underlying_integer - N;
+		underlying_integer_t x = ~underlying_integer_t{0};
+		x <<= n;
+		x >>= n;
+		return x;
 	}
 
 	static constexpr underlying_integer_t max_value()
