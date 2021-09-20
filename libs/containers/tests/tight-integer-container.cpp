@@ -3,8 +3,11 @@
 #include <numeric>
 #include <ranges>
 
+#include "util/misc.hpp"
 #include "util/misc-adaptors.hpp"
 #include "containers/tight-integers-container.hpp"
+
+#include "range/v3/all.hpp"
 
 namespace rgs = std::ranges;
 namespace vws = std::ranges::views;
@@ -138,4 +141,30 @@ TEST_CASE("bit size checks", "[tight-integers-container]")
 
 	test_edge_case_for<63, containers::signed_flag>();
 	test_edge_case_for<64, containers::signed_flag>();
+}
+
+TEST_CASE("sorting tight-integers", "[tight-integers-container]")
+{
+	constexpr auto integer_bit_size = 8;
+	using tight_container_t = containers::tight_integer_container<
+		integer_bit_size, containers::unsigned_flag>;
+	using underint_t = tight_container_t::underlying_integer_t;
+
+	tight_container_t v;
+	auto const v_siz = 100;
+	v.resize(v_siz);
+
+	using iterator_t = tight_container_t::iterator<tight_container_t>;
+	using reference_t = iterator_t::reference;
+
+	rgs::copy(
+		vws::iota(0)
+			| vws::take(v_siz)
+			| vws::reverse
+			| vws::transform(util::make_static_cast<underint_t>()),
+		v.begin());
+
+	STATIC_REQUIRE(std::sortable<iterator_t>);
+	rgs::sort(v);
+	REQUIRE(rgs::is_sorted(v));
 }

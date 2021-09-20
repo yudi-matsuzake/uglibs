@@ -99,6 +99,10 @@ private:
 
 public:
 
+	template<class TightContainer>
+	class tight_element_reference;
+	using reference = tight_element_reference<tight_integer_container>;
+
 	using container_t = Container;
 	using underlying_integer_t = typename container_t::value_type;
 
@@ -146,6 +150,7 @@ public:
 		return -(tighter_container::max_value() + 1);
 	}
 
+	template<class TightContainer>
 	class tight_element_reference{
 	private:
 		constexpr auto compute_bit_index() const
@@ -212,7 +217,7 @@ public:
 			return *get_sign_iterator();
 		}
 
-		constexpr void from_underlying_integer(underlying_integer_t x) const
+		constexpr void impl_from_underlying_integer(underlying_integer_t x) const
 		{
 			auto e_bits = get_element_number_region_bits();
 			auto v_bits = get_number_region_from_underlying_type(x);
@@ -223,6 +228,18 @@ public:
 				else
 					set_sign_bit(0);
 			}
+		}
+
+		constexpr auto& from_underlying_integer(underlying_integer_t x)
+		{
+			impl_from_underlying_integer(x);
+			return *this;
+		}
+
+		constexpr auto& from_underlying_integer(underlying_integer_t x) const
+		{
+			impl_from_underlying_integer(x);
+			return *this;
 		}
 
 		[[nodiscard]] constexpr
@@ -241,14 +258,71 @@ public:
 		}
 
 	public:
+		static constexpr bool is_underlying_const = std::is_const_v<
+			underlying_integer_t>;
+
 		constexpr tight_element_reference() = default;
 
 		constexpr tight_element_reference(
-			tight_integer_container* a_ptr,
+			TightContainer* a_ptr,
 			int64_t index) noexcept
 			: m_container_ptr(a_ptr),
 			  tight_index(index)
 		{}
+
+		constexpr
+		tight_element_reference(tight_element_reference const& v) noexcept
+		{
+			real_assigment(v);
+		}
+
+		constexpr
+		tight_element_reference(tight_element_reference&& v) noexcept
+		{
+			real_assigment(std::forward<tight_element_reference>(v));
+		}
+
+		constexpr
+		auto& operator=(underlying_integer_t v) noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference const& v) noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference&& v) noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(underlying_integer_t v) const noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference const& v) const noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference&& v) const noexcept
+			requires (not is_underlying_const)
+		{
+			return from_underlying_integer(v);
+		}
 
 		[[nodiscard]] constexpr
 		underlying_integer_t get_value() const noexcept
@@ -256,20 +330,31 @@ public:
 			return to_undelying_integer();
 		}
 
+		constexpr auto& get_container() const
+		{
+			return *m_container_ptr;
+		}
+
+		constexpr auto& get_container()
+		{
+			return *m_container_ptr;
+		}
+
 		constexpr operator underlying_integer_t() const noexcept
 		{
 			return get_value();
 		}
 
-		constexpr auto& operator=(underlying_integer_t v) const noexcept
-		{
-			from_underlying_integer(v);
-			return *this;
-		}
-
 		constexpr
 		bool operator==(tight_element_reference const& other) const
 			noexcept
+		{
+			return get_value() == other.get_value();
+		}
+
+		constexpr
+		bool compare_real_reference(
+			tight_element_reference const& other) const
 		{
 			auto const both_are_end =
 				[siz = m_container_ptr->size(),
@@ -298,27 +383,98 @@ public:
 			return !(*this == other);
 		}
 
+		constexpr
+		auto operator<=>(underlying_integer_t o) const
+		{
+			return this->get_value() <=> o;
+		}
+
+		constexpr
+		auto operator<=>(tight_element_reference const& other) const
+		{
+			return *this <=> other.get_value();
+		}
+
+		auto real_assigment(tight_element_reference const& other)
+		{
+			m_container_ptr = other.m_container_ptr;
+			tight_index = other.tight_index;
+		}
+
+		auto real_assigment(tight_element_reference&& other)
+		{
+			m_container_ptr = std::exchange(other.m_container_ptr, nullptr);
+			tight_index = std::exchange(other.tight_index, 0);
+		}
+
+		TightContainer* get_container_ptr() const
+		{
+			return m_container_ptr;
+		}
+
+		TightContainer* get_container_ptr()
+			requires (not std::is_const_v<TightContainer>)
+		{
+			return m_container_ptr;
+		}
+
+		friend constexpr void swap(
+			tight_element_reference a,
+			tight_element_reference b)
+		{
+			underlying_integer_t cup = a;
+			a = b.get_value();
+			b = cup;
+		}
+
 	private:
-		tight_integer_container* m_container_ptr = nullptr;
+		TightContainer* m_container_ptr = nullptr;
 	public:
 		int64_t tight_index = 0;
 	};
 
+	template<class TightContainer>
 	class iterator{
 	public:
 		using iterator_category = std::random_access_iterator_tag;
-		using value_type = tight_element_reference;
+		using value_type = tight_element_reference<tight_integer_container>;
 		using difference_type = int64_t;
-		using reference = tight_element_reference;
+		using reference = tight_element_reference<tight_integer_container>;
 		using pointer = iterator;
 
 		constexpr iterator() noexcept = default;
 
 		explicit constexpr
-		iterator(tight_integer_container* a_ptr, uint64_t index)
+		iterator(TightContainer* a_ptr, uint64_t index)
 			noexcept
 			: m_reference(a_ptr, index)
 		{}
+
+		constexpr iterator(iterator const& other)
+			noexcept
+			: iterator(
+				other.m_reference.get_container_ptr(),
+				other.m_reference.tight_index)
+		{}
+
+		constexpr iterator(iterator&& other)
+			noexcept
+			: iterator(
+				other.m_reference.get_container_ptr(),
+				other.m_reference.tight_index)
+		{}
+
+		constexpr iterator& operator=(iterator const& other)
+		{
+			m_reference.real_assigment(other.m_reference);
+			return *this;
+		}
+
+		constexpr iterator& operator=(iterator&& other)
+		{
+			m_reference.real_assigment(other.m_reference);
+			return *this;
+		}
 
 		constexpr reference operator*() const
 		{
@@ -359,10 +515,31 @@ public:
 			return a += (-scalar);
 		}
 
+		friend constexpr iterator operator+(int64_t scalar, iterator a)
+		{
+			return a += scalar;
+		}
+
+		friend constexpr iterator operator-(int64_t scalar, iterator a)
+		{
+			return a += (-scalar);
+		}
+
 		constexpr iterator& operator+=(int64_t scalar)
 		{
 			m_reference.tight_index += scalar;
 			return *this;
+		}
+
+		constexpr iterator& operator-=(int64_t scalar)
+		{
+			return *this += -scalar;
+		}
+
+		constexpr auto operator[](int64_t index) const noexcept
+		{
+			return m_reference.get_container()[
+				m_reference.tight_index + index];
 		}
 
 		friend constexpr int64_t operator-(iterator a, iterator b)
@@ -374,7 +551,7 @@ public:
 
 		friend constexpr bool operator==(iterator a, iterator b)
 		{
-			return a.m_reference == b.m_reference;
+			return a.m_reference.compare_real_reference(b.m_reference);
 		}
 
 		friend constexpr bool operator!=(iterator a, iterator b)
@@ -382,8 +559,13 @@ public:
 			return !(a == b);
 		}
 
+		friend constexpr auto operator<=>(iterator a, iterator b)
+		{
+			return a.m_reference.tight_index <=> b.m_reference.tight_index;
+		}
+
 	private:
-		tight_element_reference m_reference;
+		tight_element_reference<TightContainer> m_reference;
 	};
 
 
@@ -444,6 +626,14 @@ public:
 		return m_size == 0;
 	}
 
+	constexpr auto push_back(underlying_integer_t e)
+	{
+		if(compute_number_of_underint(m_size+1) < m_data.size())
+			m_data.emplace_back();
+		(*this)[m_size] = e;
+		++m_size;
+	}
+
 	/**
 	  * access element at index `index`
 	  */
@@ -460,25 +650,25 @@ public:
 	constexpr auto begin()
 		noexcept
 	{
-		return iterator{ this, 0 };
+		return iterator(this, 0);
 	}
 
 	constexpr auto end()
 		noexcept
 	{
-		return iterator(this, size());
+		return iterator{ this, size() };
 	}
 
 	constexpr auto begin() const
 		noexcept
 	{
-		return iterator{ this, 0 };
+		return iterator(this, 0);
 	}
 
 	constexpr auto end() const
 		noexcept
 	{
-		return iterator{ this, size() };
+		return iterator(this, size());
 	}
 
 	constexpr auto rbegin()
