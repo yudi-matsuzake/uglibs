@@ -174,8 +174,7 @@ void test_sorting_for()
 	auto const v_siz = rgs::size(values);
 	tight_container_t v(v_siz);
 
-	using iterator_t = typename tight_container_t::iterator<
-		tight_container_t>;
+	using iterator_t = typename tight_container_t::iterator;
 	using reference_t = iterator_t::reference;
 
 	rgs::copy(values | vws::reverse, v.begin());
@@ -243,8 +242,7 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 	auto const v_siz = rgs::size(values);
 	tight_container_t v(v_siz);
 
-	using iterator_t = typename tight_container_t::iterator<
-		tight_container_t>;
+	using iterator_t = typename tight_container_t::iterator;
 	using reference_t = iterator_t::reference;
 
 	rgs::copy(values | vws::reverse, v.begin());

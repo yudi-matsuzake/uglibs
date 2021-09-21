@@ -91,7 +91,66 @@ template<
 	class M = mutable_flag,
 	class Container = std::vector<
 		typename underlying_integer<N, S, M>::type>>
-class tight_integer_container {
+struct tight_integer_container_common{
+
+	using container_t = Container;
+	using underlying_integer_t = typename container_t::value_type;
+	using underlying_integer_info = underlying_integer<N, S, M>;
+
+	static constexpr auto number_of_bits_per_element = N;
+	static constexpr bool is_signed = underlying_integer_info::is_signed;
+	static constexpr bool is_unsigned = !is_signed;
+
+	static constexpr auto underlying_integer_size = sizeof(
+			underlying_integer_t);
+
+	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
+		std::make_unsigned_t<underlying_integer_t>
+		>::digits;
+
+	static constexpr underlying_integer_t min_value()
+		requires is_unsigned
+	{
+		return 0;
+	}
+
+	static constexpr underlying_integer_t max_value()
+		requires is_unsigned
+	{
+		auto n = bits_per_underlying_integer - N;
+		underlying_integer_t x = ~underlying_integer_t{0};
+		x <<= n;
+		x >>= n;
+		return x;
+	}
+
+	static constexpr underlying_integer_t max_value()
+		requires is_signed
+	{
+		using tighter_container = tight_integer_container_common<
+			N - 1, unsigned_flag>;
+
+		return tighter_container::max_value();
+	}
+
+	static constexpr underlying_integer_t min_value()
+		requires is_signed
+	{
+		using tighter_container = tight_integer_container_common<
+			N - 1, unsigned_flag>;
+		return -(tighter_container::max_value() + 1);
+	}
+
+};
+
+template<
+	uint8_t N,
+	class S = signed_flag,
+	class M = mutable_flag,
+	class Container = std::vector<
+		typename underlying_integer<N, S, M>::type>>
+class tight_integer_container :
+	public tight_integer_container_common<N, S, M, Container>{
 private:
 	/**
 	  * compute the number of underlying integers to hold `n_elements` of 
@@ -124,7 +183,12 @@ public:
 
 	template<class TightContainer>
 	class tight_element_reference;
+	template<class TightContainer>
+	class tight_iterator;
+
 	using reference = tight_element_reference<tight_integer_container>;
+	using iterator = tight_iterator<tight_integer_container>;
+	using const_iterator = tight_iterator<const tight_integer_container>;
 
 	using container_t = Container;
 	using underlying_integer_t = typename container_t::value_type;
@@ -141,39 +205,6 @@ public:
 	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
 		std::make_unsigned_t<underlying_integer_t>
 	>::digits;
-
-	static constexpr underlying_integer_t min_value()
-		requires is_unsigned
-	{
-		return 0;
-	}
-
-	static constexpr underlying_integer_t max_value()
-		requires is_unsigned
-	{
-		auto n = bits_per_underlying_integer - N;
-		underlying_integer_t x = ~underlying_integer_t{0};
-		x <<= n;
-		x >>= n;
-		return x;
-	}
-
-	static constexpr underlying_integer_t max_value()
-		requires is_signed
-	{
-		using tighter_container = tight_integer_container<
-			N - 1, unsigned_flag>;
-
-		return tighter_container::max_value();
-	}
-
-	static constexpr underlying_integer_t min_value()
-		requires is_signed
-	{
-		using tighter_container = tight_integer_container<
-			N - 1, unsigned_flag>;
-		return -(tighter_container::max_value() + 1);
-	}
 
 	template<class TightContainer>
 	class tight_element_reference{
@@ -459,43 +490,43 @@ public:
 	};
 
 	template<class TightContainer>
-	class iterator{
+	class tight_iterator{
 	public:
 		using iterator_category = std::random_access_iterator_tag;
 		using value_type = underlying_integer_t;
 		using difference_type = int64_t;
 		using reference = tight_element_reference<tight_integer_container>;
-		using pointer = iterator;
+		using pointer = tight_iterator;
 
-		constexpr iterator() noexcept = default;
+		constexpr tight_iterator() noexcept = default;
 
 		explicit constexpr
-		iterator(TightContainer* a_ptr, uint64_t index)
+		tight_iterator(TightContainer* a_ptr, uint64_t index)
 			noexcept
 			: m_reference(a_ptr, index)
 		{}
 
-		constexpr iterator(iterator const& other)
+		constexpr tight_iterator(tight_iterator const& other)
 			noexcept
-			: iterator(
+			: tight_iterator(
 				other.m_reference.get_container_ptr(),
 				other.m_reference.tight_index)
 		{}
 
-		constexpr iterator(iterator&& other)
+		constexpr tight_iterator(tight_iterator&& other)
 			noexcept
-			: iterator(
+			: tight_iterator(
 				other.m_reference.get_container_ptr(),
 				other.m_reference.tight_index)
 		{}
 
-		constexpr iterator& operator=(iterator const& other)
+		constexpr tight_iterator& operator=(tight_iterator const& other)
 		{
 			m_reference.real_assigment(other.m_reference);
 			return *this;
 		}
 
-		constexpr iterator& operator=(iterator&& other)
+		constexpr tight_iterator& operator=(tight_iterator&& other)
 		{
 			m_reference.real_assigment(other.m_reference);
 			return *this;
@@ -506,57 +537,57 @@ public:
 			return m_reference;
 		}
 
-		constexpr iterator& operator++()
+		constexpr tight_iterator& operator++()
 		{
 			return (*this) += 1;
 		}
 
-		constexpr iterator& operator--()
+		constexpr tight_iterator& operator--()
 		{
 			return (*this) += -1;
 		}
 
-		constexpr iterator operator++(int) const
+		constexpr tight_iterator operator++(int) const
 		{
 			auto it = *this;
 			++(*this);
 			return it;
 		}
 
-		constexpr iterator operator--(int)
+		constexpr tight_iterator operator--(int)
 		{
 			auto it = *this;
 			--(*this);
 			return it;
 		}
 
-		friend constexpr iterator operator+(iterator a, int64_t scalar)
+		friend constexpr tight_iterator operator+(tight_iterator a, int64_t scalar)
 		{
 			return a += scalar;
 		}
 
-		friend constexpr iterator operator-(iterator a, int64_t scalar)
+		friend constexpr tight_iterator operator-(tight_iterator a, int64_t scalar)
 		{
 			return a += (-scalar);
 		}
 
-		friend constexpr iterator operator+(int64_t scalar, iterator a)
+		friend constexpr tight_iterator operator+(int64_t scalar, tight_iterator a)
 		{
 			return a += scalar;
 		}
 
-		friend constexpr iterator operator-(int64_t scalar, iterator a)
+		friend constexpr tight_iterator operator-(int64_t scalar, tight_iterator a)
 		{
 			return a += (-scalar);
 		}
 
-		constexpr iterator& operator+=(int64_t scalar)
+		constexpr tight_iterator& operator+=(int64_t scalar)
 		{
 			m_reference.tight_index += scalar;
 			return *this;
 		}
 
-		constexpr iterator& operator-=(int64_t scalar)
+		constexpr tight_iterator& operator-=(int64_t scalar)
 		{
 			return *this += -scalar;
 		}
@@ -567,24 +598,24 @@ public:
 				m_reference.tight_index + index];
 		}
 
-		friend constexpr int64_t operator-(iterator a, iterator b)
+		friend constexpr int64_t operator-(tight_iterator a, tight_iterator b)
 		{
 			auto const a_index = a.m_reference.tight_index;
 			auto const b_index = b.m_reference.tight_index;
 			return a_index - b_index;
 		}
 
-		friend constexpr bool operator==(iterator a, iterator b)
+		friend constexpr bool operator==(tight_iterator a, tight_iterator b)
 		{
 			return a.m_reference.compare_real_reference(b.m_reference);
 		}
 
-		friend constexpr bool operator!=(iterator a, iterator b)
+		friend constexpr bool operator!=(tight_iterator a, tight_iterator b)
 		{
 			return !(a == b);
 		}
 
-		friend constexpr auto operator<=>(iterator a, iterator b)
+		friend constexpr auto operator<=>(tight_iterator a, tight_iterator b)
 		{
 			return a.m_reference.tight_index <=> b.m_reference.tight_index;
 		}
@@ -684,49 +715,49 @@ public:
 	constexpr auto begin()
 		noexcept
 	{
-		return iterator(this, 0);
+		return tight_iterator(this, 0);
 	}
 
 	constexpr auto end()
 		noexcept
 	{
-		return iterator{ this, size() };
+		return tight_iterator{ this, size() };
 	}
 
 	constexpr auto begin() const
 		noexcept
 	{
-		return iterator(this, 0);
+		return tight_iterator(this, 0);
 	}
 
 	constexpr auto end() const
 		noexcept
 	{
-		return iterator(this, size());
+		return tight_iterator(this, size());
 	}
 
 	constexpr auto rbegin()
 		noexcept
 	{
-		return iterator{ this, size() - 1 };
+		return tight_iterator{ this, size() - 1 };
 	}
 
 	constexpr auto rend()
 		noexcept
 	{
-		return iterator{ this, -1 };
+		return tight_iterator{ this, -1 };
 	}
 
 	constexpr auto rbegin() const
 		noexcept
 	{
-		return iterator{ this, size() - 1 };
+		return tight_iterator{ this, size() - 1 };
 	}
 
 	constexpr auto rend() const
 		noexcept
 	{
-		return iterator{ this, -1 };
+		return tight_iterator{ this, -1 };
 	}
 
 private:
@@ -734,6 +765,41 @@ private:
 	size_t m_size = 0;
 };
 
+template<class S, class M, class Container>
+class tight_integer_container<8, S, M, Container> :
+	public tight_integer_container_common<8, S, M, Container>,
+	public Container
+{
+public:
+	using Container::Container;
+};
+
+template<class S, class M, class Container>
+class tight_integer_container<16, S, M, Container> :
+	public tight_integer_container_common<16, S, M, Container>,
+	public Container
+{
+public:
+	using Container::Container;
+};
+
+template<class S, class M, class Container>
+class tight_integer_container<32, S, M, Container> :
+	public tight_integer_container_common<32, S, M, Container>,
+	public Container
+{
+public:
+	using Container::Container;
+};
+
+template<class S, class M, class Container>
+class tight_integer_container<64, S, M, Container> :
+	public tight_integer_container_common<64, S, M, Container>,
+	public Container
+{
+public:
+	using Container::Container;
+};
 
 } // end of namespace containers
 
