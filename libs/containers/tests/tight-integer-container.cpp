@@ -154,8 +154,11 @@ void test_sorting_for()
 
 	auto const values = []
 	{
-		constexpr underint_t default_size = 10;
-		static_assert(tight_container_t::max_value() > default_size);
+		constexpr underint_t n_values = 20;
+		constexpr underint_t default_size =
+			tight_container_t::max_value() < n_values
+			? tight_container_t::max_value()
+			: n_values;
 
 		if constexpr(is_signed){
 			constexpr underint_t first_value = -default_size/2;
@@ -186,6 +189,11 @@ void test_sorting_for()
 
 TEST_CASE("sorting tight-integers", "[tight-integers-container]")
 {
+
+	test_sorting_for<2, containers::unsigned_flag>();
+	test_sorting_for<3, containers::unsigned_flag>();
+	test_sorting_for<4, containers::unsigned_flag>();
+	test_sorting_for<5, containers::unsigned_flag>();
 
 	test_sorting_for<7, containers::unsigned_flag>();
 	test_sorting_for<8, containers::unsigned_flag>();
@@ -248,23 +256,23 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 
 }
 
-TEST_CASE("binary tight integer container", "[tight-integers-container]")
-{
-	using binary_tight_t = containers::tight_integer_container<
-		1, containers::unsigned_flag>;
+/* TEST_CASE("binary tight integer container", "[tight-integers-container]") */
+/* { */
+/* 	using binary_tight_t = containers::tight_integer_container< */
+/* 		1, containers::unsigned_flag>; */
 
-	binary_tight_t c(8);
+/* 	binary_tight_t c(8); */
 
-	uint8_t x = 42;
-	auto x_bits = containers::bit_container_adaptor(x);
-	rgs::copy(x_bits, c.begin());
+/* 	uint8_t x = 42; */
+/* 	auto x_bits = containers::bit_container_adaptor(x); */
+/* 	rgs::copy(x_bits, c.begin()); */
 
-	REQUIRE(rgs::equal(x_bits, c));
+/* 	REQUIRE(rgs::equal(x_bits, c)); */
 
-	rgs::sort(c);
-	REQUIRE(rgs::is_sorted(c));
+/* 	rgs::sort(c); */
+/* 	REQUIRE(rgs::is_sorted(c)); */
 
-	rgs::copy(c, x_bits.begin());
-	REQUIRE(rgs::equal(x_bits, c));
-	/* REQUIRE(x == 7); */
-}
+/* 	rgs::copy(c, x_bits.begin()); */
+/* 	REQUIRE(rgs::equal(x_bits, c)); */
+/* 	/1* REQUIRE(x == 7); *1/ */
+/* } */
