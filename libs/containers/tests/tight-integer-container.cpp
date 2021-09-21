@@ -256,23 +256,23 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 
 }
 
-/* TEST_CASE("binary tight integer container", "[tight-integers-container]") */
-/* { */
-/* 	using binary_tight_t = containers::tight_integer_container< */
-/* 		1, containers::unsigned_flag>; */
+TEST_CASE("binary tight integer container", "[tight-integers-container]")
+{
+	using binary_tight_t = containers::tight_integer_container<
+		1, containers::unsigned_flag>;
 
-/* 	binary_tight_t c(8); */
+	binary_tight_t c(8);
 
-/* 	uint8_t x = 42; */
-/* 	auto x_bits = containers::bit_container_adaptor(x); */
-/* 	rgs::copy(x_bits, c.begin()); */
+	uint8_t x = 42;
+	auto x_bits = containers::bit_container_adaptor(x);
+	rgs::copy(x_bits, c.begin());
 
-/* 	REQUIRE(rgs::equal(x_bits, c)); */
+	REQUIRE(rgs::equal(x_bits, c));
 
-/* 	rgs::sort(c); */
-/* 	REQUIRE(rgs::is_sorted(c)); */
+	rgs::sort(c);
+	REQUIRE(rgs::is_sorted(c));
 
-/* 	rgs::copy(c, x_bits.begin()); */
-/* 	REQUIRE(rgs::equal(x_bits, c)); */
-/* 	/1* REQUIRE(x == 7); *1/ */
-/* } */
+	rgs::copy(c, x_bits.begin());
+	REQUIRE(rgs::equal(x_bits, c));
+	REQUIRE(x == 7);
+}
