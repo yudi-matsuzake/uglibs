@@ -79,8 +79,9 @@ private:
 	constexpr auto compute_number_of_underint(size_t n_elements) const
 		noexcept
 	{
-		size_t const n_bits = n_elements*N;
-		size_t const n_ints = n_bits/N + ((n_bits % N) > 0);
+		size_t const n_bits = n_elements*number_of_bits_per_element;
+		auto const n = bits_per_underlying_integer;
+		size_t const n_ints = n_bits/n + ((n_bits % n) > 0);
 		return n_ints;
 	}
 
@@ -422,7 +423,7 @@ public:
 			tight_element_reference a,
 			tight_element_reference b)
 		{
-			underlying_integer_t cup = a;
+			underlying_integer_t cup = a.get_value();
 			a = b.get_value();
 			b = cup;
 		}
@@ -437,7 +438,7 @@ public:
 	class iterator{
 	public:
 		using iterator_category = std::random_access_iterator_tag;
-		using value_type = tight_element_reference<tight_integer_container>;
+		using value_type = underlying_integer_t;
 		using difference_type = int64_t;
 		using reference = tight_element_reference<tight_integer_container>;
 		using pointer = iterator;
@@ -568,6 +569,15 @@ public:
 		tight_element_reference<TightContainer> m_reference;
 	};
 
+	constexpr tight_integer_container() = default;
+
+	/** 
+	  * creates a tight container with `n_elements` tight elements
+	  */
+	constexpr explicit tight_integer_container(uint64_t n_elements)
+		: m_data(compute_number_of_underint(n_elements)),
+		  m_size(n_elements)
+	{}
 
 	/**
 	  * resize the container to hold n_elements with N bits
@@ -702,3 +712,22 @@ private:
 
 
 } // end of namespace containers
+
+/* template<uint8_t N, class S, class C, template<class> class TQ, template<class> class TU> */
+/* struct std::basic_common_reference< */
+/* 	containers::tight_integer_container<N, S, C>, */
+/* 	typename containers::underlying_integer<N, S>::type, */
+/* 	TQ, */
+/* 	TU>{ */
+/* 	using type = containers::tight_integer_container<N, S, C>::reference; */
+/* }; */
+
+/* template<uint8_t N, class S, class C, template<class> class TQ, template<class> class TU> */
+/* struct std::basic_common_reference< */
+/* 	typename containers::underlying_integer<N, S>::type, */
+/* 	containers::tight_integer_container<N, S, C>, */
+/* 	TQ, */
+/* 	TU>{ */
+/* 	using type = containers::tight_integer_container<N, S, C>::reference; */
+/* }; */
+

@@ -143,28 +143,128 @@ TEST_CASE("bit size checks", "[tight-integers-container]")
 	test_edge_case_for<64, containers::signed_flag>();
 }
 
+template<int N, class S>
+void test_sorting_for()
+{
+	constexpr auto integer_bit_size = N;
+	using tight_container_t = containers::tight_integer_container<
+		integer_bit_size, containers::unsigned_flag>;
+	using underint_t = tight_container_t::underlying_integer_t;
+	constexpr bool is_signed = tight_container_t::is_signed;
+
+	auto const values = []
+	{
+		constexpr underint_t default_size = 10;
+		static_assert(tight_container_t::max_value() > default_size);
+
+		if constexpr(is_signed){
+			constexpr underint_t first_value = -default_size/2;
+			constexpr underint_t last_value = first_value+default_size;
+			return rgs::iota_view(first_value, last_value);
+		}else{
+			constexpr underint_t first_value = 0;
+			constexpr underint_t last_value = default_size;
+			return rgs::iota_view(first_value, last_value);
+		}
+	}();
+
+	auto const v_siz = rgs::size(values);
+	tight_container_t v(v_siz);
+
+	using iterator_t = typename tight_container_t::iterator<
+		tight_container_t>;
+	using reference_t = iterator_t::reference;
+
+	rgs::copy(values | vws::reverse, v.begin());
+	REQUIRE(rgs::equal(values | vws::reverse, v));
+
+	STATIC_REQUIRE(std::sortable<iterator_t>);
+	rgs::sort(v);
+
+	REQUIRE(rgs::equal(v, values));
+}
+
 TEST_CASE("sorting tight-integers", "[tight-integers-container]")
+{
+
+	test_sorting_for<7, containers::unsigned_flag>();
+	test_sorting_for<8, containers::unsigned_flag>();
+	test_sorting_for<9, containers::unsigned_flag>();
+
+	test_sorting_for<15, containers::unsigned_flag>();
+	test_sorting_for<16, containers::unsigned_flag>();
+	test_sorting_for<17, containers::unsigned_flag>();
+
+	test_sorting_for<31, containers::unsigned_flag>();
+	test_sorting_for<32, containers::unsigned_flag>();
+	test_sorting_for<33, containers::unsigned_flag>();
+
+	test_sorting_for<63, containers::unsigned_flag>();
+	test_sorting_for<64, containers::unsigned_flag>();
+
+	test_sorting_for<7, containers::signed_flag>();
+	test_sorting_for<8, containers::signed_flag>();
+	test_sorting_for<9, containers::signed_flag>();
+
+	test_sorting_for<15, containers::signed_flag>();
+	test_sorting_for<16, containers::signed_flag>();
+	test_sorting_for<17, containers::signed_flag>();
+
+	test_sorting_for<31, containers::signed_flag>();
+	test_sorting_for<32, containers::signed_flag>();
+	test_sorting_for<33, containers::signed_flag>();
+
+	test_sorting_for<63, containers::signed_flag>();
+	test_sorting_for<64, containers::signed_flag>();
+}
+
+TEST_CASE("small sorting", "[tight-integers-container]")
 {
 	constexpr auto integer_bit_size = 8;
 	using tight_container_t = containers::tight_integer_container<
 		integer_bit_size, containers::unsigned_flag>;
 	using underint_t = tight_container_t::underlying_integer_t;
 
-	tight_container_t v;
-	auto const v_siz = 100;
-	v.resize(v_siz);
+	auto const values = []
+	{
+		underint_t first_value = 0;
+		underint_t last_value = 4;
+		return rgs::iota_view(first_value, last_value);
+	}();
 
-	using iterator_t = tight_container_t::iterator<tight_container_t>;
+	auto const v_siz = rgs::size(values);
+	tight_container_t v(v_siz);
+
+	using iterator_t = typename tight_container_t::iterator<
+		tight_container_t>;
 	using reference_t = iterator_t::reference;
 
-	rgs::copy(
-		vws::iota(0)
-			| vws::take(v_siz)
-			| vws::reverse
-			| vws::transform(util::make_static_cast<underint_t>()),
-		v.begin());
+	rgs::copy(values | vws::reverse, v.begin());
+	REQUIRE(rgs::equal(v, values | vws::reverse));
 
 	STATIC_REQUIRE(std::sortable<iterator_t>);
 	rgs::sort(v);
-	REQUIRE(rgs::is_sorted(v));
+	REQUIRE(rgs::equal(v, values));
+
+}
+
+TEST_CASE("binary tight integer container", "[tight-integers-container]")
+{
+	using binary_tight_t = containers::tight_integer_container<
+		1, containers::unsigned_flag>;
+
+	binary_tight_t c(8);
+
+	uint8_t x = 42;
+	auto x_bits = containers::bit_container_adaptor(x);
+	rgs::copy(x_bits, c.begin());
+
+	REQUIRE(rgs::equal(x_bits, c));
+
+	rgs::sort(c);
+	REQUIRE(rgs::is_sorted(c));
+
+	rgs::copy(c, x_bits.begin());
+	REQUIRE(rgs::equal(x_bits, c));
+	/* REQUIRE(x == 7); */
 }
