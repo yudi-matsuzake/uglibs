@@ -1,9 +1,13 @@
 #pragma once
 
-#include <iterator>
-#include <string>
-#include <sstream>
-#include <array>
+#include <stdint.h>	// for uint64_t
+#include <stdlib.h>	// for rand
+#include <algorithm>	// for equal, generate
+#include <array>	// for array
+#include <functional>	// for hash
+#include <iterator>	// for distance, prev
+#include <sstream>	// for stringstream
+#include <string>	// for basic_string, string, allocator, wstring
 
 namespace util{
 
