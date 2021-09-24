@@ -826,11 +826,18 @@ struct integer_info{
 	using signess = decltype(get_signess());
 };
 
-template<util::arbitrary_integer_or_integral T>
+template<
+	util::arbitrary_integer_or_integral T,
+	class C = detail::default_container_t<
+		integer_info<T>::n_bits,
+		typename integer_info<T>::signess,
+		typename integer_info<T>::mutability
+	>>
 class tight_integer_container : public detail::tight_integer_container<
 	integer_info<T>::n_bits,
 	typename integer_info<T>::signess,
-	typename integer_info<T>::mutability>{
+	typename integer_info<T>::mutability,
+	C>{
 public:
 	using base_t = detail::tight_integer_container<
 		integer_info<T>::n_bits,
