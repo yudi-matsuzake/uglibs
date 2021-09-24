@@ -12,7 +12,6 @@ add_library(util
 	./include/util/bit.hpp
 	./include/util/container-operations.hpp
 	./include/util/misc-adaptors.hpp
-	./include/util/unsigned-integer.hpp
 	./include/util/concepts.hpp
 	./include/util/cv-adaptors.hpp
 	./include/util/static-vector.hpp
@@ -63,7 +62,6 @@ if(ENABLE_PCH)
 		./include/util/misc.hpp
 		./include/util/container-operations.hpp
 		./include/util/misc-adaptors.hpp
-		./include/util/unsigned-integer.hpp
 		./include/util/concepts.hpp
 		./include/util/cv-adaptors.hpp
 		./include/util/static-vector.hpp)
