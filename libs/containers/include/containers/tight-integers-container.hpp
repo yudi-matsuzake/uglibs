@@ -804,26 +804,20 @@ public:
 using detail::underlying_integer;
 
 template<util::arbitrary_integer_or_integral T>
-struct integer_info{
-	static auto constexpr n_bits = []
-	{
-		if constexpr(util::arbitrary_integer<T>)
-			return T::n_bits;
-		else
-			return util::number_of_bits<T>();
-	}();
+struct integer_info;
 
+template<util::arbitrary_integer T>
+struct integer_info<T>{
+	static auto constexpr n_bits = T::n_bits;
 	using mutability = util::to_mutability_t<T>;
+	using signess = T::signess;
+};
 
-	static constexpr auto get_signess()
-		-> T::signess
-		requires util::arbitrary_integer<T>;
-
-	static constexpr auto get_signess()
-		-> util::to_signess_t<T>
-		requires std::integral<T>;
-
-	using signess = decltype(get_signess());
+template<std::integral T>
+struct integer_info<T>{
+	static auto constexpr n_bits = util::number_of_bits<T>();
+	using mutability = util::to_mutability_t<T>;
+	using signess = util::to_signess_t<T>;
 };
 
 template<

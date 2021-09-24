@@ -177,6 +177,6 @@ concept arbitrary_integer = ((T::is_signed ^ T::is_unsigned) == 1)
 
 template<class T>
 concept arbitrary_integer_or_integral = arbitrary_integer<T>
-|| std::integral<T>;
+	|| std::integral<T>;
 
 } // end of namespace util

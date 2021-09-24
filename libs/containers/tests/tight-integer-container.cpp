@@ -13,6 +13,24 @@ namespace rgs = std::ranges;
 namespace vws = std::ranges::views;
 namespace acs = ranges::actions;
 
+template<bool is_signed>
+constexpr static auto make_values(
+	std::integral auto n_values,
+	std::integral auto max)
+{
+	auto default_size = max < n_values ? max : n_values;
+
+	if constexpr(is_signed){
+		int64_t const first_value = -default_size/2;
+		int64_t const last_value = first_value+default_size;
+		return rgs::iota_view(first_value, last_value);
+	}else{
+		uint64_t const first_value = 0;
+		uint64_t const last_value = default_size;
+		return rgs::iota_view(first_value, last_value);
+	}
+};
+
 TEST_CASE("underlying integer", "[tight-integers-container]")
 {
 	using bin_container_t = containers::underlying_integer<
@@ -147,28 +165,13 @@ template<int N, class S>
 void test_sorting_for()
 {
 	using integer_t = util::integer<N, S>;
-	using tight_container_t = containers::tight_integer_container<integer_t>;
+	using tight_container_t = containers::tight_integer_container<
+		integer_t>;
 	using underint_t = tight_container_t::underlying_integer_t;
 	constexpr bool is_signed = tight_container_t::is_signed;
 
-	auto const values = []
-	{
-		constexpr underint_t n_values = 20;
-		constexpr underint_t default_size =
-			tight_container_t::max_value() < n_values
-			? tight_container_t::max_value()
-			: n_values;
-
-		if constexpr(is_signed){
-			constexpr underint_t first_value = -default_size/2;
-			constexpr underint_t last_value = first_value+default_size;
-			return rgs::iota_view(first_value, last_value);
-		}else{
-			constexpr underint_t first_value = 0;
-			constexpr underint_t last_value = default_size;
-			return rgs::iota_view(first_value, last_value);
-		}
-	}();
+	auto const values = make_values<is_signed>(
+		20, tight_container_t::max_value());
 
 	auto const v_siz = rgs::size(values);
 	tight_container_t v(v_siz);
@@ -224,20 +227,18 @@ TEST_CASE("sorting tight-integers", "[tight-integers-container]")
 	test_sorting_for<64, util::signed_flag>();
 }
 
-TEST_CASE("small sorting", "[tight-integers-container]")
+template<class T>
+void integral_sorting()
 {
-	using integer_t = util::unsigned_integer<8>;
+	using integer_t = T;
 	using tight_container_t = containers::tight_integer_container<
 		integer_t>;
 	using underint_t = tight_container_t::underlying_integer_t;
 
-	auto const values = []
-	{
-		underint_t first_value = 0;
-		underint_t last_value = 4;
-		return rgs::iota_view(first_value, last_value);
-	}();
+	constexpr auto is_signed = tight_container_t::is_signed;
 
+	auto const values = make_values<is_signed>(
+		20, tight_container_t::max_value());
 	auto const v_siz = rgs::size(values);
 	tight_container_t v(v_siz);
 
@@ -250,7 +251,21 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 	STATIC_REQUIRE(std::sortable<iterator_t>);
 	rgs::sort(v);
 	REQUIRE(rgs::equal(v, values));
+}
 
+TEST_CASE("integral types sorting", "[tight-integers-container]")
+{
+	integral_sorting<uint8_t>();
+	integral_sorting<int8_t>();
+
+	integral_sorting<uint16_t>();
+	integral_sorting<int16_t>();
+
+	integral_sorting<uint32_t>();
+	integral_sorting<int32_t>();
+
+	integral_sorting<uint64_t>();
+	integral_sorting<int64_t>();
 }
 
 TEST_CASE("binary tight integer container", "[tight-integers-container]")
