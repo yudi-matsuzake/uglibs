@@ -1,7 +1,7 @@
 
 #include <catch2/catch.hpp>
 
-#include "util/meta.hpp"
+#include "util/variant.hpp"
 
 TEST_CASE("merged_variant", "[util]")
 {

@@ -4,6 +4,7 @@
 
 #include "util/misc.hpp"
 #include "util/static-string.hpp"
+#include "util/variant.hpp"
 
 /**
   * @file integers.hpp defines integers with abstract types
@@ -35,7 +36,9 @@ namespace detail{
 
 template<uint32_t N, signess S>
 struct integer_common{
-	static_assert(N <= 64, "only support until 64 bit integers");
+	static_assert(
+		N >= 1 && N <= 64,
+		"only support at least 1 to 64 bit integers");
 
 	static constexpr bool is_signed = std::is_same_v<S, signed_flag>;
 	static constexpr bool is_unsigned = std::is_same_v<S, unsigned_flag>;
@@ -57,65 +60,72 @@ struct integer_common{
 };
 
 template<uint32_t N, signess S>
-struct integer : uninstantiable, integer_common<N, S> {
+struct integer : integer_common<N, S> {
 	using type = integer<N, S>;
 };
 
 template<>
 struct integer<8, signed_flag>
-	: uninstantiable,
-	  integer_common<8, signed_flag> {
+	: integer_common<8, signed_flag> {
 	using type = int8_t;
 };
 
 template<>
 struct integer<8, unsigned_flag>
-	: uninstantiable,
-	  integer_common<8, unsigned_flag> {
+	: integer_common<8, unsigned_flag> {
 	using type = uint8_t;
 };
 
 template<>
 struct integer<16, signed_flag>
-	: uninstantiable,
-	  integer_common<16, signed_flag> {
+	: integer_common<16, signed_flag> {
 	using type = int16_t;
 };
 
 template<>
 struct integer<16, unsigned_flag>
-	: uninstantiable,
-	  integer_common<16, unsigned_flag> {
+	: integer_common<16, unsigned_flag> {
 	using type = uint16_t;
 };
 
 template<>
 struct integer<32, signed_flag>
-	: uninstantiable,
-	  integer_common<32, signed_flag> {
+	: integer_common<32, signed_flag> {
 	using type = int32_t;
 };
 
 template<>
 struct integer<32, unsigned_flag>
-	: uninstantiable,
-	  integer_common<32, unsigned_flag> {
+	: integer_common<32, unsigned_flag> {
 	using type = uint32_t;
 };
 
 template<>
 struct integer<64, signed_flag>
-	: uninstantiable,
-	  integer_common<64, signed_flag> {
+	: integer_common<64, signed_flag> {
 	using type = int64_t;
 };
 
 template<>
 struct integer<64, unsigned_flag>
-	: uninstantiable,
-	  integer_common<64, unsigned_flag> {
+	: integer_common<64, unsigned_flag> {
 	using type = uint64_t;
 };
+
+template<signess S, uint32_t ... ints>
+constexpr auto make_variant_integer(std::integer_sequence<uint32_t, ints...>)
+	-> std::variant<integer<ints, S> ... >;
+
+template<signess S, class IntegerSequence>
+using variant_integer_t = decltype(make_variant_integer<S>(IntegerSequence{}));
+
+using variant_integer_base_t =
+	merged_variant_t<
+		variant_integer_t<
+			signed_flag, make_integer_range_t<uint32_t, 1, 64>>,
+		variant_integer_t<
+			unsigned_flag, make_integer_range_t<uint32_t, 1, 64>>
+	>;
 
 } // end of namespace detail
 
@@ -124,5 +134,12 @@ using signed_integer = typename detail::integer<N, signed_flag>;
 
 template<int N>
 using unsigned_integer = typename detail::integer<N, unsigned_flag>;
+
+struct integer : public detail::variant_integer_base_t
+{
+	using base_t = detail::variant_integer_base_t;
+	using base_t::base_t;
+	using base_t::operator=;
+};
 
 } // end of namespace util

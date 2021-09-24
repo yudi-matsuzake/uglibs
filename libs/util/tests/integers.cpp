@@ -15,4 +15,6 @@ TEST_CASE("integers", "[util]")
 	STATIC_REQUIRE(util::signed_integer<8>::type_name() == "int8");
 	STATIC_REQUIRE(util::signed_integer<32>::type_name() == "int32");
 	STATIC_REQUIRE(util::signed_integer<64>::type_name() == "int64");
+
+	util::integer test = util::unsigned_integer<3>{};
 }
