@@ -7,6 +7,7 @@
 #include <limits>
 
 #include "util/bit.hpp"
+#include "util/integers.hpp"
 #include "containers/bit-container-adaptor.hpp"
 
 namespace containers{
@@ -14,22 +15,19 @@ namespace containers{
 namespace rgs = std::ranges;
 namespace vws = std::views;
 
-template<class T>
-static constexpr auto number_of_bits = std::numeric_limits<T>::digits;
+/* struct signed_flag{}; */
+/* struct unsigned_flag{}; */
 
-struct signed_flag{};
-struct unsigned_flag{};
+/* struct const_flag{}; */
+/* struct mutable_flag{}; */
 
-struct const_flag{};
-struct mutable_flag{};
+/* template<class T> */
+/* concept signess = std::is_same_v<T, signed_flag> */
+/* 	|| std::is_same_v<T, unsigned_flag>; */
 
-template<class T>
-concept signess = std::is_same_v<T, signed_flag>
-	|| std::is_same_v<T, unsigned_flag>;
-
-template<class T>
-concept mutability = std::is_same_v<T, const_flag>
-	|| std::is_same_v<T, mutable_flag>;
+/* template<class T> */
+/* concept mutability = std::is_same_v<T, const_flag> */
+/* 	|| std::is_same_v<T, mutable_flag>; */
 
 /**
   * given a bitsize N, this struct determines which std integers must me used,
@@ -39,17 +37,23 @@ concept mutability = std::is_same_v<T, const_flag>
   * underlying_integer<32>::type = int32_t
   * underlying_integer<64, unsigned_flag>::type = uint64_t
   */
-template<uint8_t N, signess S = signed_flag, mutability M = mutable_flag>
+template<
+	uint8_t N,
+	util::signess S = util::signed_flag,
+	util::mutability M = util::mutable_flag>
 struct underlying_integer
 {
 
-	static constexpr auto is_signed = std::is_same_v<S, signed_flag>;
-	static constexpr auto is_unsigned = std::is_same_v<S, unsigned_flag>;
-	static constexpr auto is_const = std::is_same_v<M, const_flag>;
-	static constexpr auto is_mutable = std::is_same_v<M, mutable_flag>;
+	static constexpr auto is_signed = std::is_same_v<S, util::signed_flag>;
+	static constexpr auto is_unsigned = std::is_same_v<
+		S, util::unsigned_flag>;
+
+	static constexpr auto is_const = std::is_same_v<M, util::const_flag>;
+	static constexpr auto is_mutable = std::is_same_v<
+		M, util::mutable_flag>;
 
 	static_assert(
-		N > 0 && N <= number_of_bits<uint64_t>,
+		N > 0 && N <= util::number_of_bits<uint64_t>(),
 		"underlying_integer integer only supports 1 to 64 bits");
 
 	static_assert(
@@ -60,13 +64,13 @@ struct underlying_integer
 	static_assert(is_const xor is_mutable);
 
 	using unsigned_type = std::conditional_t<
-		(N <= number_of_bits<uint8_t>),
+		(N <= util::number_of_bits<uint8_t>()),
 		uint8_t,
 		std::conditional_t<
-			(N <= number_of_bits<uint16_t>),
+			(N <= util::number_of_bits<uint16_t>()),
 			uint16_t,
 			std::conditional_t<
-				(N <= number_of_bits<uint32_t>),
+				(N <= util::number_of_bits<uint32_t>()),
 				uint32_t,
 				uint64_t
 			>
@@ -88,8 +92,8 @@ struct underlying_integer
 
 template<
 	uint8_t N,
-	class S = signed_flag,
-	class M = mutable_flag,
+	class S = util::signed_flag,
+	class M = util::mutable_flag,
 	class Container = std::vector<
 		typename underlying_integer<N, S, M>::type>>
 struct tight_integer_container_common{
@@ -129,7 +133,7 @@ struct tight_integer_container_common{
 		requires is_signed
 	{
 		using tighter_container = tight_integer_container_common<
-			N - 1, unsigned_flag>;
+			N - 1, util::unsigned_flag>;
 
 		return tighter_container::max_value();
 	}
@@ -138,7 +142,7 @@ struct tight_integer_container_common{
 		requires is_signed
 	{
 		using tighter_container = tight_integer_container_common<
-			N - 1, unsigned_flag>;
+			N - 1, util::unsigned_flag>;
 		return -(tighter_container::max_value() + 1);
 	}
 
@@ -146,8 +150,8 @@ struct tight_integer_container_common{
 
 template<
 	uint8_t N,
-	class S = signed_flag,
-	class M = mutable_flag,
+	class S = util::signed_flag,
+	class M = util::mutable_flag,
 	class Container = std::vector<
 		typename underlying_integer<N, S, M>::type>>
 class tight_integer_container :

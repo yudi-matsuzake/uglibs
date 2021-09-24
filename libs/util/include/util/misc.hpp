@@ -8,8 +8,13 @@
 #include <iterator>	// for distance, prev
 #include <sstream>	// for stringstream
 #include <string>	// for basic_string, string, allocator, wstring
+#include <string_view>	// for string_view
+#include <ranges>
 
 namespace util{
+
+namespace rgs = std::ranges;
+namespace vws = std::views;
 
 template<class str_iterator, class ext_iterator>
 bool ends_with(
@@ -105,6 +110,41 @@ constexpr auto make_random_indices(uint64_t max_index)
 			return rand() % max_index;
 		}
 	);
+}
+
+/**
+  * this class represents a struct or class that cannot be instantiable
+  *
+  * the most useful application are type safe flags
+  */
+struct uninstantiable{
+	uninstantiable() = delete;
+	~uninstantiable() = delete;
+	uninstantiable(uninstantiable const&) = delete;
+	uninstantiable(uninstantiable&&) = delete;
+};
+
+constexpr auto number_of_digits(std::integral auto n, std::integral auto base)
+{
+	uint64_t count = 0;
+
+	do{
+		++count;
+		n /= base;
+	}while(n > 0);
+
+	return count;
+}
+
+template<class T, uint64_t N, uint64_t M>
+constexpr auto array_concat(
+	std::array<T, N> const& a,
+	std::array<T, M> const& b)
+{
+	std::array<T, N + M> result;
+	rgs::copy(a, result.begin());
+	rgs::copy(b, result.begin() + a.size());
+	return result;
 }
 
 }

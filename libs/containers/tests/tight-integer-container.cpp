@@ -16,7 +16,7 @@ namespace acs = ranges::actions;
 TEST_CASE("underlying integer", "[tight-integers-container]")
 {
 	using bin_container_t = containers::underlying_integer<
-		1, containers::unsigned_flag>::type;
+		1, util::unsigned_flag>::type;
 
 	STATIC_REQUIRE(sizeof(bin_container_t) == 1);
 	STATIC_REQUIRE(sizeof(containers::underlying_integer<8>::type) == 1);
@@ -35,7 +35,7 @@ TEST_CASE(
 	constexpr auto integer_bit_size = 9;
 	using tight_container_t = containers::tight_integer_container<
 		integer_bit_size,
-		containers::unsigned_flag>;
+		util::unsigned_flag>;
 
 	using underint_t = tight_container_t::underlying_integer_t;
 
@@ -73,10 +73,10 @@ static auto test_edge_case_for()
 	using tight_container_t = containers::tight_integer_container<
 		integer_bit_size, S>;
 
-	using underint_t = tight_container_t::underlying_integer_t;
+	using underint_t = typename tight_container_t::underlying_integer_t;
 
 	constexpr bool is_signed = std::is_same_v<
-		S, containers::signed_flag>;
+		S, util::signed_flag>;
 
 	tight_container_t v;
 	STATIC_REQUIRE(rgs::range<tight_container_t>);
@@ -112,35 +112,35 @@ static auto test_edge_case_for()
 
 TEST_CASE("bit size checks", "[tight-integers-container]")
 {
-	test_edge_case_for<7, containers::unsigned_flag>();
-	test_edge_case_for<8, containers::unsigned_flag>();
-	test_edge_case_for<9, containers::unsigned_flag>();
+	test_edge_case_for<7, util::unsigned_flag>();
+	test_edge_case_for<8, util::unsigned_flag>();
+	test_edge_case_for<9, util::unsigned_flag>();
 
-	test_edge_case_for<15, containers::unsigned_flag>();
-	test_edge_case_for<16, containers::unsigned_flag>();
-	test_edge_case_for<17, containers::unsigned_flag>();
+	test_edge_case_for<15, util::unsigned_flag>();
+	test_edge_case_for<16, util::unsigned_flag>();
+	test_edge_case_for<17, util::unsigned_flag>();
 
-	test_edge_case_for<31, containers::unsigned_flag>();
-	test_edge_case_for<32, containers::unsigned_flag>();
-	test_edge_case_for<33, containers::unsigned_flag>();
+	test_edge_case_for<31, util::unsigned_flag>();
+	test_edge_case_for<32, util::unsigned_flag>();
+	test_edge_case_for<33, util::unsigned_flag>();
 
-	test_edge_case_for<63, containers::unsigned_flag>();
-	test_edge_case_for<64, containers::unsigned_flag>();
+	test_edge_case_for<63, util::unsigned_flag>();
+	test_edge_case_for<64, util::unsigned_flag>();
 
-	test_edge_case_for<7, containers::signed_flag>();
-	test_edge_case_for<8, containers::signed_flag>();
-	test_edge_case_for<9, containers::signed_flag>();
+	test_edge_case_for<7, util::signed_flag>();
+	test_edge_case_for<8, util::signed_flag>();
+	test_edge_case_for<9, util::signed_flag>();
 
-	test_edge_case_for<15, containers::signed_flag>();
-	test_edge_case_for<16, containers::signed_flag>();
-	test_edge_case_for<17, containers::signed_flag>();
+	test_edge_case_for<15, util::signed_flag>();
+	test_edge_case_for<16, util::signed_flag>();
+	test_edge_case_for<17, util::signed_flag>();
 
-	test_edge_case_for<31, containers::signed_flag>();
-	test_edge_case_for<32, containers::signed_flag>();
-	test_edge_case_for<33, containers::signed_flag>();
+	test_edge_case_for<31, util::signed_flag>();
+	test_edge_case_for<32, util::signed_flag>();
+	test_edge_case_for<33, util::signed_flag>();
 
-	test_edge_case_for<63, containers::signed_flag>();
-	test_edge_case_for<64, containers::signed_flag>();
+	test_edge_case_for<63, util::signed_flag>();
+	test_edge_case_for<64, util::signed_flag>();
 }
 
 template<int N, class S>
@@ -148,7 +148,7 @@ void test_sorting_for()
 {
 	constexpr auto integer_bit_size = N;
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size, containers::unsigned_flag>;
+		integer_bit_size, util::unsigned_flag>;
 	using underint_t = tight_container_t::underlying_integer_t;
 	constexpr bool is_signed = tight_container_t::is_signed;
 
@@ -189,47 +189,47 @@ void test_sorting_for()
 TEST_CASE("sorting tight-integers", "[tight-integers-container]")
 {
 
-	test_sorting_for<2, containers::unsigned_flag>();
-	test_sorting_for<3, containers::unsigned_flag>();
-	test_sorting_for<4, containers::unsigned_flag>();
-	test_sorting_for<5, containers::unsigned_flag>();
+	test_sorting_for<2, util::unsigned_flag>();
+	test_sorting_for<3, util::unsigned_flag>();
+	test_sorting_for<4, util::unsigned_flag>();
+	test_sorting_for<5, util::unsigned_flag>();
 
-	test_sorting_for<7, containers::unsigned_flag>();
-	test_sorting_for<8, containers::unsigned_flag>();
-	test_sorting_for<9, containers::unsigned_flag>();
+	test_sorting_for<7, util::unsigned_flag>();
+	test_sorting_for<8, util::unsigned_flag>();
+	test_sorting_for<9, util::unsigned_flag>();
 
-	test_sorting_for<15, containers::unsigned_flag>();
-	test_sorting_for<16, containers::unsigned_flag>();
-	test_sorting_for<17, containers::unsigned_flag>();
+	test_sorting_for<15, util::unsigned_flag>();
+	test_sorting_for<16, util::unsigned_flag>();
+	test_sorting_for<17, util::unsigned_flag>();
 
-	test_sorting_for<31, containers::unsigned_flag>();
-	test_sorting_for<32, containers::unsigned_flag>();
-	test_sorting_for<33, containers::unsigned_flag>();
+	test_sorting_for<31, util::unsigned_flag>();
+	test_sorting_for<32, util::unsigned_flag>();
+	test_sorting_for<33, util::unsigned_flag>();
 
-	test_sorting_for<63, containers::unsigned_flag>();
-	test_sorting_for<64, containers::unsigned_flag>();
+	test_sorting_for<63, util::unsigned_flag>();
+	test_sorting_for<64, util::unsigned_flag>();
 
-	test_sorting_for<7, containers::signed_flag>();
-	test_sorting_for<8, containers::signed_flag>();
-	test_sorting_for<9, containers::signed_flag>();
+	test_sorting_for<7, util::signed_flag>();
+	test_sorting_for<8, util::signed_flag>();
+	test_sorting_for<9, util::signed_flag>();
 
-	test_sorting_for<15, containers::signed_flag>();
-	test_sorting_for<16, containers::signed_flag>();
-	test_sorting_for<17, containers::signed_flag>();
+	test_sorting_for<15, util::signed_flag>();
+	test_sorting_for<16, util::signed_flag>();
+	test_sorting_for<17, util::signed_flag>();
 
-	test_sorting_for<31, containers::signed_flag>();
-	test_sorting_for<32, containers::signed_flag>();
-	test_sorting_for<33, containers::signed_flag>();
+	test_sorting_for<31, util::signed_flag>();
+	test_sorting_for<32, util::signed_flag>();
+	test_sorting_for<33, util::signed_flag>();
 
-	test_sorting_for<63, containers::signed_flag>();
-	test_sorting_for<64, containers::signed_flag>();
+	test_sorting_for<63, util::signed_flag>();
+	test_sorting_for<64, util::signed_flag>();
 }
 
 TEST_CASE("small sorting", "[tight-integers-container]")
 {
 	constexpr auto integer_bit_size = 8;
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size, containers::unsigned_flag>;
+		integer_bit_size, util::unsigned_flag>;
 	using underint_t = tight_container_t::underlying_integer_t;
 
 	auto const values = []
@@ -257,7 +257,7 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 TEST_CASE("binary tight integer container", "[tight-integers-container]")
 {
 	using binary_tight_t = containers::tight_integer_container<
-		1, containers::unsigned_flag>;
+		1, util::unsigned_flag>;
 
 	binary_tight_t c(8);
 

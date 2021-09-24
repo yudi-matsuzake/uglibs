@@ -18,6 +18,8 @@ add_library(util
 	./include/util/static-vector.hpp
 	./include/util/bit-adaptors.hpp
 	./include/util/meta.hpp
+	./include/util/integers.hpp
+	./include/util/static-string.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -37,6 +39,7 @@ if(ENABLE_TESTING)
 	enable_testing()
 	add_executable(
 		util-tests
+		./tests/static-string.cpp
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp
 		./tests/pairwise-tuple.cpp
