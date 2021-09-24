@@ -15,19 +15,10 @@ namespace containers{
 namespace rgs = std::ranges;
 namespace vws = std::views;
 
-/* struct signed_flag{}; */
-/* struct unsigned_flag{}; */
+namespace detail{
 
-/* struct const_flag{}; */
-/* struct mutable_flag{}; */
-
-/* template<class T> */
-/* concept signess = std::is_same_v<T, signed_flag> */
-/* 	|| std::is_same_v<T, unsigned_flag>; */
-
-/* template<class T> */
-/* concept mutability = std::is_same_v<T, const_flag> */
-/* 	|| std::is_same_v<T, mutable_flag>; */
+namespace rgs = std::ranges;
+namespace vws = std::views;
 
 /**
   * given a bitsize N, this struct determines which std integers must me used,
@@ -90,12 +81,15 @@ struct underlying_integer
 	>;
 };
 
+template<uint8_t N, util::signess S, util::mutability M>
+using default_container_t = std::vector<
+	typename underlying_integer<N, S, M>::type>;
+
 template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class Container = std::vector<
-		typename underlying_integer<N, S, M>::type>>
+	class Container = default_container_t<N, S, M>>
 struct tight_integer_container_common{
 
 	using container_t = Container;
@@ -152,8 +146,7 @@ template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class Container = std::vector<
-		typename underlying_integer<N, S, M>::type>>
+	class Container = default_container_t<N, S, M>>
 class tight_integer_container :
 	public tight_integer_container_common<N, S, M, Container>{
 private:
@@ -806,23 +799,22 @@ public:
 	using Container::Container;
 };
 
+} // end of namespace detail
+
+using detail::underlying_integer;
+
+template<class IntegerType>
+class tight_integer_container;
+
+template<uint32_t N, util::signess S>
+class tight_integer_container<util::integer<N, S>> :
+	public detail::tight_integer_container<N, S, util::mutable_flag>{
+public:
+	using base_t = detail::tight_integer_container<
+		N, S, util::mutable_flag>;
+
+	using base_t::base_t;
+	using base_t::operator=;
+};
+
 } // end of namespace containers
-
-/* template<uint8_t N, class S, class C, template<class> class TQ, template<class> class TU> */
-/* struct std::basic_common_reference< */
-/* 	containers::tight_integer_container<N, S, C>, */
-/* 	typename containers::underlying_integer<N, S>::type, */
-/* 	TQ, */
-/* 	TU>{ */
-/* 	using type = containers::tight_integer_container<N, S, C>::reference; */
-/* }; */
-
-/* template<uint8_t N, class S, class C, template<class> class TQ, template<class> class TU> */
-/* struct std::basic_common_reference< */
-/* 	typename containers::underlying_integer<N, S>::type, */
-/* 	containers::tight_integer_container<N, S, C>, */
-/* 	TQ, */
-/* 	TU>{ */
-/* 	using type = containers::tight_integer_container<N, S, C>::reference; */
-/* }; */
-

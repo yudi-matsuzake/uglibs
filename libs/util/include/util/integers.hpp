@@ -129,13 +129,16 @@ using variant_integer_base_t =
 
 } // end of namespace detail
 
-template<int N>
-using signed_integer = typename detail::integer<N, signed_flag>;
+template<int N, signess S>
+using integer = typename detail::integer<N, S>;
 
 template<int N>
-using unsigned_integer = typename detail::integer<N, unsigned_flag>;
+using signed_integer = integer<N, signed_flag>;
 
-struct integer : public detail::variant_integer_base_t
+template<int N>
+using unsigned_integer = integer<N, unsigned_flag>;
+
+struct integer_variant : public detail::variant_integer_base_t
 {
 	using base_t = detail::variant_integer_base_t;
 	using base_t::base_t;

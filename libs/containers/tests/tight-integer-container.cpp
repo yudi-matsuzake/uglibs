@@ -32,10 +32,10 @@ TEST_CASE(
 	"reserve, clear, size and capacity",
 	"[tight-integers-container]")
 {
-	constexpr auto integer_bit_size = 9;
+	using integer_t = util::unsigned_integer<9>;
+
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size,
-		util::unsigned_flag>;
+		integer_t>;
 
 	using underint_t = tight_container_t::underlying_integer_t;
 
@@ -69,9 +69,9 @@ TEST_CASE(
 template<size_t N, class S>
 static auto test_edge_case_for()
 {
-	constexpr auto integer_bit_size = N;
+	using integer_t = util::integer<N, S>;
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size, S>;
+		integer_t>;
 
 	using underint_t = typename tight_container_t::underlying_integer_t;
 
@@ -146,9 +146,8 @@ TEST_CASE("bit size checks", "[tight-integers-container]")
 template<int N, class S>
 void test_sorting_for()
 {
-	constexpr auto integer_bit_size = N;
-	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size, util::unsigned_flag>;
+	using integer_t = util::integer<N, S>;
+	using tight_container_t = containers::tight_integer_container<integer_t>;
 	using underint_t = tight_container_t::underlying_integer_t;
 	constexpr bool is_signed = tight_container_t::is_signed;
 
@@ -227,9 +226,9 @@ TEST_CASE("sorting tight-integers", "[tight-integers-container]")
 
 TEST_CASE("small sorting", "[tight-integers-container]")
 {
-	constexpr auto integer_bit_size = 8;
+	using integer_t = util::unsigned_integer<8>;
 	using tight_container_t = containers::tight_integer_container<
-		integer_bit_size, util::unsigned_flag>;
+		integer_t>;
 	using underint_t = tight_container_t::underlying_integer_t;
 
 	auto const values = []
@@ -257,7 +256,7 @@ TEST_CASE("small sorting", "[tight-integers-container]")
 TEST_CASE("binary tight integer container", "[tight-integers-container]")
 {
 	using binary_tight_t = containers::tight_integer_container<
-		1, util::unsigned_flag>;
+		util::unsigned_integer<1>>;
 
 	binary_tight_t c(8);
 

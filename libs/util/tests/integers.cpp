@@ -16,5 +16,5 @@ TEST_CASE("integers", "[util]")
 	STATIC_REQUIRE(util::signed_integer<32>::type_name() == "int32");
 	STATIC_REQUIRE(util::signed_integer<64>::type_name() == "int64");
 
-	util::integer test = util::unsigned_integer<3>{};
+	util::integer_variant test = util::unsigned_integer<3>{};
 }
