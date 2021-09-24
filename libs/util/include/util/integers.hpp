@@ -5,6 +5,7 @@
 #include "util/misc.hpp"
 #include "util/static-string.hpp"
 #include "util/variant.hpp"
+#include "util/meta.hpp"
 
 /**
   * @file integers.hpp defines integers with abstract types
@@ -23,6 +24,20 @@ struct unsigned_flag : uninstantiable {};
 
 struct const_flag : uninstantiable {};
 struct mutable_flag : uninstantiable {};
+
+template<class T>
+using to_signess_t = std::conditional_t<
+	std::is_signed_v<T>,
+	util::signed_flag,
+	util::unsigned_flag
+>;
+
+template<class T>
+using to_mutability_t = std::conditional_t<
+	std::is_const_v<T>,
+	util::const_flag,
+	util::mutable_flag
+>;
 
 template<class T>
 concept signess = std::is_same_v<T, signed_flag>
@@ -127,6 +142,12 @@ using variant_integer_base_t =
 			unsigned_flag, make_integer_range_t<uint32_t, 1, 64>>
 	>;
 
+template<class T, template<int, class> class Ref>
+struct is_specialization_of_integer : std::false_type {};
+
+template<uint32_t N, class S>
+struct is_specialization_of_integer<integer<N, S>, integer>: std::true_type {};
+
 } // end of namespace detail
 
 template<int N, signess S>
@@ -144,5 +165,18 @@ struct integer_variant : public detail::variant_integer_base_t
 	using base_t::base_t;
 	using base_t::operator=;
 };
+
+template<class T>
+concept arbitrary_integer = ((T::is_signed ^ T::is_unsigned) == 1)
+	&& detail::is_specialization_of_integer<T, integer>::value
+	&& requires(T v)
+{
+	typename T::type;
+	{ T::n_bits } -> std::convertible_to<uint32_t>;
+};
+
+template<class T>
+concept arbitrary_integer_or_integral = arbitrary_integer<T>
+|| std::integral<T>;
 
 } // end of namespace util

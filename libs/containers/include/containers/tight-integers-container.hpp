@@ -803,15 +803,39 @@ public:
 
 using detail::underlying_integer;
 
-template<class IntegerType>
-class tight_integer_container;
+template<util::arbitrary_integer_or_integral T>
+struct integer_info{
+	static auto constexpr n_bits = []
+	{
+		if constexpr(util::arbitrary_integer<T>)
+			return T::n_bits;
+		else
+			return util::number_of_bits<T>();
+	}();
 
-template<uint32_t N, util::signess S>
-class tight_integer_container<util::integer<N, S>> :
-	public detail::tight_integer_container<N, S, util::mutable_flag>{
+	using mutability = util::to_mutability_t<T>;
+
+	static constexpr auto get_signess()
+		-> T::signess
+		requires util::arbitrary_integer<T>;
+
+	static constexpr auto get_signess()
+		-> util::to_signess_t<T>
+		requires std::integral<T>;
+
+	using signess = decltype(get_signess());
+};
+
+template<util::arbitrary_integer_or_integral T>
+class tight_integer_container : public detail::tight_integer_container<
+	integer_info<T>::n_bits,
+	typename integer_info<T>::signess,
+	typename integer_info<T>::mutability>{
 public:
 	using base_t = detail::tight_integer_container<
-		N, S, util::mutable_flag>;
+		integer_info<T>::n_bits,
+		typename integer_info<T>::signess,
+		typename integer_info<T>::mutability>;
 
 	using base_t::base_t;
 	using base_t::operator=;
