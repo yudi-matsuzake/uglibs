@@ -39,6 +39,7 @@ if(ENABLE_TESTING)
 	enable_testing()
 	add_executable(
 		util-tests
+		./tests/integers.cpp
 		./tests/static-string.cpp
 		./tests/util-tests.cpp
 		./tests/merged-variant.cpp

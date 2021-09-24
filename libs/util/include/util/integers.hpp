@@ -2,7 +2,8 @@
 
 #include <string_view>
 
-#include "misc.hpp"
+#include "util/misc.hpp"
+#include "util/static-string.hpp"
 
 /**
   * @file integers.hpp defines integers with abstract types
@@ -10,7 +11,8 @@
   * note that most of these types are opaque
   *
   * these types are useful in containers and others structures
-  * that optimize time
+  * that perform optimizations for integers with arbitrary number of
+  * bits
   */
 
 namespace util{
@@ -32,74 +34,95 @@ concept mutability = std::is_same_v<T, const_flag>
 namespace detail{
 
 template<uint32_t N, signess S>
-struct integer : uninstantiable {
-	using type = integer<N, S>;
-	using signess = S;
+struct integer_common{
+	static_assert(N <= 64, "only support until 64 bit integers");
+
+	static constexpr bool is_signed = std::is_same_v<S, signed_flag>;
+	static constexpr bool is_unsigned = std::is_same_v<S, unsigned_flag>;
+
 	static constexpr auto n_bits = N;
+	using signess = S;
+
+	static constexpr auto type_name()
+		requires is_unsigned
+	{
+		return "uint" + to_static_string<N>();
+	}
+
+	static constexpr auto type_name()
+		requires is_signed
+	{
+		return "int" + to_static_string<N>();
+	}
+};
+
+template<uint32_t N, signess S>
+struct integer : uninstantiable, integer_common<N, S> {
+	using type = integer<N, S>;
 };
 
 template<>
-struct integer<8, signed_flag>{
+struct integer<8, signed_flag>
+	: uninstantiable,
+	  integer_common<8, signed_flag> {
 	using type = int8_t;
-	using signess = signed_flag;
-	static constexpr auto n_bits = 8;
 };
 
 template<>
-struct integer<8, unsigned_flag>{
-	using type = int8_t;
-	using signess = unsigned_flag;
-	static constexpr auto n_bits = 8;
+struct integer<8, unsigned_flag>
+	: uninstantiable,
+	  integer_common<8, unsigned_flag> {
+	using type = uint8_t;
 };
 
 template<>
-struct integer<16, signed_flag>{
+struct integer<16, signed_flag>
+	: uninstantiable,
+	  integer_common<16, signed_flag> {
 	using type = int16_t;
-	using signess = signed_flag;
-	static constexpr auto n_bits = 16;
 };
 
 template<>
-struct integer<16, unsigned_flag>{
+struct integer<16, unsigned_flag>
+	: uninstantiable,
+	  integer_common<16, unsigned_flag> {
 	using type = uint16_t;
-	using signess = unsigned_flag;
-	static constexpr auto n_bits = 16;
 };
 
 template<>
-struct integer<32, signed_flag>{
+struct integer<32, signed_flag>
+	: uninstantiable,
+	  integer_common<32, signed_flag> {
 	using type = int32_t;
-	using signess = signed_flag;
-	static constexpr auto n_bits = 32;
 };
 
 template<>
-struct integer<32, unsigned_flag>{
+struct integer<32, unsigned_flag>
+	: uninstantiable,
+	  integer_common<32, unsigned_flag> {
 	using type = uint32_t;
-	using signess = unsigned_flag;
-	static constexpr auto n_bits = 32;
 };
 
 template<>
-struct integer<64, signed_flag>{
+struct integer<64, signed_flag>
+	: uninstantiable,
+	  integer_common<64, signed_flag> {
 	using type = int64_t;
-	using signess = signed_flag;
-	static constexpr auto n_bits = 64;
 };
 
 template<>
-struct integer<64, unsigned_flag>{
+struct integer<64, unsigned_flag>
+	: uninstantiable,
+	  integer_common<64, unsigned_flag> {
 	using type = uint64_t;
-	using signess = unsigned_flag;
-	static constexpr auto n_bits = 64;
 };
 
 } // end of namespace detail
 
 template<int N>
-using signed_integer = typename detail::integer<N, signed_flag>::type;
+using signed_integer = typename detail::integer<N, signed_flag>;
 
 template<int N>
-using unsigned_integer = typename detail::integer<N, unsigned_flag>::type;
+using unsigned_integer = typename detail::integer<N, unsigned_flag>;
 
 } // end of namespace util
