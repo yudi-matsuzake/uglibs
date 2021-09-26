@@ -82,14 +82,24 @@ struct underlying_integer
 };
 
 template<uint8_t N, util::signess S, util::mutability M>
-using default_container_t = std::vector<
-	typename underlying_integer<N, S, M>::type>;
+using underint_t = typename underlying_integer<N, S, M>::type;
+
+template<uint8_t N, util::signess S, util::mutability M>
+using default_allocator_t = std::allocator<underint_t<N, S, M>>;
+
+template<
+	uint8_t N,
+	util::signess S,
+	util::mutability M,
+	class A = default_allocator_t<N, S, M>>
+using default_container_t = std::vector<underint_t<N, S, M>, A>;
 
 template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class Container = default_container_t<N, S, M>>
+	class A = default_allocator_t<N, S, M>,
+	class Container = default_container_t<N, S, M, A>>
 struct tight_integer_container_common{
 
 	using container_t = Container;
@@ -146,9 +156,10 @@ template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class Container = default_container_t<N, S, M>>
+	class A = default_allocator_t<N, S, M>,
+	class Container = default_container_t<N, S, M, A>>
 class tight_integer_container :
-	public tight_integer_container_common<N, S, M, Container>{
+	public tight_integer_container_common<N, S, M, A, Container>{
 private:
 	/**
 	  * compute the number of underlying integers to hold `n_elements` of 
@@ -763,17 +774,17 @@ private:
 	size_t m_size = 0;
 };
 
-template<class S, class M, class Container>
-class tight_integer_container<8, S, M, Container> :
-	public tight_integer_container_common<8, S, M, Container>,
+template<class S, class M, class A, class Container>
+class tight_integer_container<8, S, M, A, Container> :
+	public tight_integer_container_common<8, S, M, A, Container>,
 	public Container
 {
 public:
 	using Container::Container;
 };
 
-template<class S, class M, class Container>
-class tight_integer_container<16, S, M, Container> :
+template<class S, class M, class A, class Container>
+class tight_integer_container<16, S, M, A, Container> :
 	public tight_integer_container_common<16, S, M, Container>,
 	public Container
 {
@@ -781,8 +792,8 @@ public:
 	using Container::Container;
 };
 
-template<class S, class M, class Container>
-class tight_integer_container<32, S, M, Container> :
+template<class S, class M, class A, class Container>
+class tight_integer_container<32, S, M, A, Container> :
 	public tight_integer_container_common<32, S, M, Container>,
 	public Container
 {
@@ -790,8 +801,8 @@ public:
 	using Container::Container;
 };
 
-template<class S, class M, class Container>
-class tight_integer_container<64, S, M, Container> :
+template<class S, class M, class A, class Container>
+class tight_integer_container<64, S, M, A, Container> :
 	public tight_integer_container_common<64, S, M, Container>,
 	public Container
 {
@@ -820,23 +831,37 @@ struct integer_info<T>{
 	using signess = util::to_signess_t<T>;
 };
 
+template<class T>
+using tight_allocator_t = typename detail::default_allocator_t<
+	integer_info<T>::n_bits,
+	typename integer_info<T>::signess,
+	typename integer_info<T>::mutability
+>;
+
+template<class T>
+using tight_container_t = typename detail::default_container_t<
+	integer_info<T>::n_bits,
+	typename integer_info<T>::signess,
+	typename integer_info<T>::mutability
+>;
+
 template<
 	util::arbitrary_integer_or_integral T,
-	class C = detail::default_container_t<
-		integer_info<T>::n_bits,
-		typename integer_info<T>::signess,
-		typename integer_info<T>::mutability
-	>>
+	class A = tight_allocator_t<T>,
+	class C = tight_container_t<T>>
 class tight_integer_container : public detail::tight_integer_container<
 	integer_info<T>::n_bits,
 	typename integer_info<T>::signess,
 	typename integer_info<T>::mutability,
+	A,
 	C>{
 public:
 	using base_t = detail::tight_integer_container<
 		integer_info<T>::n_bits,
 		typename integer_info<T>::signess,
-		typename integer_info<T>::mutability>;
+		typename integer_info<T>::mutability,
+		A, 
+		C>;
 
 	using base_t::base_t;
 	using base_t::operator=;
