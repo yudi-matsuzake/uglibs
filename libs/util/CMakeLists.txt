@@ -18,6 +18,7 @@ add_library(util
 	./include/util/bit-adaptors.hpp
 	./include/util/meta.hpp
 	./include/util/integers.hpp
+	./include/util/integer-concepts.hpp
 	./include/util/static-string.hpp
 	./include/util/underlying-integer.hpp
 	./src/misc.cpp

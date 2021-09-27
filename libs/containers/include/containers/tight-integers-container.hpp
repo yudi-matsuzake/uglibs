@@ -56,36 +56,13 @@ struct tight_integer_container_common{
 		>::digits;
 
 	static constexpr underlying_integer_t min_value()
-		requires is_unsigned
 	{
-		return 0;
+		return std::numeric_limits<util::integer<N, S>>::min();
 	}
 
 	static constexpr underlying_integer_t max_value()
-		requires is_unsigned
 	{
-		auto n = bits_per_underlying_integer - N;
-		underlying_integer_t x = ~underlying_integer_t{0};
-		x <<= n;
-		x >>= n;
-		return x;
-	}
-
-	static constexpr underlying_integer_t max_value()
-		requires is_signed
-	{
-		using tighter_container = tight_integer_container_common<
-			N - 1, util::unsigned_flag>;
-
-		return tighter_container::max_value();
-	}
-
-	static constexpr underlying_integer_t min_value()
-		requires is_signed
-	{
-		using tighter_container = tight_integer_container_common<
-			N - 1, util::unsigned_flag>;
-		return -(tighter_container::max_value() + 1);
+		return std::numeric_limits<util::integer<N, S>>::max();
 	}
 
 };

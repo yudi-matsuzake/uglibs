@@ -2,10 +2,11 @@
 
 #include <string_view>
 
-#include "util/misc.hpp"
+#include "util/integer-concepts.hpp"
 #include "util/static-string.hpp"
 #include "util/variant.hpp"
 #include "util/meta.hpp"
+#include "util/underlying-integer.hpp"
 
 /**
   * @file integers.hpp defines integers with abstract types
@@ -18,34 +19,6 @@
   */
 
 namespace util{
-
-struct signed_flag   : uninstantiable{};
-struct unsigned_flag : uninstantiable {};
-
-struct const_flag : uninstantiable {};
-struct mutable_flag : uninstantiable {};
-
-template<class T>
-using to_signess_t = std::conditional_t<
-	std::is_signed_v<T>,
-	util::signed_flag,
-	util::unsigned_flag
->;
-
-template<class T>
-using to_mutability_t = std::conditional_t<
-	std::is_const_v<T>,
-	util::const_flag,
-	util::mutable_flag
->;
-
-template<class T>
-concept signess = std::is_same_v<T, signed_flag>
-	|| std::is_same_v<T, unsigned_flag>;
-
-template<class T>
-concept mutability = std::is_same_v<T, const_flag>
-	|| std::is_same_v<T, mutable_flag>;
 
 namespace detail{
 
@@ -181,13 +154,49 @@ concept arbitrary_integer_or_integral = arbitrary_integer<T>
 
 } // end of namespace util
 
-/* template<uint32_t N, util::signess S> */
-/* class std::numeric_limits<util::integer<N, S>>{ */
-/* public: */
-/* 	using type = util::integer<N, S>; */
+template<util::arbitrary_integer T>
+class std::numeric_limits<T>{
+public:
+	using underlying_integer_t = typename util::underlying_integer<
+		T::n_bits, typename T::signess, util::mutable_flag>::type;
 
-/* 	static constexpr auto max() */
-/* 	{ */
-/* 		return type::max_value(); */
-/* 	} */
-/* }; */
+	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
+		std::make_unsigned_t<underlying_integer_t>
+		>::digits;
+
+	static constexpr underlying_integer_t min()
+		requires T::is_unsigned
+	{
+		return 0;
+	}
+
+	static constexpr underlying_integer_t max()
+		requires T::is_unsigned
+	{
+		auto n = bits_per_underlying_integer - T::n_bits;
+		underlying_integer_t x = ~underlying_integer_t{0};
+		x <<= n;
+		x >>= n;
+		return x;
+	}
+
+	static constexpr underlying_integer_t max()
+		requires T::is_signed
+	{
+		using tighter_integer_t = util::integer<
+			T::n_bits - 1,
+			util::unsigned_flag>;
+
+		return std::numeric_limits<tighter_integer_t>::max();
+	}
+
+	static constexpr underlying_integer_t min()
+		requires T::is_signed
+	{
+		using tighter_integer_t = util::integer<
+			T::n_bits - 1, util::unsigned_flag>;
+
+		return -(std::numeric_limits<tighter_integer_t>::max() + 1);
+	}
+
+};
