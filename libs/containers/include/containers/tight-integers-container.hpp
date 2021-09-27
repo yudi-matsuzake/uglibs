@@ -111,6 +111,7 @@ public:
 	class tight_iterator;
 
 	using reference = tight_element_reference<tight_integer_container>;
+	using const_reference = tight_element_reference<const tight_integer_container>;
 	using iterator = tight_iterator<tight_integer_container>;
 	using const_iterator = tight_iterator<const tight_integer_container>;
 
@@ -687,6 +688,16 @@ public:
 private:
 	container_t m_data;
 	size_t m_size = 0;
+};
+
+template<class M, class A, class Container>
+class tight_integer_container<1, util::unsigned_flag, M, A, Container> :
+	public tight_integer_container_common<
+		8, util::unsigned_flag, M, A, Container>,
+	public Container
+{
+public:
+	using Container::Container;
 };
 
 template<class S, class M, class A, class Container>

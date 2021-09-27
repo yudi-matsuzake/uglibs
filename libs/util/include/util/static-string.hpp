@@ -91,7 +91,7 @@ using static_string = basic_static_string<char, N>;
 template<uint64_t N>
 constexpr auto to_static_string()
 {
-	constexpr auto n_digits = number_of_digits(N, 10);
+	constexpr auto n_digits = number_of_digits(N, 10UL);
 	static_string<n_digits + 1> a;
 
 	auto n = N;
