@@ -180,3 +180,14 @@ concept arbitrary_integer_or_integral = arbitrary_integer<T>
 	|| std::integral<T>;
 
 } // end of namespace util
+
+/* template<uint32_t N, util::signess S> */
+/* class std::numeric_limits<util::integer<N, S>>{ */
+/* public: */
+/* 	using type = util::integer<N, S>; */
+
+/* 	static constexpr auto max() */
+/* 	{ */
+/* 		return type::max_value(); */
+/* 	} */
+/* }; */

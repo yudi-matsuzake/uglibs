@@ -19,6 +19,7 @@ add_library(util
 	./include/util/meta.hpp
 	./include/util/integers.hpp
 	./include/util/static-string.hpp
+	./include/util/underlying-integer.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -41,7 +42,7 @@ if(ENABLE_TESTING)
 		./tests/integers.cpp
 		./tests/static-string.cpp
 		./tests/util-tests.cpp
-		./tests/merged-variant.cpp
+		./tests/variants.cpp
 		./tests/pairwise-tuple.cpp
 		./tests/bits.cpp
 		./tests/bit-adaptors.cpp

@@ -1,6 +1,8 @@
 
 #include <catch2/catch.hpp>
 
+#include <list>
+
 #include "util/variant.hpp"
 
 TEST_CASE("merged_variant", "[util]")
@@ -34,6 +36,35 @@ TEST_CASE("merged_variant", "[util]")
 				char,
 				int16_t,
 				uint64_t
+			>
+		>
+	);
+}
+
+TEST_CASE("templated_variant", "[util]")
+{
+	STATIC_REQUIRE(
+		std::is_same_v<
+			util::templated_variant<
+				std::variant<int, double>,
+				std::vector
+			>::type,
+			std::variant<std::vector<int>, std::vector<double>>
+		>
+	);
+
+	STATIC_REQUIRE(
+		std::is_same_v<
+			util::templated_variant_t<
+				std::variant<std::string, double>,
+				std::vector,
+				std::list
+			>,
+			std::variant<
+				std::vector<std::string>,
+				std::vector<double>,
+				std::list<std::string>,
+				std::list<double>
 			>
 		>
 	);

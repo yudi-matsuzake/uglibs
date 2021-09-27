@@ -33,17 +33,17 @@ constexpr static auto make_values(
 
 TEST_CASE("underlying integer", "[tight-integers-container]")
 {
-	using bin_container_t = containers::underlying_integer<
+	using bin_container_t = util::underlying_integer<
 		1, util::unsigned_flag>::type;
 
 	STATIC_REQUIRE(sizeof(bin_container_t) == 1);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<8>::type) == 1);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<9>::type) == 2);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<16>::type) == 2);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<17>::type) == 4);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<32>::type) == 4);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<33>::type) == 8);
-	STATIC_REQUIRE(sizeof(containers::underlying_integer<64>::type) == 8);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<8>::type) == 1);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<9>::type) == 2);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<16>::type) == 2);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<17>::type) == 4);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<32>::type) == 4);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<33>::type) == 8);
+	STATIC_REQUIRE(sizeof(util::underlying_integer<64>::type) == 8);
 }
 
 TEST_CASE(

@@ -9,9 +9,11 @@ namespace detail{
 
 template<class ... V0, class ... V1>
 constexpr auto merge_variant(std::variant<V0...>, std::variant<V1...>)
-{
-	return std::variant<V0..., V1...>{};
-}
+	-> std::variant<V0..., V1...>;
+
+template<template<class...> class T, class ... Us>
+constexpr auto make_templated_variant(std::variant<Us ...>)
+	-> std::variant<T<Us> ...>{};
 
 } // end of namespace detail
 
@@ -86,5 +88,21 @@ constexpr auto make_integer_range()
 template<class T, T Begin, T Size>
 using make_integer_range_t = decltype(
 	make_integer_range<T, Begin, Size>());
+
+template<
+	class V,
+	template<class ...> class T,
+	template<class ...> class ... Ts>
+struct templated_variant{
+	using type = merged_variant_t<
+		decltype(detail::make_templated_variant<T>(std::declval<V>())),
+		decltype(detail::make_templated_variant<Ts>(std::declval<V>())) ...
+	>;
+};
+
+template<class V,
+	template<class ...> class T,
+	template<class ...> class ... Ts>
+using templated_variant_t = typename templated_variant<V, T, Ts ...>::type;
 
 } // end of namespace util
