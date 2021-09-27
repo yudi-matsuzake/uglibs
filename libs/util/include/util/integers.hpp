@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string_view>
+#include <iostream>
 
 #include "util/integer-concepts.hpp"
 #include "util/static-string.hpp"
@@ -52,54 +52,6 @@ struct integer : integer_common<N, S> {
 	using type = integer<N, S>;
 };
 
-template<>
-struct integer<8, signed_flag>
-	: integer_common<8, signed_flag> {
-	using type = int8_t;
-};
-
-template<>
-struct integer<8, unsigned_flag>
-	: integer_common<8, unsigned_flag> {
-	using type = uint8_t;
-};
-
-template<>
-struct integer<16, signed_flag>
-	: integer_common<16, signed_flag> {
-	using type = int16_t;
-};
-
-template<>
-struct integer<16, unsigned_flag>
-	: integer_common<16, unsigned_flag> {
-	using type = uint16_t;
-};
-
-template<>
-struct integer<32, signed_flag>
-	: integer_common<32, signed_flag> {
-	using type = int32_t;
-};
-
-template<>
-struct integer<32, unsigned_flag>
-	: integer_common<32, unsigned_flag> {
-	using type = uint32_t;
-};
-
-template<>
-struct integer<64, signed_flag>
-	: integer_common<64, signed_flag> {
-	using type = int64_t;
-};
-
-template<>
-struct integer<64, unsigned_flag>
-	: integer_common<64, unsigned_flag> {
-	using type = uint64_t;
-};
-
 template<signess S, uint32_t ... ints>
 constexpr auto make_variant_integer(std::integer_sequence<uint32_t, ints...>)
 	-> std::variant<integer<ints, S> ... >;
@@ -115,11 +67,11 @@ using variant_integer_base_t =
 			unsigned_flag, make_integer_range_t<uint32_t, 1, 64>>
 	>;
 
-template<class T, template<int, class> class Ref>
+template<class T>
 struct is_specialization_of_integer : std::false_type {};
 
 template<uint32_t N, class S>
-struct is_specialization_of_integer<integer<N, S>, integer>: std::true_type {};
+struct is_specialization_of_integer<integer<N, S>>: std::true_type {};
 
 } // end of namespace detail
 
@@ -141,7 +93,7 @@ struct integer_variant : public detail::variant_integer_base_t
 
 template<class T>
 concept arbitrary_integer = ((T::is_signed ^ T::is_unsigned) == 1)
-	&& detail::is_specialization_of_integer<T, integer>::value
+	&& detail::is_specialization_of_integer<T>::value
 	&& requires(T v)
 {
 	typename T::type;

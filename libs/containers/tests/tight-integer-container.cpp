@@ -233,6 +233,8 @@ void integral_sorting()
 	using integer_t = T;
 	using tight_container_t = containers::tight_integer_container<
 		integer_t>;
+
+	STATIC_REQUIRE(std::is_base_of_v<std::vector<T>, tight_container_t>);
 	using underint_t = tight_container_t::underlying_integer_t;
 
 	constexpr auto is_signed = tight_container_t::is_signed;

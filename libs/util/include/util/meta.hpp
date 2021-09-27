@@ -86,10 +86,13 @@ namespace detail{
 template<template<class...> class P, class ... Ts>
 using pairwise_tuple = typename detail::pairwise_tuple_impl<P, Ts ...>::type;
 
-template<typename Test, template<typename...> class Ref>
+template<class T, template<class...> class Primary>
 struct is_specialization_of : std::false_type {};
 
-template<template<typename...> class Ref, typename... Args>
-struct is_specialization_of<Ref<Args...>, Ref>: std::true_type {};
+template<template <class...> class Primary, class ... Args>
+struct is_specialization_of<Primary<Args...>, Primary>  : std::true_type {};
+
+template<class T, template<class...> class Primary>
+constexpr bool is_specialization_of_v = is_specialization_of<T, Primary>::value;
 
 } // end of namespace util
