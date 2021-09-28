@@ -110,15 +110,24 @@ public:
 	template<class TightContainer>
 	class tight_iterator;
 
+	using container_t = Container;
+	using underlying_integer_t = typename container_t::value_type;
+	using underlying_integer_info = util::underlying_integer<N, S, M>;
+
 	using reference = tight_element_reference<tight_integer_container>;
 	using const_reference = tight_element_reference<const tight_integer_container>;
 	using iterator = tight_iterator<tight_integer_container>;
 	using const_iterator = tight_iterator<const tight_integer_container>;
+	using value_type	= underlying_integer_t;
+	using size_type		= uint64_t;
+	using difference_type	= int64_t;
 
-	using container_t = Container;
-	using underlying_integer_t = typename container_t::value_type;
+	using pointer		= iterator;
+	using const_pointer	= const_iterator;
 
-	using underlying_integer_info = util::underlying_integer<N, S, M>;
+	using reverse_iterator	= iterator;
+	using const_reverse_iterator= const_iterator;
+	using allocator_type	= A;
 
 	static constexpr auto number_of_bits_per_element = N;
 	static constexpr bool is_signed = underlying_integer_info::is_signed;
@@ -421,6 +430,7 @@ public:
 		using value_type = underlying_integer_t;
 		using difference_type = int64_t;
 		using reference = tight_element_reference<tight_integer_container>;
+		using const_reference = tight_element_reference<tight_integer_container>;
 		using pointer = tight_iterator;
 
 		constexpr tight_iterator() noexcept = default;
@@ -462,6 +472,11 @@ public:
 			return m_reference;
 		}
 
+		constexpr reference operator*()
+		{
+			return m_reference;
+		}
+
 		constexpr tight_iterator& operator++()
 		{
 			return (*this) += 1;
@@ -472,7 +487,7 @@ public:
 			return (*this) += -1;
 		}
 
-		constexpr tight_iterator operator++(int) const
+		constexpr iterator operator++(int)
 		{
 			auto it = *this;
 			++(*this);
@@ -517,7 +532,7 @@ public:
 			return *this += -scalar;
 		}
 
-		constexpr auto operator[](int64_t index) const noexcept
+		constexpr const_reference operator[](int64_t index) const noexcept
 		{
 			return m_reference.get_container()[
 				m_reference.tight_index + index];
@@ -629,12 +644,12 @@ public:
 	  */
 	constexpr auto operator[](int64_t index)
 	{
-		return tight_element_reference{ this, index };
+		return reference{ this, index };
 	}
 
 	constexpr auto operator[](int64_t index) const
 	{
-		return tight_element_reference{ this, index };
+		return const_reference{ this, index };
 	}
 
 	constexpr auto begin()
@@ -652,19 +667,19 @@ public:
 	constexpr auto begin() const
 		noexcept
 	{
-		return tight_iterator(this, 0);
+		return const_iterator(this, 0);
 	}
 
 	constexpr auto end() const
 		noexcept
 	{
-		return tight_iterator(this, size());
+		return const_iterator(this, size());
 	}
 
 	constexpr auto rbegin()
 		noexcept
 	{
-		return tight_iterator{ this, size() - 1 };
+		return iterator{ this, size() - 1 };
 	}
 
 	constexpr auto rend()
@@ -676,13 +691,13 @@ public:
 	constexpr auto rbegin() const
 		noexcept
 	{
-		return tight_iterator{ this, size() - 1 };
+		return const_iterator{ this, size() - 1 };
 	}
 
 	constexpr auto rend() const
 		noexcept
 	{
-		return tight_iterator{ this, -1 };
+		return const_iterator{ this, -1 };
 	}
 
 private:

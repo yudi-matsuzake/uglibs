@@ -493,15 +493,15 @@ public:
 public:
 
 	using const_reference	= element_wrapper<run_length_container<T> const>;
-	using reference				= element_wrapper<run_length_container<T>>;
-	using value_type			= T;
-	using size_type				= uint64_t;
+	using reference		= element_wrapper<run_length_container<T>>;
+	using value_type	= T;
+	using size_type		= uint64_t;
 	using difference_type	= int64_t;
-	using pointer 				= rl_iterator<run_length_container<T>>;
-	using const_pointer		= rl_iterator<const run_length_container<T>>;
-	using iterator				= rl_iterator<run_length_container<T>>;
+	using pointer 		= rl_iterator<run_length_container<T>>;
+	using const_pointer	= rl_iterator<const run_length_container<T>>;
+	using iterator		= rl_iterator<run_length_container<T>>;
 	using const_iterator	= rl_iterator<const run_length_container<T>>;
-	using reverse_iterator= rl_iterator<run_length_container<T>>;
+	using reverse_iterator	= rl_iterator<run_length_container<T>>;
 	using const_reverse_iterator= rl_iterator<const run_length_container<T>>;
 	using allocator_type	= Alloc;
 

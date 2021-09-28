@@ -3,6 +3,7 @@
 /* #include <vector> */
 
 #include "util/bit-adaptors.hpp"
+#include "util/misc.hpp"
 
 namespace containers{
 
@@ -104,8 +105,9 @@ public:
 
 		friend constexpr bool operator==(iterator a, iterator b)
 		{
-			auto const max = a.max_index();
-			if(max != b.max_index())
+			auto to_sig = util::make_static_cast<int64_t>();
+			auto const max = to_sig(a.max_index());
+			if(max != to_sig(b.max_index()))
 				return false;
 
 			if(!a.m_reference.is_same_reference(b.m_reference))

@@ -75,13 +75,13 @@ struct is_specialization_of_integer<integer<N, S>>: std::true_type {};
 
 } // end of namespace detail
 
-template<int N, signess S>
+template<uint32_t N, signess S>
 using integer = typename detail::integer<N, S>;
 
-template<int N>
+template<uint32_t N>
 using signed_integer = integer<N, signed_flag>;
 
-template<int N>
+template<uint32_t N>
 using unsigned_integer = integer<N, unsigned_flag>;
 
 struct integer_variant : public detail::variant_integer_base_t
