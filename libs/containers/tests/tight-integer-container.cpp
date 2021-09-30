@@ -91,6 +91,10 @@ static auto test_edge_case_for()
 	using tight_container_t = containers::tight_integer_container<
 		integer_t>;
 
+	constexpr uint8_t loose_n = (N == 64) ? N : (N+1);
+	using loose_container_t = containers::tight_integer_container<
+		util::integer<loose_n, S>>;
+
 	using underint_t = typename tight_container_t::underlying_integer_t;
 
 	constexpr bool is_signed = std::is_same_v<
@@ -126,6 +130,11 @@ static auto test_edge_case_for()
 	INFO("v size: " << rgs::size(v));
 	INFO("values size: " << test_intervals.size() * n_edge_values);
 	REQUIRE(rgs::equal(v, values));
+
+	loose_container_t l;
+	l.resize(v.size());
+	rgs::copy(values, l.begin());
+	REQUIRE(v == l);
 }
 
 TEST_CASE("bit size checks", "[tight-integers-container]")

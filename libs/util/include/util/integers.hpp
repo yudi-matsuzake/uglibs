@@ -104,6 +104,27 @@ template<class T>
 concept arbitrary_integer_or_integral = arbitrary_integer<T>
 	|| std::integral<T>;
 
+template<util::arbitrary_integer_or_integral T>
+struct integer_info;
+
+template<util::arbitrary_integer T>
+struct integer_info<T>{
+	static auto constexpr n_bits = T::n_bits;
+	using mutability = util::to_mutability_t<T>;
+	using signess = typename T::signess;
+	static constexpr auto type_name = T::type_name();
+};
+
+template<std::integral T>
+struct integer_info<T>{
+	static auto constexpr n_bits = util::number_of_bits<T>();
+	using mutability = util::to_mutability_t<T>;
+	using signess = util::to_signess_t<T>;
+	using integer = util::integer<n_bits, signess>;
+	static constexpr auto type_name = integer::type_name();
+
+};
+
 } // end of namespace util
 
 template<util::arbitrary_integer T>

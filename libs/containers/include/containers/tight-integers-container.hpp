@@ -29,15 +29,15 @@ template<
 	uint8_t N,
 	util::signess S,
 	util::mutability M,
-	class A = default_allocator_t<N, S, M>>
-using default_container_t = std::vector<underint_t<N, S, M>, A>;
+	class Alloc>
+using default_container_t = std::vector<underint_t<N, S, M>, Alloc>;
 
 template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class A = default_allocator_t<N, S, M>,
-	class Container = default_container_t<N, S, M, A>>
+	class Alloc = default_allocator_t<N, S, M>,
+	class Container = default_container_t<N, S, M, Alloc>>
 struct tight_integer_container_common{
 
 	using container_t = Container;
@@ -71,10 +71,10 @@ template<
 	uint8_t N,
 	class S = util::signed_flag,
 	class M = util::mutable_flag,
-	class A = default_allocator_t<N, S, M>,
-	class Container = default_container_t<N, S, M, A>>
+	class Alloc = default_allocator_t<N, S, M>,
+	class Container = default_container_t<N, S, M, Alloc>>
 class tight_integer_container :
-	public tight_integer_container_common<N, S, M, A, Container>{
+	public tight_integer_container_common<N, S, M, Alloc, Container>{
 private:
 	/**
 	  * compute the number of underlying integers to hold `n_elements` of 
@@ -110,6 +110,7 @@ public:
 	template<class TightContainer>
 	class tight_iterator;
 
+	using type = tight_integer_container;
 	using container_t = Container;
 	using underlying_integer_t = typename container_t::value_type;
 	using underlying_integer_info = util::underlying_integer<N, S, M>;
@@ -127,7 +128,7 @@ public:
 
 	using reverse_iterator	= iterator;
 	using const_reverse_iterator= const_iterator;
-	using allocator_type	= A;
+	using allocator_type	= Alloc;
 
 	static constexpr auto number_of_bits_per_element = N;
 	static constexpr bool is_signed = underlying_integer_info::is_signed;
@@ -335,6 +336,11 @@ public:
 			return get_value();
 		}
 
+		constexpr operator underlying_integer_t() noexcept
+		{
+			return get_value();
+		}
+
 		constexpr
 		bool operator==(tight_element_reference const& other) const
 			noexcept
@@ -346,18 +352,18 @@ public:
 		bool compare_real_reference(
 			tight_element_reference const& other) const
 		{
-			auto const both_are_end =
-				[siz = m_container_ptr->size(),
-				i = tight_index,
-				o = other.tight_index]
-			{
-				return  i >= siz && o >= siz;
-			};
-
 			auto const both_before_begin =
 				[i = tight_index, o = other.tight_index]
 			{
 				return  i < 0 && o < 0;
+			};
+
+			auto const both_are_end =
+				[siz = m_container_ptr->size(),
+				i = static_cast<uint64_t>(tight_index),
+				o = static_cast<uint64_t>(other.tight_index)]
+			{
+				return i >= siz && o >= siz;
 			};
 
 			return m_container_ptr == other.m_container_ptr
@@ -429,8 +435,8 @@ public:
 		using iterator_category = std::random_access_iterator_tag;
 		using value_type = underlying_integer_t;
 		using difference_type = int64_t;
-		using reference = tight_element_reference<tight_integer_container>;
-		using const_reference = tight_element_reference<tight_integer_container>;
+		using reference = tight_element_reference<TightContainer>;
+		using const_reference = tight_element_reference<TightContainer>;
 		using pointer = tight_iterator;
 
 		constexpr tight_iterator() noexcept = default;
@@ -467,7 +473,7 @@ public:
 			return *this;
 		}
 
-		constexpr reference operator*() const
+		constexpr const_reference operator*() const
 		{
 			return m_reference;
 		}
@@ -487,7 +493,7 @@ public:
 			return (*this) += -1;
 		}
 
-		constexpr iterator operator++(int)
+		constexpr tight_iterator operator++(int)
 		{
 			auto it = *this;
 			++(*this);
@@ -569,10 +575,27 @@ public:
 	/** 
 	  * creates a tight container with `n_elements` tight elements
 	  */
-	constexpr explicit tight_integer_container(uint64_t n_elements)
-		: m_data(compute_number_of_underint(n_elements)),
-		  m_size(n_elements)
+	constexpr explicit tight_integer_container(const Alloc& alloc )
+		noexcept(noexcept(container_t(alloc)))
+		: m_data(alloc)
 	{}
+
+	constexpr explicit tight_integer_container(
+		size_type count,
+		const Alloc& alloc = Alloc())
+		: m_data(compute_number_of_underint(count), alloc),
+		  m_size(count)
+	{}
+
+	constexpr explicit tight_integer_container(
+		size_type count,
+		const value_type& value,
+		const Alloc& alloc = Alloc())
+		: tight_integer_container(count, alloc)
+	{
+		rgs::fill(*this, value);
+	}
+
 
 	/**
 	  * resize the container to hold n_elements with N bits
@@ -676,6 +699,18 @@ public:
 		return const_iterator(this, size());
 	}
 
+	constexpr auto cbegin() const
+		noexcept
+	{
+		return const_iterator(this, 0);
+	}
+
+	constexpr auto cend() const
+		noexcept
+	{
+		return const_iterator(this, size());
+	}
+
 	constexpr auto rbegin()
 		noexcept
 	{
@@ -688,16 +723,28 @@ public:
 		return tight_iterator{ this, -1 };
 	}
 
-	constexpr auto rbegin() const
+	constexpr auto crbegin() const
 		noexcept
 	{
 		return const_iterator{ this, size() - 1 };
 	}
 
-	constexpr auto rend() const
+	constexpr auto crend() const
 		noexcept
 	{
 		return const_iterator{ this, -1 };
+	}
+
+	template<rgs::range OtherTight>
+	bool operator==(OtherTight const& other) const
+	{
+		return rgs::equal(*this, other);
+	}
+
+	template<rgs::range OtherTight>
+	bool operator!=(OtherTight const& other) const
+	{
+		return !(*this == other);
 	}
 
 private:
@@ -705,27 +752,27 @@ private:
 	size_t m_size = 0;
 };
 
-template<class M, class A, class Container>
-class tight_integer_container<1, util::unsigned_flag, M, A, Container> :
+template<class M, class Alloc, class Container>
+class tight_integer_container<1, util::unsigned_flag, M, Alloc, Container> :
 	public tight_integer_container_common<
-		8, util::unsigned_flag, M, A, Container>,
+		1, util::unsigned_flag, M, Alloc, Container>,
 	public Container
 {
 public:
 	using Container::Container;
 };
 
-template<class S, class M, class A, class Container>
-class tight_integer_container<8, S, M, A, Container> :
-	public tight_integer_container_common<8, S, M, A, Container>,
+template<class S, class M, class Alloc, class Container>
+class tight_integer_container<8, S, M, Alloc, Container> :
+	public tight_integer_container_common<8, S, M, Alloc, Container>,
 	public Container
 {
 public:
 	using Container::Container;
 };
 
-template<class S, class M, class A, class Container>
-class tight_integer_container<16, S, M, A, Container> :
+template<class S, class M, class Alloc, class Container>
+class tight_integer_container<16, S, M, Alloc, Container> :
 	public tight_integer_container_common<16, S, M, Container>,
 	public Container
 {
@@ -733,8 +780,8 @@ public:
 	using Container::Container;
 };
 
-template<class S, class M, class A, class Container>
-class tight_integer_container<32, S, M, A, Container> :
+template<class S, class M, class Alloc, class Container>
+class tight_integer_container<32, S, M, Alloc, Container> :
 	public tight_integer_container_common<32, S, M, Container>,
 	public Container
 {
@@ -742,8 +789,8 @@ public:
 	using Container::Container;
 };
 
-template<class S, class M, class A, class Container>
-class tight_integer_container<64, S, M, A, Container> :
+template<class S, class M, class Alloc, class Container>
+class tight_integer_container<64, S, M, Alloc, Container> :
 	public tight_integer_container_common<64, S, M, Container>,
 	public Container
 {
@@ -753,57 +800,58 @@ public:
 
 } // end of namespace detail
 
-template<util::arbitrary_integer_or_integral T>
-struct integer_info;
-
-template<util::arbitrary_integer T>
-struct integer_info<T>{
-	static auto constexpr n_bits = T::n_bits;
-	using mutability = util::to_mutability_t<T>;
-	using signess = T::signess;
-};
-
-template<std::integral T>
-struct integer_info<T>{
-	static auto constexpr n_bits = util::number_of_bits<T>();
-	using mutability = util::to_mutability_t<T>;
-	using signess = util::to_signess_t<T>;
-};
-
 template<class T>
 using tight_allocator_t = typename detail::default_allocator_t<
-	integer_info<T>::n_bits,
-	typename integer_info<T>::signess,
-	typename integer_info<T>::mutability
+	util::integer_info<T>::n_bits,
+	typename util::integer_info<T>::signess,
+	typename util::integer_info<T>::mutability
 >;
 
-template<class T>
+template<class T, class Alloc>
 using tight_container_t = typename detail::default_container_t<
-	integer_info<T>::n_bits,
-	typename integer_info<T>::signess,
-	typename integer_info<T>::mutability
+	util::integer_info<T>::n_bits,
+	typename util::integer_info<T>::signess,
+	typename util::integer_info<T>::mutability,
+	Alloc
 >;
 
 template<
 	util::arbitrary_integer_or_integral T,
-	class A = tight_allocator_t<T>,
-	class C = tight_container_t<T>>
+	class Alloc = tight_allocator_t<T>,
+	class C = tight_container_t<T, Alloc>>
 class tight_integer_container : public detail::tight_integer_container<
-	integer_info<T>::n_bits,
-	typename integer_info<T>::signess,
-	typename integer_info<T>::mutability,
-	A,
+	util::integer_info<T>::n_bits,
+	typename util::integer_info<T>::signess,
+	typename util::integer_info<T>::mutability,
+	Alloc,
 	C>{
 public:
 	using base_t = detail::tight_integer_container<
-		integer_info<T>::n_bits,
-		typename integer_info<T>::signess,
-		typename integer_info<T>::mutability,
-		A, 
+		util::integer_info<T>::n_bits,
+		typename util::integer_info<T>::signess,
+		typename util::integer_info<T>::mutability,
+		Alloc, 
 		C>;
 
 	using base_t::base_t;
 	using base_t::operator=;
+	using integer_type = T;
+
+	base_t& base()
+	{
+		return *this;
+	}
+
+	base_t const& base() const
+	{
+		return *this;
+	}
 };
+
+template<class T>
+using underint_t = typename detail::underint_t<
+	util::integer_info<T>::n_bits,
+	typename util::integer_info<T>::signess,
+	typename util::integer_info<T>::mutability>;
 
 } // end of namespace containers
