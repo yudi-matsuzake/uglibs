@@ -147,4 +147,18 @@ constexpr auto array_concat(
 	return result;
 }
 
+template<class T>
+constexpr T pow(T n, T exp) noexcept
+{
+	if(exp < T{0})
+		return T{};
+
+	auto p = T{1};
+
+	for(auto i=0; i<exp; ++i)
+		p *= n;
+
+	return p;
+}
+
 }

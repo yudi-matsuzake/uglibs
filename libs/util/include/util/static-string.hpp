@@ -9,6 +9,8 @@
 
 #include "util/misc.hpp"
 
+#include "range/v3/numeric/accumulate.hpp"
+
 namespace util{
 
 template<class T, uint64_t N>
@@ -18,9 +20,19 @@ public:
 
 	constexpr basic_static_string() = default;
 
-	constexpr basic_static_string(T const (&a)[N])
+	constexpr basic_static_string(T const (&a)[N]) noexcept
 		: std::array<T, N>{ std::to_array(a) }
 	{}
+
+	template<uint64_t S, uint64_t E>
+	constexpr auto substring() const noexcept
+		requires (S <= E && S >= 0 && E <= N)
+	{
+		basic_static_string<T, E - S + 1> ss;
+		rgs::copy(this->begin() + S, this->begin() + E, ss.begin());
+		ss.back() = '\0';
+		return ss;
+	}
 
 };
 
@@ -109,6 +121,23 @@ constexpr auto to_static_string()
 	);
 	
 	return a;
+}
+
+template<uint64_t N>
+constexpr uint64_t from_static_string(static_string<N> const& str)
+{
+	uint64_t acc = 0;
+
+	rgs::for_each(
+		vws::reverse(str) | vws::drop(1),
+		[i=0, &acc](char c) mutable
+		{
+			uint64_t ci = c - '0';
+			acc += ci * pow(10, i++);
+		}
+	);
+
+	return acc;
 }
 
 } // end of namespace util

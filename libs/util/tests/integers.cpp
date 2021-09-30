@@ -1,6 +1,33 @@
 #include "catch2/catch.hpp"
 
+#include <string_view>
+
 #include "util/integers.hpp"
+
+/* uint32_t get_integer_precision(std::string_view str) */
+/* { */
+/* 	/1* if(str[0] == 'u') *1/ */
+/* 	/1* 	return std::strtoi( *1/ */
+/* } */
+
+/* constexpr util::integer_variant unsigned_integer_from_string(std::string_view str) */
+/* { */
+/* 	return util::unsigned_integer<3>{}; */
+/* } */
+
+/* constexpr util::integer_variant signed_integer_from_string(std::string_view str) */
+/* { */
+/* 	return util::signed_integer<3>{}; */
+/* } */
+
+/* constexpr util::integer_variant integer_from_string(std::string_view str) */
+/* { */
+/* 	if(auto c = str[0]; c == 'u') */
+/* 		return unsigned_integer_from_string(str); */
+/* 	else if(c == 'i') */
+/* 		return signed_integer_from_string(str); */
+/* 	return {}; */
+/* } */
 
 TEST_CASE("integers", "[util]")
 {
