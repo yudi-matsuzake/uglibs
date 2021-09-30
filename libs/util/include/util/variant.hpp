@@ -19,8 +19,19 @@ constexpr auto make_templated_variant(std::variant<Us ...>)
 
 
 // helper type for visit
-template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
+template<class... Ts> struct visitor : Ts... {
+	using Ts::operator()...;
+};
 template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
+
+template<class T, class ... Ts>
+auto match(T&& arg, Ts&& ... fs)
+{
+	return std::visit(
+		visitor{ std::forward<Ts>(fs) ... },
+		std::forward<T>(arg)
+	);
+}
 
 // list of types
 template<class ... T>

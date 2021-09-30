@@ -59,12 +59,14 @@ constexpr auto make_variant_integer(std::integer_sequence<uint32_t, ints...>)
 template<signess S, class IntegerSequence>
 using variant_integer_t = decltype(make_variant_integer<S>(IntegerSequence{}));
 
+using variant_integer_precisions_t = make_integer_range_t<uint32_t, 1, 64>;
+
 using variant_integer_base_t =
 	merged_variant_t<
 		variant_integer_t<
-			signed_flag, make_integer_range_t<uint32_t, 1, 64>>,
+			signed_flag, variant_integer_precisions_t>,
 		variant_integer_t<
-			unsigned_flag, make_integer_range_t<uint32_t, 1, 64>>
+			unsigned_flag, variant_integer_precisions_t>
 	>;
 
 template<class T>
@@ -84,12 +86,9 @@ using signed_integer = integer<N, signed_flag>;
 template<uint32_t N>
 using unsigned_integer = integer<N, unsigned_flag>;
 
-struct integer_variant : public detail::variant_integer_base_t
-{
-	using base_t = detail::variant_integer_base_t;
-	using base_t::base_t;
-	using base_t::operator=;
-};
+using integer_variant = detail::variant_integer_base_t;
+
+using variant_integer_precisions_t = detail::variant_integer_precisions_t;
 
 template<class T>
 concept arbitrary_integer = ((T::is_signed ^ T::is_unsigned) == 1)
