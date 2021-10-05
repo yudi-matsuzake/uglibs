@@ -46,6 +46,7 @@ if(ENABLE_TESTING)
 		./tests/variants.cpp
 		./tests/pairwise-tuple.cpp
 		./tests/bits.cpp
+		./tests/meta.cpp
 		./tests/bit-adaptors.cpp
 		./tests/misc-adaptors.cpp)
 

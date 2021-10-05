@@ -1,12 +1,13 @@
 #pragma once
 
+#include <cinttypes>
 #include <variant>
 #include <tuple>
 #include <utility>
 
 namespace util{
 
-template <class T, class F, std::uint64_t ...I>
+template <class T, class F, uint64_t ...I>
 constexpr void tuple_foreach(T&& tuple, F&& f, std::index_sequence<I...>) {
 	((f(std::get<I>(std::forward<T>(tuple)))), ...);
 }
@@ -14,7 +15,7 @@ constexpr void tuple_foreach(T&& tuple, F&& f, std::index_sequence<I...>) {
 template <class T, class F>
 constexpr void tuple_foreach(T&& tuple, F&& f) {
 	using noref_t = std::remove_reference_t<T>;
-	constexpr std::uint64_t N = std::tuple_size<noref_t>::value;
+	constexpr uint64_t N = std::tuple_size<noref_t>::value;
 	tuple_foreach(
 		std::forward<T>(tuple),
 		std::forward<F>(f),
@@ -22,7 +23,7 @@ constexpr void tuple_foreach(T&& tuple, F&& f) {
 	);
 }
 
-template <class T, class F, std::uint64_t ...I>
+template <class T, class F, uint64_t ...I>
 constexpr auto tuple_transform(T&& tuple, F&& f, std::index_sequence<I...>)
 {
 	using tuple_type = std::tuple<
@@ -36,7 +37,7 @@ constexpr auto tuple_transform(T&& tuple, F&& f, std::index_sequence<I...>)
 template <class T, class F>
 constexpr auto tuple_transform(T&& tuple, F&& f) {
 	using noref_t = std::remove_reference_t<T>;
-	constexpr std::uint64_t N = std::tuple_size<noref_t>::value;
+	constexpr uint64_t N = std::tuple_size<noref_t>::value;
 
 	return tuple_transform(
 		std::forward<T>(tuple),
@@ -94,5 +95,38 @@ struct is_specialization_of<Primary<Args...>, Primary>  : std::true_type {};
 
 template<class T, template<class...> class Primary>
 constexpr bool is_specialization_of_v = is_specialization_of<T, Primary>::value;
+
+// queue
+
+template<class T>
+using integer_queue_empty = std::integer_sequence<T>;
+
+template<class T, T ... elements>
+constexpr T integer_queue_type(std::integer_sequence<T, elements...>);
+
+template<class Q>
+using integer_queue_type_t = decltype(integer_queue_type(std::declval<Q>()));
+
+template<class T, T e, T ... elements>
+constexpr auto integer_queue_push_back(std::integer_sequence<T, elements...>)
+	-> std::integer_sequence<T, elements ..., e>;
+
+template<class Q, integer_queue_type_t<Q> e>
+using integer_queue_push_back_t = decltype(
+	integer_queue_push_back<
+		integer_queue_type_t<Q>,
+		e>(Q{})
+);
+
+template<class T, T e, T ... elements>
+constexpr auto integer_queue_push_front(std::integer_sequence<T, elements...>)
+	-> std::integer_sequence<T, e, elements ...>;
+
+template<class Q, integer_queue_type_t<Q> e>
+using integer_queue_push_front_t = decltype(
+	integer_queue_push_front<
+		integer_queue_type_t<Q>,
+		e>(Q{})
+);
 
 } // end of namespace util

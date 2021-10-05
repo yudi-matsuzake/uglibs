@@ -4,7 +4,6 @@
 
 #include "util/integer-concepts.hpp"
 #include "util/static-string.hpp"
-#include "util/variant.hpp"
 #include "util/meta.hpp"
 #include "util/underlying-integer.hpp"
 
@@ -52,23 +51,6 @@ struct integer : integer_common<N, S> {
 	using type = integer<N, S>;
 };
 
-template<signess S, uint32_t ... ints>
-constexpr auto make_variant_integer(std::integer_sequence<uint32_t, ints...>)
-	-> std::variant<integer<ints, S> ... >;
-
-template<signess S, class IntegerSequence>
-using variant_integer_t = decltype(make_variant_integer<S>(IntegerSequence{}));
-
-using variant_integer_precisions_t = make_integer_range_t<uint32_t, 1, 64>;
-
-using variant_integer_base_t =
-	merged_variant_t<
-		variant_integer_t<
-			signed_flag, variant_integer_precisions_t>,
-		variant_integer_t<
-			unsigned_flag, variant_integer_precisions_t>
-	>;
-
 template<class T>
 struct is_specialization_of_integer : std::false_type {};
 
@@ -85,10 +67,6 @@ using signed_integer = integer<N, signed_flag>;
 
 template<uint32_t N>
 using unsigned_integer = integer<N, unsigned_flag>;
-
-using integer_variant = detail::variant_integer_base_t;
-
-using variant_integer_precisions_t = detail::variant_integer_precisions_t;
 
 template<class T>
 concept arbitrary_integer = ((T::is_signed ^ T::is_unsigned) == 1)
