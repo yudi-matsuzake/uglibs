@@ -51,6 +51,46 @@ struct integer : integer_common<N, S> {
 	using type = integer<N, S>;
 };
 
+template<>
+struct integer<8, unsigned_flag> : integer_common<8, unsigned_flag>{
+	using type = uint8_t;
+};
+
+template<>
+struct integer<8, signed_flag> : integer_common<8, signed_flag>{
+	using type = int8_t;
+};
+
+template<>
+struct integer<16, unsigned_flag> : integer_common<16, unsigned_flag>{
+	using type = uint16_t;
+};
+
+template<>
+struct integer<16, signed_flag> : integer_common<16, signed_flag>{
+	using type = int16_t;
+};
+
+template<>
+struct integer<32, unsigned_flag> : integer_common<32, unsigned_flag>{
+	using type = uint32_t;
+};
+
+template<>
+struct integer<32, signed_flag> : integer_common<32, signed_flag>{
+	using type = int32_t;
+};
+
+template<>
+struct integer<64, unsigned_flag> : integer_common<64, unsigned_flag>{
+	using type = uint64_t;
+};
+
+template<>
+struct integer<64, signed_flag> : integer_common<64, signed_flag>{
+	using type = int64_t;
+};
+
 template<class T>
 struct is_specialization_of_integer : std::false_type {};
 
@@ -60,7 +100,7 @@ struct is_specialization_of_integer<integer<N, S>>: std::true_type {};
 } // end of namespace detail
 
 template<uint32_t N, signess S>
-using integer = typename detail::integer<N, S>;
+using integer = typename detail::integer<N, S>::type;
 
 template<uint32_t N>
 using signed_integer = integer<N, signed_flag>;
@@ -97,9 +137,8 @@ struct integer_info<T>{
 	static auto constexpr n_bits = util::number_of_bits<T>();
 	using mutability = util::to_mutability_t<T>;
 	using signess = util::to_signess_t<T>;
-	using integer = util::integer<n_bits, signess>;
+	using integer = detail::integer<n_bits, signess>;
 	static constexpr auto type_name = integer::type_name();
-
 };
 
 } // end of namespace util

@@ -299,3 +299,22 @@ TEST_CASE("binary tight integer container", "[tight-integers-container]")
 	REQUIRE(rgs::equal(x_bits, c));
 	REQUIRE(x == 7);
 }
+
+template<class T>
+bool check_constness(containers::tight_integer_container<T> const& c)
+{
+	return rgs::equal(c, vws::iota(0UL, c.size()));
+}
+
+TEST_CASE("constness", "[tight-integer-container]")
+{
+	using tight_container_t = containers::tight_integer_container<
+		util::unsigned_integer<3>
+	>;
+
+	tight_container_t c;
+	c.resize(7);
+
+	rgs::copy(vws::iota(0UL, c.size()), c.begin());
+	REQUIRE(check_constness(c));
+}

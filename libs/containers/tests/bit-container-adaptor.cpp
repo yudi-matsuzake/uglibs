@@ -56,7 +56,8 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 	REQUIRE(a.size()*n_bits_per_element == (c.end() - c.begin()));
 
 	using c_type = decltype(c);
-	c_type::iterator it;
+	using c_iterator_type = rgs::iterator_t<c_type>;
+	c_iterator_type it;
 	it = c.begin();
 	STATIC_REQUIRE(rgs::range<c_type>);
 

@@ -112,7 +112,7 @@ public:
 
 	using type = tight_integer_container;
 	using container_t = Container;
-	using underlying_integer_t = typename container_t::value_type;
+	using underlying_integer_t = underint_t<N, S, M>;
 	using underlying_integer_info = util::underlying_integer<N, S, M>;
 
 	using reference = tight_element_reference<tight_integer_container>;
@@ -249,8 +249,9 @@ public:
 		}
 
 	public:
-		static constexpr bool is_underlying_const = std::is_const_v<
-			underlying_integer_t>;
+
+		static constexpr bool is_container_const = std::is_const_v<
+			TightContainer>;
 
 		constexpr tight_element_reference() = default;
 
@@ -264,55 +265,71 @@ public:
 		constexpr
 		tight_element_reference(tight_element_reference const& v) noexcept
 		{
-			real_assigment(v);
+			real_assignment(v);
 		}
 
 		constexpr
 		tight_element_reference(tight_element_reference&& v) noexcept
 		{
-			real_assigment(std::forward<tight_element_reference>(v));
+			real_assignment(std::forward<tight_element_reference>(v));
 		}
 
 		constexpr
 		auto& operator=(underlying_integer_t v) noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
 		}
 
 		constexpr
 		auto& operator=(tight_element_reference const& v) noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
 		}
 
 		constexpr
 		auto& operator=(tight_element_reference&& v) noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
 		}
 
 		constexpr
 		auto& operator=(underlying_integer_t v) const noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
 		}
 
 		constexpr
 		auto& operator=(tight_element_reference const& v) const noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
 		}
 
 		constexpr
 		auto& operator=(tight_element_reference&& v) const noexcept
-			requires (not is_underlying_const)
+			requires (not is_container_const)
 		{
 			return from_underlying_integer(v);
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference const& v) noexcept
+			requires (is_container_const)
+		{
+			this->real_assignment(v);
+			return *this;
+		}
+
+		constexpr
+		auto& operator=(tight_element_reference&& v) noexcept
+			requires (is_container_const)
+		{
+			this->real_assignment(v);
+			return *this;
 		}
 
 		[[nodiscard]] constexpr
@@ -391,13 +408,13 @@ public:
 			return *this <=> other.get_value();
 		}
 
-		auto real_assigment(tight_element_reference const& other)
+		auto real_assignment(tight_element_reference const& other)
 		{
 			m_container_ptr = other.m_container_ptr;
 			tight_index = other.tight_index;
 		}
 
-		auto real_assigment(tight_element_reference&& other)
+		auto real_assignment(tight_element_reference&& other)
 		{
 			m_container_ptr = std::exchange(other.m_container_ptr, nullptr);
 			tight_index = std::exchange(other.tight_index, 0);
@@ -463,13 +480,13 @@ public:
 
 		constexpr tight_iterator& operator=(tight_iterator const& other)
 		{
-			m_reference.real_assigment(other.m_reference);
+			m_reference.real_assignment(other.m_reference);
 			return *this;
 		}
 
 		constexpr tight_iterator& operator=(tight_iterator&& other)
 		{
-			m_reference.real_assigment(other.m_reference);
+			m_reference.real_assignment(other.m_reference);
 			return *this;
 		}
 
@@ -663,14 +680,35 @@ public:
 	}
 
 	/**
+	  * access element at index `index`, throws std::out_of_range
+	  */
+	constexpr const_reference at(uint64_t index) const
+	{
+		if(index < m_size)
+			return (*this)[index];
+
+		throw std::out_of_range(
+			"index out of range: " + std::to_string(index));
+	}
+
+	constexpr reference at(uint64_t index)
+	{
+		if(index < m_size)
+			return (*this)[index];
+
+		throw std::out_of_range(
+			"index out of range: " + std::to_string(index));
+	}
+
+	/**
 	  * access element at index `index`
 	  */
-	constexpr auto operator[](int64_t index)
+	constexpr auto operator[](int64_t index) noexcept
 	{
 		return reference{ this, index };
 	}
 
-	constexpr auto operator[](int64_t index) const
+	constexpr auto operator[](int64_t index) const noexcept
 	{
 		return const_reference{ this, index };
 	}

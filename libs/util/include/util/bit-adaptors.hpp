@@ -36,6 +36,15 @@ public:
 		return m_data.size() * n_bits_per_element;
 	}
 
+	template<std::integral U>
+	constexpr auto& operator=(U e) const noexcept
+		requires (not std::is_const_v<T>)
+	{
+		auto&& [ v, b ] = compute_indices();
+		m_data[v] = set_bit(m_data[v], b, e, bit_order::leftmost{});
+		return *this;
+	}
+
 	constexpr auto& operator=(T e) const noexcept
 		requires (not std::is_const_v<T>)
 	{

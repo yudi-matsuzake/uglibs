@@ -15,14 +15,13 @@ template<std::integral T>
 class bit_container_adaptor{
 public:
 
-	using bit_reference = util::element_bit_reference<T>;
-
+	template<std::integral Q>
 	class iterator{
 	public:
 		using iterator_category = std::random_access_iterator_tag;
-		using value_type = T;
+		using value_type = Q;
 		using difference_type = int64_t;
-		using reference = bit_reference;
+		using reference = util::element_bit_reference<Q>;
 		using pointer = iterator;
 
 		constexpr iterator() noexcept = default;
@@ -31,7 +30,7 @@ public:
 
 		template<uint64_t N>
 		constexpr explicit iterator(
-			std::span<T, N> s,
+			std::span<Q, N> s,
 			uint64_t bit_index) noexcept
 			: m_reference(s, bit_index)
 		{}
@@ -131,11 +130,11 @@ public:
 			return m_reference.get_data().size() * n_bits_per_element;
 		}
 
-		bit_reference m_reference;
+		util::element_bit_reference<Q> m_reference;
 	};
 
 	static constexpr auto n_bits_per_element =
-		bit_reference::n_bits_per_element;
+		util::element_bit_reference<T>::n_bits_per_element;
 
 	template<uint64_t N>
 	constexpr explicit
