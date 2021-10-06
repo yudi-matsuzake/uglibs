@@ -21,6 +21,7 @@ add_library(util
 	./include/util/integer-concepts.hpp
 	./include/util/static-string.hpp
 	./include/util/underlying-integer.hpp
+	./include/util/integer-variant.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -48,6 +49,7 @@ if(ENABLE_TESTING)
 		./tests/bits.cpp
 		./tests/meta.cpp
 		./tests/bit-adaptors.cpp
+		./tests/integer-variant.cpp
 		./tests/misc-adaptors.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2)
