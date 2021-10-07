@@ -153,6 +153,9 @@ public:
 		std::make_unsigned_t<underlying_integer_t>
 		>::digits;
 
+	static constexpr bool is_signed = T::is_signed;
+	static constexpr bool is_unsigned = T::is_unsigned;
+
 	static constexpr underlying_integer_t min()
 		requires T::is_unsigned
 	{
