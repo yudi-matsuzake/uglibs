@@ -35,7 +35,9 @@ auto match(T&& arg, Ts&& ... fs)
 
 // list of types
 template<class ... T>
-struct list_of_types{};
+struct list_of_types{
+	using type_variant_t = std::variant<T ... >;
+};
 
 /**
   * struct to merge variants
