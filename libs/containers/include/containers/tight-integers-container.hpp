@@ -459,7 +459,7 @@ public:
 		constexpr tight_iterator() noexcept = default;
 
 		explicit constexpr
-		tight_iterator(TightContainer* a_ptr, uint64_t index)
+		tight_iterator(TightContainer* a_ptr, int64_t index)
 			noexcept
 			: m_reference(a_ptr, index)
 		{}

@@ -60,8 +60,14 @@ using integer_precisions_t = decltype(
 
 namespace detail{
 
+template<class S, class ... Is>
+constexpr auto has_variant_with_sign(std::variant<Is ... >)
+{
+	return (std::is_same_v<typename integer_info<Is>::signess, S> || ...);
+}
+
 template<class IntegerVariant, class S, class T, T first, T ... ints>
-auto make_integer(uint32_t n, std::integer_sequence<T, first, ints ...>)
+constexpr auto make_integer(uint32_t n, std::integer_sequence<T, first, ints ...>)
 	-> std::optional<IntegerVariant>
 {
 	if(n == first)
@@ -72,6 +78,36 @@ auto make_integer(uint32_t n, std::integer_sequence<T, first, ints ...>)
 	}else{
 		return std::nullopt;
 	}
+}
+
+template<class IntegerVariant>
+auto unsigned_integer_from_string(std::string_view str)
+	-> std::optional<IntegerVariant>
+{
+	auto n = std::strtoul(str.substr(4).data(), nullptr, 10);
+	return make_integer<IntegerVariant, util::unsigned_flag>(
+		n,
+		util::integer_precisions_t<
+		util::unsigned_flag,
+			IntegerVariant
+		>{}
+	);
+
+	return std::nullopt;
+}
+
+template<class IntegerVariant>
+auto signed_integer_from_string(std::string_view str)
+	-> std::optional<IntegerVariant>
+{
+	auto n = std::strtoul(str.substr(3).data(), nullptr, 10);
+	return detail::make_integer<IntegerVariant, util::signed_flag>(
+		n,
+		util::integer_precisions_t<
+			util::signed_flag,
+			IntegerVariant
+		>{}
+	);
 }
 
 } // end of namespace detail
@@ -93,24 +129,24 @@ auto integer_from_string(std::string_view str)
 	if(str.size() < 4 || str.size() > 6)
 		return std::nullopt;
 
-	if(str.substr(0, 4) == "uint"){
-		auto n = std::strtoul(str.substr(4).data(), nullptr, 10);
-		return detail::make_integer<IntegerVariant, util::unsigned_flag>(
-			n,
-			util::integer_precisions_t<
-				util::unsigned_flag,
-				IntegerVariant
-			>{}
-		);
-	}else if(str.substr(0, 3) == "int"){
-		auto n = std::strtoul(str.substr(3).data(), nullptr, 10);
-		return detail::make_integer<IntegerVariant, util::signed_flag>(
-			n,
-			util::integer_precisions_t<
-				util::signed_flag,
-				IntegerVariant
-			>{}
-		);
+	static constexpr auto has_unsigned = has_variant_with_sign<
+		util::unsigned_flag>(IntegerVariant{});
+
+	static constexpr auto has_signed = has_variant_with_sign<
+		util::signed_flag>(IntegerVariant{});
+
+	if constexpr (has_unsigned){
+		if(str.substr(0, 4) == "uint"){
+			return detail::unsigned_integer_from_string<
+				IntegerVariant>(str);
+		}
+	}
+
+	if constexpr (has_signed){
+		if(str.substr(0, 3) == "int"){
+			return detail::signed_integer_from_string<
+				IntegerVariant>(str);
+		}
 	}
 
 	return std::nullopt;
