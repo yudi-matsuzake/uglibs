@@ -722,7 +722,7 @@ public:
 	constexpr auto end()
 		noexcept
 	{
-		return tight_iterator{ this, size() };
+		return tight_iterator{ this, static_cast<int64_t>(size()) };
 	}
 
 	constexpr auto begin() const
@@ -734,7 +734,7 @@ public:
 	constexpr auto end() const
 		noexcept
 	{
-		return const_iterator(this, size());
+		return const_iterator(this, static_cast<int64_t>(size()));
 	}
 
 	constexpr auto cbegin() const
@@ -746,7 +746,7 @@ public:
 	constexpr auto cend() const
 		noexcept
 	{
-		return const_iterator(this, size());
+		return const_iterator(this, static_cast<int64_t>(size()));
 	}
 
 	constexpr auto rbegin()
