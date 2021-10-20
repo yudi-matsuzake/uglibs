@@ -29,12 +29,12 @@ struct type_if_else<false, A, B>{
  */
 
 template<class pixel_type, class M>
-class pixels_iterator_adaptor{
+class cells_iterator_adaptor{
 public:
-	pixels_iterator_adaptor() = delete;
-	virtual ~pixels_iterator_adaptor() = default;
+	cells_iterator_adaptor() = delete;
+	virtual ~cells_iterator_adaptor() = default;
 
-	explicit pixels_iterator_adaptor(M& a_reference) noexcept
+	explicit cells_iterator_adaptor(M& a_reference) noexcept
 		: m_reference(a_reference)
 	{}
 
@@ -63,21 +63,21 @@ protected:
 };
 
 /**
-  * build an adaptor to transverse the pixels of an opencv image
+  * build an adaptor to transverse the cells of an opencv image
   */
 template<class T>
-auto pixels(cv::Mat& img)
+auto cells(cv::Mat& img)
 {
-	return pixels_iterator_adaptor<T, cv::Mat>(img);
+	return cells_iterator_adaptor<T, cv::Mat>(img);
 }
 
 /**
-  * build an adaptor to transverse the pixels of an opencv image
+  * build an adaptor to transverse the cells of an opencv image
   */
 template<class T>
-auto pixels(cv::Mat const& img)
+auto cells(cv::Mat const& img)
 {
-	return pixels_iterator_adaptor<T, cv::Mat const>(img);
+	return cells_iterator_adaptor<T, cv::Mat const>(img);
 }
 
 template<class T, class I, class M>
@@ -195,11 +195,11 @@ protected:
 };
 
 /**
-  * build an adaptor to transverse the pixels and the coordinate 
+  * build an adaptor to transverse the cells and the coordinate 
   * of an opencv image
   */
 template<class T>
-auto pixels_at(cv::Mat& img)
+auto cells_at(cv::Mat& img)
 {
 	return pixel_point_iterator_adaptor<
 		T,
@@ -209,11 +209,11 @@ auto pixels_at(cv::Mat& img)
 }
 
 /**
-  * build an adaptor to transverse the pixels and the coordinate 
+  * build an adaptor to transverse the cells and the coordinate 
   * of an opencv image
   */
 template<class T>
-auto pixels_at(cv::Mat const& img)
+auto cells_at(cv::Mat const& img)
 {
 	return pixel_point_iterator_adaptor<
 		T,
