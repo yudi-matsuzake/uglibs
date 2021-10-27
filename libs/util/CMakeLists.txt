@@ -50,7 +50,8 @@ if(ENABLE_TESTING)
 		./tests/meta.cpp
 		./tests/bit-adaptors.cpp
 		./tests/integer-variant.cpp
-		./tests/misc-adaptors.cpp)
+		./tests/misc-adaptors.cpp
+		./tests/arithmetic-friends.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2)
 
