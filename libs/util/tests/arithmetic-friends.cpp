@@ -63,5 +63,4 @@ TEST_CASE("arithmetic friends", "[util]")
 	STATIC_REQUIRE(e == -1);
 
 	STATIC_REQUIRE((derived{ 1.f } / derived{ 2.f }) == 0.5f);
-
 }
