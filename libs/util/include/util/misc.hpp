@@ -53,13 +53,18 @@ constexpr auto minmax(T&& a, T&& b)
 }
 
 template<class T>
-constexpr auto make_static_cast()
+static constexpr auto make_static_cast()
 {
 	return [](auto&& x)
 	{
 		return static_cast<T>(x);
 	};
 }
+
+template<class T>
+using static_cast_function_t = std::invoke_result_t<
+	decltype(make_static_cast<T>)>;
+
 template <class T>
 constexpr inline auto hash_combine(const T seed, const T v)
 {
@@ -75,6 +80,11 @@ constexpr auto make_interpolation(T min_a, T max_a, T min_b, T max_b)
 		return min_b + (x - min_a) / (max_a - min_a) * (max_b - min_b);
 	};
 }
+
+template<class T>
+using interpolation_function_t = std::invoke_result_t<
+	decltype(util::make_interpolation<T>), T, T, T, T>;
+
 
 template<class T, uint64_t N>
 constexpr auto generate_array(auto&& f)
