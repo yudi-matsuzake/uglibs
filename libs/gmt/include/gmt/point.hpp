@@ -9,6 +9,8 @@
 #include <array>
 #include <functional>
 #include <type_traits>
+#include <ranges>
+#include <cmath>
 
 #include "util/misc-adaptors.hpp"
 #include "util/misc.hpp"
@@ -16,6 +18,9 @@
 #include "gmt/point-operations.hpp"
 
 namespace gmt{
+
+namespace rgs = std::ranges;
+namespace vws = std::views;
 
 /**
   * the type member of this class will be `T` only if `T` is not void
@@ -71,6 +76,26 @@ constexpr auto make_point_converter()
 	{
 		return point_convert<PointType>(p);
 	};
+}
+
+template<class PointType>
+constexpr auto point_ceil(PointType const& p)
+{
+	PointType r;
+	rgs::copy(p | vws::transform([](auto x){ return std::ceil(x); }),
+		r.begin()
+	);
+	return r;
+}
+
+template<class PointType>
+constexpr auto point_floor(PointType const& p)
+{
+	PointType r;
+	rgs::copy(p | vws::transform([](auto x){ return std::floor(x); }),
+		r.begin()
+	);
+	return r;
 }
 
 }
