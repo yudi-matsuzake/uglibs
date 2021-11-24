@@ -228,7 +228,7 @@ auto operator*(interval<A> const& a, S scalar)
 {
 	using type = decltype(A{} + S{});
 
-	auto tot = util::make_static_cast<type>();
+	auto const tot = util::make_static_cast<type>();
 
 	if(a.is_empty())
 		return interval<type>::empty();
