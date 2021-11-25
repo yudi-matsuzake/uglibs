@@ -38,7 +38,7 @@ TEST_CASE("integer queue", "[util][meta]")
 TEST_CASE("tuple_reverse", "[util][meta]")
 {
 	constexpr std::tuple<int, double, float> t{ 1, 2.3, 1.3f };
-	constexpr auto r = tuple_reverse(t);
+	constexpr auto r = util::tuple_reverse(t);
 	STATIC_REQUIRE(
 		std::is_same_v<
 			decltype(r),

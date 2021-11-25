@@ -42,6 +42,7 @@ class point :	public std::array<T, N>,
 public:
 	using this_type = point<T, N, OperationOutputType>;
 	using element_type = T;
+	static constexpr auto dim = N;
 
 	constexpr point() = default;
 	constexpr point(this_type&) = default;
