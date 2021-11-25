@@ -87,6 +87,38 @@ namespace detail{
 template<template<class...> class P, class ... Ts>
 using pairwise_tuple = typename detail::pairwise_tuple_impl<P, Ts ...>::type;
 
+namespace detail{
+
+template<class ... T, uint64_t ... I>
+constexpr auto tuple_reverse(
+	std::tuple<T...> const& t,
+	std::integer_sequence<uint64_t, I ...>) noexcept
+{
+	using tuple_type = std::tuple<T...>;
+	constexpr auto tuple_size = std::tuple_size_v<tuple_type>;
+
+	using reverse_tuple_t = std::tuple<
+		std::tuple_element_t<tuple_size - I - 1, tuple_type> ...
+	>;
+
+	reverse_tuple_t r = { std::get<tuple_size - I - 1>(t) ...  };
+
+	return r;
+}
+
+} // end of namespace detail
+
+/**
+  * reverses a tuple $t = (T_0, T_1, ... T_{n-1}$ to
+  * $(T_{n-1}, T_{n-2}, ..., T_1, T_0}$
+  */
+template<class...T>
+constexpr auto tuple_reverse(std::tuple<T...> const& t) noexcept
+{
+	return detail::tuple_reverse(t, std::make_index_sequence<sizeof...(T)>{});
+}
+
+
 template<class T, template<class...> class Primary>
 struct is_specialization_of : std::false_type {};
 

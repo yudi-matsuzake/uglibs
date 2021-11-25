@@ -3,7 +3,7 @@
 #include "util/meta.hpp"
 
 
-TEST_CASE("integer queue", "[meta]")
+TEST_CASE("integer queue", "[util][meta]")
 {
 	STATIC_REQUIRE(
 		std::is_same_v<
@@ -33,4 +33,20 @@ TEST_CASE("integer queue", "[meta]")
 			util::integer_queue_push_front_t<empty_t, 3>,
 			4>,
 		std::integer_sequence<int, 4, 3>>);
+}
+
+TEST_CASE("tuple_reverse", "[util][meta]")
+{
+	constexpr std::tuple<int, double, float> t{ 1, 2.3, 1.3f };
+	constexpr auto r = tuple_reverse(t);
+	STATIC_REQUIRE(
+		std::is_same_v<
+			decltype(r),
+			std::tuple<float, double, int> const
+		>
+	);
+
+	STATIC_REQUIRE(std::get<0>(t) == std::get<2>(r));
+	STATIC_REQUIRE(std::get<1>(t) == std::get<1>(r));
+	STATIC_REQUIRE(std::get<2>(t) == std::get<0>(r));
 }
