@@ -5,31 +5,22 @@
 
 #pragma once
 
-#include <optional>
-#include <tuple>
-#include <utility>
-#include <limits>
-#include <cstdint>
-#include <iterator>
-
-#include "range/v3/view/zip.hpp"
-#include "range/v3/view/iota.hpp"
-#include "range/v3/algorithm/min.hpp"
-
-#include "util/meta.hpp"
+#include "range/v3/view.hpp"
 
 
 namespace util{
 
-template<ranges::range ... Ts>
-auto enumerate(Ts&& ... a)
-{
-	auto const sizes = std::array{ (ranges::size(std::forward<Ts>(a)), ...) };
-	using sizes_t = decltype(sizes)::size_type;
+namespace views = ranges::views;
 
-	return ranges::views::zip(
-		ranges::views::iota(sizes_t{0}, ranges::min(sizes)),
-		std::forward<Ts>(a) ...
+template<class T>
+auto numbers(T start, T finish, T step = T{1})
+{
+	auto n = static_cast<int64_t>(std::ceil((finish - start)/step));
+	return views::iota(0LL, n) | views::transform(
+		[start, step](auto i) -> T
+		{
+			return start + step*static_cast<T>(i);
+		}
 	);
 }
 
