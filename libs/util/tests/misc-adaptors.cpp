@@ -1,25 +1,29 @@
 #include <catch2/catch.hpp>
 
+#include <array>
 #include <ranges>
-#include <vector>
-#include <list>
+#include <algorithm>
 
 #include "util/misc-adaptors.hpp"
-#include "range/v3/algorithm/all_of.hpp"
+#include "range/v3/view.hpp"
 
-TEST_CASE("enumerate adaptor ", "[util]")
+namespace rgs = std::ranges;
+namespace vws = std::views;
+
+namespace views = ranges::views;
+
+TEST_CASE("numbers view", "[util]")
 {
-	auto const a = std::array{1, 2, 3, 4, 5};
 
-	for(auto&& [i, value] : util::enumerate(a)){
-		REQUIRE(a[i] == value);
-	}
+	REQUIRE(rgs::equal(util::numbers(0, 10), vws::iota(0, 10)));
 
-	REQUIRE(ranges::all_of(util::enumerate(a),
-		[&a](auto&& pack)
-		{
-			auto&& [i, value] = pack;
-			return a[i] == value;
-		}
+	REQUIRE(rgs::equal(
+		util::numbers(0.0, 1.5),
+		std::array{ 0.0, 1.0 }
+	));
+
+	REQUIRE(rgs::equal(
+		util::numbers(0.0, 0.7, 0.3),
+		std::array{ 0.0, 0.3, 0.6 }
 	));
 }
