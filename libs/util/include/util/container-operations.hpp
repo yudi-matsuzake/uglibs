@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "util/misc-adaptors.hpp"
+#include "util/views.hpp"
 
 namespace util::cop{
 

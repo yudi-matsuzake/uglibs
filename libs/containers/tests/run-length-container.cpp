@@ -2,7 +2,7 @@
 
 #include "containers/run-length-container.hpp"
 #include "util/misc.hpp"
-#include "util/misc-adaptors.hpp"
+#include "util/views.hpp"
 
 #include <stdexcept>
 

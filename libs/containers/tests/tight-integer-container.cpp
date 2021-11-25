@@ -4,7 +4,7 @@
 #include <ranges>
 
 #include "util/misc.hpp"
-#include "util/misc-adaptors.hpp"
+#include "util/views.hpp"
 #include "containers/tight-integers-container.hpp"
 
 #include "range/v3/all.hpp"

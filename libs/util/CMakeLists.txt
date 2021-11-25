@@ -11,7 +11,7 @@ add_library(util
 	./include/util/io.hpp
 	./include/util/bit.hpp
 	./include/util/container-operations.hpp
-	./include/util/misc-adaptors.hpp
+	./include/util/views.hpp
 	./include/util/concepts.hpp
 	./include/util/cv-adaptors.hpp
 	./include/util/static-vector.hpp
@@ -50,7 +50,6 @@ if(ENABLE_TESTING)
 		./tests/meta.cpp
 		./tests/bit-adaptors.cpp
 		./tests/integer-variant.cpp
-		./tests/misc-adaptors.cpp
 		./tests/arithmetic-friends.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2)
@@ -67,7 +66,7 @@ if(ENABLE_PCH)
 		./include/util/io.hpp
 		./include/util/misc.hpp
 		./include/util/container-operations.hpp
-		./include/util/misc-adaptors.hpp
+		./include/util/views.hpp
 		./include/util/concepts.hpp
 		./include/util/cv-adaptors.hpp
 		./include/util/static-vector.hpp)

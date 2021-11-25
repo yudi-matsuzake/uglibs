@@ -2,7 +2,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include "util/misc-adaptors.hpp"
+#include "util/views.hpp"
 #include "util/misc.hpp"
 #include "ia/interval.hpp"
 

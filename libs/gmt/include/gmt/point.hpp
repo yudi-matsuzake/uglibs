@@ -12,7 +12,7 @@
 #include <ranges>
 #include <cmath>
 
-#include "util/misc-adaptors.hpp"
+#include "util/views.hpp"
 #include "util/misc.hpp"
 
 #include "gmt/point-operations.hpp"

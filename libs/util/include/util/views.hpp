@@ -1,21 +1,21 @@
-/** @file misc-adaptors.hpp
-  * Implementation of adaptors to help common 
+/** @file views.hpp
+  * Implementation of views to help common 
   * objects manipulation
   */
 
 #pragma once
 
-#include <ranges>
+#include "range/v3/view.hpp"
 
 namespace util{
 
-namespace vws = std::views;
+namespace views = ranges::views;
 
 template<class T>
 auto numbers(T start, T finish, T step = T{1})
 {
 	auto n = static_cast<int64_t>(std::ceil((finish - start)/step));
-	return vws::iota(0LL, n) | vws::transform(
+	return views::iota(0LL, n) | views::transform(
 		[start, step](auto i) -> T
 		{
 			return start + step*static_cast<T>(i);
