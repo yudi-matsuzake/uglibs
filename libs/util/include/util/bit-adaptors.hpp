@@ -37,7 +37,7 @@ public:
 	}
 
 	template<std::integral U>
-	constexpr auto& operator=(U e) const noexcept
+	constexpr auto& operator=(U e) const
 		requires (not std::is_const_v<T>)
 	{
 		auto&& [ v, b ] = compute_indices();
@@ -45,7 +45,7 @@ public:
 		return *this;
 	}
 
-	constexpr auto& operator=(T e) const noexcept
+	constexpr auto& operator=(T e) const
 		requires (not std::is_const_v<T>)
 	{
 		auto&& [ v, b ] = compute_indices();
@@ -53,13 +53,13 @@ public:
 		return *this;
 	}
 
-	constexpr auto& operator=(element_bit_reference const& e) const noexcept
+	constexpr auto& operator=(element_bit_reference const& e) const
 		requires (not std::is_const_v<T>)
 	{
 		return *this = e.get_bit_value();
 	}
 
-	constexpr auto& operator=(element_bit_reference&& e) const noexcept
+	constexpr auto& operator=(element_bit_reference&& e) const
 		requires (not std::is_const_v<T>)
 	{
 		return *this = e.get_bit_value();
@@ -123,9 +123,14 @@ public:
 private:
 	constexpr auto compute_indices() const
 	{
+		if(bit_index < 0)
+			throw std::logic_error("bit index cannot be negative");
 		auto const vector_index = bit_index / n_bits_per_element;
 		auto const index = bit_index % n_bits_per_element;
-		return std::tuple{ vector_index, index };
+		return std::tuple{
+			to_unsigned(vector_index),
+			to_unsigned(index)
+		};
 	}
 
 	std::span<T> m_data;

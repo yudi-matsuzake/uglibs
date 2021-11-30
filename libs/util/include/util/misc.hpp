@@ -171,4 +171,10 @@ constexpr T pow(T n, T exp) noexcept
 	return p;
 }
 
+template<class T>
+constexpr auto to_unsigned(T v) noexcept
+{
+	return static_cast<std::make_unsigned_t<T>>(v);
+}
+
 }

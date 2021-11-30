@@ -31,7 +31,7 @@ public:
 		template<uint64_t N>
 		constexpr explicit iterator(
 			std::span<Q, N> s,
-			uint64_t bit_index) noexcept
+			int64_t bit_index) noexcept
 			: m_reference(s, bit_index)
 		{}
 
@@ -176,7 +176,7 @@ public:
 
 	constexpr auto end() noexcept
 	{
-		return iterator{ m_data, size() };
+		return iterator{ m_data, static_cast<int64_t>(size()) };
 	}
 
 	constexpr auto begin() const noexcept
@@ -186,7 +186,7 @@ public:
 
 	constexpr auto end() const noexcept
 	{
-		return iterator{ m_data, size() };
+		return iterator{ m_data, static_cast<int64_t>(size()) };
 	}
 
 	constexpr auto rbegin() noexcept
@@ -201,7 +201,7 @@ public:
 
 	constexpr auto rbegin() const noexcept
 	{
-		return iterator{ m_data, size() };
+		return iterator{ m_data, static_cast<int64_t>(size()) };
 	}
 
 	constexpr auto rend() const noexcept

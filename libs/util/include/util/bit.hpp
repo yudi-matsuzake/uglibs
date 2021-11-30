@@ -5,6 +5,7 @@
 #include <variant>
 #include <span>
 
+#include "util/misc.hpp"
 #include "util/variant.hpp"
 
 namespace util{
@@ -36,17 +37,15 @@ constexpr auto number_of_bits()
   * if `order` is bit_order::leftmost than the first bit is the
   * leftmost
   */
+template<std::integral T>
 [[nodiscard]] constexpr
 auto set_bit(
-	std::integral auto x,
+	T x,
 	std::integral auto n,
 	bit_index_order order = bit_order::rightmost{}) noexcept
+	-> T
 {
-	using x_type = decltype(x);
-	using T = decltype(x_type{} | decltype(n){});
-
-	constexpr auto s = number_of_bits<x_type>() - 1;
-
+	constexpr auto s = number_of_bits<T>() - 1;
 	return std::visit(visitor{
 		[x, n](bit_order::rightmost){ return x | (T{1} << n); },
 		[x, n](bit_order::leftmost){ return x | (T{1} << (s - n)); }
@@ -60,19 +59,22 @@ auto set_bit(
   * if `order` is bit_order::leftmost than the first bit is the
   * leftmost
   */
+template<std::integral T, std::integral Q>
 [[nodiscard]] constexpr
-auto clear_bit(
-	std::integral auto x,
-	std::integral auto n, 
-	bit_index_order order = bit_order::rightmost{}) noexcept
+auto clear_bit(T x, Q n, bit_index_order order = bit_order::rightmost{})
+	noexcept -> T
 {
-	using x_type = decltype(x);
-	using T = decltype(decltype(x){} & decltype(n){});
-	constexpr auto s = number_of_bits<x_type>() - 1;
+	constexpr auto s = number_of_bits<T>() - 1;
 
 	return std::visit(visitor{
-		[&](bit_order::rightmost){ return x & ~(T{1} << n); },
-		[&](bit_order::leftmost){ return x & ~(T{1} << (s - n)); }
+		[&](bit_order::rightmost)
+		{
+			return static_cast<T>(x & ~(Q{1} << n));
+		},
+		[&](bit_order::leftmost)
+		{
+			return static_cast<T>(x & ~(Q{1} << (s - n)));
+		}
 	}, order);
 }
 
@@ -84,27 +86,29 @@ auto clear_bit(
   * if `order` is bit_order::leftmost than the first bit is the
   * leftmost
   */
+template<std::integral T>
 [[nodiscard]] constexpr
 auto set_bit(
-	std::integral auto x,
-	std::integral auto n,
+	T x,
+	std::integral auto n_bits,
 	std::integral auto bit_value,
 	bit_index_order order = bit_order::rightmost{}) noexcept
+	-> T
 {
 
-	using x_type = decltype(x);
-	constexpr auto s = number_of_bits<x_type>() - 1;
+	constexpr auto s = number_of_bits<T>() - 1;
 
-	x_type b = bit_value & 1;
+	T b = bit_value & 1;
+	T n = static_cast<T>(n_bits);
 
 	return std::visit(visitor{
-		[&](bit_order::rightmost)
+		[=](bit_order::rightmost)
 		{
-			return clear_bit(x, n) | (b << n);
+			return static_cast<T>(clear_bit(x, n) | (b << n));
 		},
-		[&, n=(s - n)](bit_order::leftmost)
+		[=, n=(s - n)](bit_order::leftmost)
 		{
-			return clear_bit(x, n) | (b << n);
+			return static_cast<T>(clear_bit(x, n) | (b << n));
 		},
 	}, order);
 }
@@ -116,18 +120,18 @@ auto set_bit(
   * if `order` is bit_order::leftmost than the first bit is the
   * leftmost
   */
+template<std::integral T>
 [[nodiscard]] constexpr
 auto get_bit(
-	std::integral auto x,
+	T x,
 	std::integral auto n,
 	bit_index_order order = bit_order::rightmost{}) noexcept
+	-> T
 {
-	using x_type = decltype(x);
-	constexpr auto s = number_of_bits<x_type>() - 1;
-
+	constexpr auto s = number_of_bits<T>() - 1;
 	return std::visit(visitor{
-		[&](bit_order::rightmost){ return (x >> n) & 1; },
-		[&](bit_order::leftmost){ return (x >> (s - n)) & 1; },
+		[&](bit_order::rightmost){ return static_cast<T>((x >> n) & 1); },
+		[&](bit_order::leftmost){ return static_cast<T>((x >> (s - n)) & 1); },
 	}, order);
 }
 

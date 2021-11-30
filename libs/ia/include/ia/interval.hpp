@@ -228,22 +228,31 @@ auto operator*(interval<A> const& a, S scalar)
 {
 	using type = decltype(A{} + S{});
 
-	auto const tot = util::make_static_cast<type>();
-
 	if(a.is_empty())
 		return interval<type>::empty();
 
 	if(scalar > 0){
 		return interval<type>(
-			execute_downward([&]{return a.lo()*tot(scalar);}),
-			execute_upward([&]{return a.hi()*tot(scalar);})
+			execute_downward([&a, scalar]
+			{
+				return a.lo()*static_cast<type>(scalar);
+			}),
+			execute_upward([&a, scalar]{
+				return a.hi()*static_cast<type>(scalar);
+			})
 		);
 	}
 
 	if(scalar < 0){
 		return interval<type>(
-			execute_downward([&]{return a.hi()*tot(scalar);}),
-			execute_upward([&]{return a.lo()*tot(scalar);})
+			execute_downward([&a, scalar]
+			{
+				return a.hi()*static_cast<type>(scalar);
+			}),
+			execute_upward([&a, scalar]
+			{
+				return a.lo()*static_cast<type>(scalar);
+			})
 		);
 	}
 

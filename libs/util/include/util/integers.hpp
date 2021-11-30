@@ -165,10 +165,13 @@ public:
 	static constexpr underlying_integer_t max()
 		requires T::is_unsigned
 	{
-		auto n = bits_per_underlying_integer - T::n_bits;
-		underlying_integer_t x = ~underlying_integer_t{0};
-		x <<= n;
-		x >>= n;
+		constexpr auto const to_underint = util::make_static_cast<
+			underlying_integer_t>();
+
+		auto n = to_underint(bits_per_underlying_integer - T::n_bits);
+		auto x = to_underint(~underlying_integer_t{0});
+		x = to_underint(x << n);
+		x = to_underint(x >> n);
 		return x;
 	}
 
