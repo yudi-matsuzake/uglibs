@@ -9,7 +9,7 @@ namespace containers{
 
 /**
   * this adaptor adapts a contiguously memory location (abstracted as a
-  * std::span) as an bit container
+  * std::span) as a bit container
   */
 template<std::integral T>
 class bit_container_adaptor{

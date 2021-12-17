@@ -30,6 +30,7 @@ if(ENABLE_TESTING)
 		tests/containers-tests.cpp
 		tests/bit-container-adaptor.cpp
 		tests/tight-integer-container.cpp
+		tests/bitset.cpp
 		tests/run-length-container.cpp)
 
 	target_link_libraries(containers-tests Catch2::Catch2 containers util::util)
