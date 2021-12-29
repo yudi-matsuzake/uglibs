@@ -32,6 +32,7 @@ if(ENABLE_TESTING)
 		./tests/gmt-tests.cpp
 		./tests/point.cpp
 		./tests/mat.cpp
+		./tests/embedded-point.cpp
 		./tests/cross-product.cpp)
 
 	target_link_libraries(gmt-tests gmt util::util Catch2::Catch2)

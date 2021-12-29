@@ -13,9 +13,9 @@ namespace gmt{
 
 template<class T, uint64_t N, class OperationOutputType = void>
 class vector : public point<T, N,
-								typename defaulted_type<
-									OperationOutputType,
-									vector<T, N>>::type> {
+	typename defaulted_type<
+		OperationOutputType,
+		vector<T, N>>::type> {
 public:
 	using operation_type = typename defaulted_type<
 		OperationOutputType,

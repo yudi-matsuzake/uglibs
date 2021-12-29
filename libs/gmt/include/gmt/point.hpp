@@ -40,17 +40,17 @@ class point :	public std::array<T, N>,
 			typename defaulted_type<OperationOutputType, point<T, N>>::type>
 {
 public:
-	using this_type = point<T, N, OperationOutputType>;
+	using point_type = point<T, N, OperationOutputType>;
 	using element_type = T;
 	static constexpr auto dim = N;
 
 	constexpr point() = default;
-	constexpr point(this_type&) = default;
-	constexpr point(this_type&&) = default;
-	constexpr point(this_type const&) = default;
+	constexpr point(point_type&) = default;
+	constexpr point(point_type&&) = default;
+	constexpr point(point_type const&) = default;
 
-	constexpr this_type& operator=(this_type&&)	= default;
-	constexpr this_type& operator=(this_type const&)= default;
+	constexpr point_type& operator=(point_type&&)	= default;
+	constexpr point_type& operator=(point_type const&)= default;
 
 	template<class ... Ts>
 	constexpr point(Ts&& ... args)
