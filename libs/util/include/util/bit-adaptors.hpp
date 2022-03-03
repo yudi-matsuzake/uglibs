@@ -19,16 +19,27 @@ public:
 	constexpr element_bit_reference(element_bit_reference const&)
 		noexcept = default;
 
+	friend class element_bit_reference<std::remove_const_t<T> const>;
+
 	template<uint64_t N>
 	constexpr explicit 
-	element_bit_reference(std::span<T, N> s, int64_t index = 0)
+	element_bit_reference(std::span<T, N> s, int64_t index)
 		noexcept
 		: m_data(s), bit_index{index}
 	{}
 
 	constexpr explicit
-		element_bit_reference(T& s, int64_t index = 0) noexcept
+		element_bit_reference(T& s, int64_t index) noexcept
 		: m_data(&s, 1), bit_index{index}
+	{}
+
+	template<uint64_t N>
+	constexpr element_bit_reference(std::span<T, N> s) noexcept
+		: element_bit_reference(s, 0L)
+	{}
+
+	constexpr element_bit_reference(T& s) noexcept
+		: element_bit_reference(&s, 1L)
 	{}
 
 	constexpr auto n_bit_indices() const
@@ -37,7 +48,7 @@ public:
 	}
 
 	template<std::integral U>
-	constexpr auto& operator=(U e) const
+	constexpr auto& operator=(U const& e) const
 		requires (not std::is_const_v<T>)
 	{
 		auto&& [ v, b ] = compute_indices();
@@ -45,7 +56,7 @@ public:
 		return *this;
 	}
 
-	constexpr auto& operator=(T e) const
+	constexpr auto& operator=(T const& e) const
 		requires (not std::is_const_v<T>)
 	{
 		auto&& [ v, b ] = compute_indices();
@@ -63,6 +74,24 @@ public:
 		requires (not std::is_const_v<T>)
 	{
 		return *this = e.get_bit_value();
+	}
+
+	constexpr auto& operator=(
+		element_bit_reference<std::remove_const_t<T>> const& e)
+		requires (std::is_const_v<T>)
+	{
+		m_data = e.m_data;
+		bit_index = e.bit_index;
+		return *this;
+	}
+
+	constexpr auto& operator=(
+		element_bit_reference<std::remove_const_t<T>>&& e)
+		requires (std::is_const_v<T>)
+	{
+		m_data = std::move(e.m_data);
+		bit_index = std::exchange(e.bit_index, 0LL);
+		return *this;
 	}
 
 	constexpr auto get_bit_value() const
@@ -140,21 +169,22 @@ public:
 
 } // end of namespace util
 
-template<class T, template<class> class TQ, template<class> class TU>
-struct std::basic_common_reference<
-	util::element_bit_reference<T>,
-	T,
-	TQ,
-	TU>{
-	using type = util::element_bit_reference<T>;
+template<
+	std::integral T,
+	std::integral U,
+	template<class> class TQ,
+	template<class> class TU>
+struct std::basic_common_reference<util::element_bit_reference<T>, U, TQ, TU>{
+	using type = std::common_reference_t<T, U>;
 };
 
-template<class T, template<class> class TQ, template<class> class TU>
-struct std::basic_common_reference<
-	T,
-	util::element_bit_reference<T>,
-	TQ,
-	TU>{
-	using type = util::element_bit_reference<T>;
+template<
+	std::integral T,
+	std::integral U,
+	template<class> class TQ,
+	template<class> class TU>
+struct std::basic_common_reference<U, util::element_bit_reference<T>, TQ, TU>{
+	using type = typename std::basic_common_reference<
+		util::element_bit_reference<T>, U, TQ, TU
+	>::type;
 };
-

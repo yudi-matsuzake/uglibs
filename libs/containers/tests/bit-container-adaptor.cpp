@@ -24,28 +24,68 @@ constexpr bool simple_element_test()
 	uint8_t x = 0b10011100;
 	auto c = containers::bit_container_adaptor(x);
 
-	return rgs::all_of(c, [i = 0, x](auto bit) mutable
+	return rgs::all_of(c, [i = 0, x](auto&& bit) mutable
 	{
 		return bit == util::get_bit(x, i++, util::bit_order::leftmost{});
 	});
 }
 
-bool check_elements(ranges::range auto a, ranges::range auto bit_container)
+template<ranges::range R>
+bool check_elements(R&& a, ranges::range auto bit_container)
 {
 	auto to_bits = [](auto const& a)
 	{
 		return containers::bit_container_adaptor(a);
 	};
 
-	auto const all_bits = a
-		| ranges::views::transform(to_bits)
-		| ranges::to<std::vector>;
+	using value_t = ranges::range_value_t<R>;
+	using vector_t = std::vector<value_t>;
 
-	return ranges::equal(bit_container, all_bits | ranges::views::join);
+	vector_t v;
+	for(auto&& bits : a | ranges::views::transform(to_bits))
+		for(auto&& bi : bits)
+			v.push_back(bi);
+
+	return ranges::equal(bit_container, v);
 }
 
 TEST_CASE("bit container adaptor related tests", "[containers]")
 {
+	using container_t = containers::bit_container_adaptor<uint8_t>;
+	using iterator_t = container_t::iterator<uint8_t>;
+	STATIC_REQUIRE(std::input_or_output_iterator<iterator_t>);
+
+	STATIC_REQUIRE(std::is_same_v<
+		std::iter_value_t<iterator_t>,
+		uint8_t
+	>);
+	STATIC_REQUIRE(std::is_same_v<
+		std::iter_reference_t<iterator_t>,
+		util::element_bit_reference<uint8_t>
+	>);
+	STATIC_REQUIRE(std::is_same_v<
+		std::iter_reference_t<iterator_t>,
+		util::element_bit_reference<uint8_t>
+	>);
+	STATIC_REQUIRE(std::is_same_v<
+		std::iter_rvalue_reference_t<iterator_t>,
+		util::element_bit_reference<uint8_t>
+	>);
+	STATIC_REQUIRE(
+		std::common_reference_with<
+			std::iter_rvalue_reference_t<iterator_t>&&,
+			const std::iter_value_t<iterator_t>&
+		>
+	);
+	STATIC_REQUIRE(
+		std::common_reference_with<
+			std::iter_rvalue_reference_t<iterator_t> const&&,
+			std::iter_value_t<iterator_t>&
+		>
+	);
+	STATIC_REQUIRE(std::indirectly_readable<
+		containers::bit_container_adaptor<uint8_t>::iterator<uint8_t>
+	>);
 	STATIC_REQUIRE(simple_element_test());
 
 	using T = uint8_t;

@@ -189,6 +189,16 @@ public:
 		return iterator{ m_data, static_cast<int64_t>(size()) };
 	}
 
+	constexpr auto cbegin() const noexcept
+	{
+		return begin();
+	}
+
+	constexpr auto cend() const noexcept
+	{
+		return end();
+	}
+
 	constexpr auto rbegin() noexcept
 	{
 		return iterator{ m_data, size() };

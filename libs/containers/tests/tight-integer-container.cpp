@@ -13,6 +13,8 @@ namespace rgs = std::ranges;
 namespace vws = std::ranges::views;
 namespace acs = ranges::actions;
 
+namespace views = ranges::views;
+
 template<bool is_signed>
 constexpr static auto make_values(
 	std::integral auto n_values,
