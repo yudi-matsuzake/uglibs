@@ -19,6 +19,10 @@ public:
 
 	void bind() const;
 
+	void draw_triangles() const;
+
+	void draw_lines() const;
+
 	glm::mat4 const& model_matrix() const;
 
 	std::vector<mesh3d_attributes_layout> const& attributes() const;
@@ -28,6 +32,9 @@ public:
 private:
 	ug::graphics::vao vao;
 	ug::graphics::vbo vbo;
+	ug::graphics::ebo ebo_lines;
+
+	void initialize_ebos();
 
 	std::vector<mesh3d_attributes_layout>	m_attributes;
 	glm::mat4 model = glm::mat4(1.f);

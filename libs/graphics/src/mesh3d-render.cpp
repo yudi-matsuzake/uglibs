@@ -4,7 +4,7 @@
 
 namespace ug::graphics{
 
-static constexpr auto vertex_shaders = std::array{R"__(
+static constexpr auto phong_simple_vs = std::array{R"__(
 #version 330 core
 
 layout (location = 0) in vec3 l_pos;
@@ -29,7 +29,7 @@ void main()
 }
 )__"};
 
-static constexpr auto fragment_shaders = std::array{R"__(
+static constexpr auto phong_simple_fs = std::array{R"__(
 #version 330 core
 
 out vec4 frag_color;
@@ -41,11 +41,13 @@ in vec4 v_color;
 uniform vec3 u_light_pos;
 uniform vec3 u_view_pos;
 uniform vec3 u_light_color;
+uniform vec4 u_color;
 
 uniform float u_ambient_light_strength;
 uniform float u_specular_strength;
 uniform bool u_specular_lighting;
 uniform bool u_diffuse_lighting;
+uniform bool u_use_attr_color;
 
 void main()
 {
@@ -72,15 +74,20 @@ void main()
 		light += specular;
 	}
 
-	vec3 result = clamp(light, 0.f, 1.f) * v_color.rgb;
-	frag_color = vec4(result, v_color.a);
+	vec4 color = u_use_attr_color ? v_color : u_color;
+
+	vec3 result = clamp(light, 0.f, 1.f) * color.rgb;
+	frag_color = vec4(result, color.a);
 } 
 )__"};
 
-static auto make_program()
+template<uint64_t N>
+static auto make_program(
+	static_shader_source<N> const& vertex_shaders,
+	static_shader_source<N> const& fragment_shaders)
 {
-	ug::graphics::vertex_shader vs;
-	ug::graphics::fragment_shader fs;
+	vertex_shader vs;
+	fragment_shader fs;
 
 	vs.set_source(vertex_shaders);
 	fs.set_source(fragment_shaders);
@@ -97,12 +104,11 @@ static auto make_program()
 }
 
 mesh3d_render::mesh3d_render(app* app_ptr)
-	: render(app_ptr), m_program(make_program())
+	: render(app_ptr),
+	  m_program(make_program(phong_simple_vs, phong_simple_fs))
 {}
 
-void mesh3d_render::operator()(
-	scene const& s,
-	mesh3d const& mesh)
+void mesh3d_render::common_program_setup(scene const& s, mesh3d const& mesh)
 {
 	m_program.use();
 	mesh.bind();
@@ -123,9 +129,38 @@ void mesh3d_render::operator()(
 	m_program.set_uniform("u_diffuse_lighting", diffuse_lighting);
 	m_program.set_uniform("u_specular_lighting", specular_lighting);
 	m_program.set_uniform("u_specular_strength", specular_strength);
+}
 
-	auto count = static_cast<int32_t>(mesh.attributes().size());
-	GL(glDrawArrays(GL_TRIANGLES, 0, count));
+void mesh3d_render::operator()(
+	scene const& s,
+	mesh3d const& mesh)
+{
+	common_program_setup(s, mesh);
+
+	if(triangles.draw){
+		m_program.set_uniform("u_color", triangles.color);
+		m_program.set_uniform(
+			"u_use_attr_color",
+			triangles.use_attr_color
+		);
+		mesh.draw_triangles();
+	}
+
+	if(lines.draw){
+		float saved_line_width;
+		GL(glGetFloatv(GL_LINE_WIDTH, &saved_line_width));
+
+		GL(glLineWidth(lines.line_width));
+		m_program.set_uniform("u_color", lines.color);
+		m_program.set_uniform(
+			"u_use_attr_color",
+			lines.use_attr_color
+		);
+		mesh.draw_lines();
+
+		GL(glLineWidth(saved_line_width));
+	}
+
 }
 
 } // end of namespace ug::graphics
