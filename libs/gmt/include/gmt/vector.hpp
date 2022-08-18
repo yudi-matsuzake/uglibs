@@ -42,7 +42,7 @@ constexpr auto squared_norm(Vector const& v)
 template<class Vector>
 auto norm(Vector const& v)
 {
-	return std::sqrt(squared_norm(v));
+	return sqrt(squared_norm(v));
 }
 
 
