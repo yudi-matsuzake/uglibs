@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/component.hpp"
 
@@ -18,31 +20,31 @@ public:
 	static constexpr auto zoom_in_proportion	= 1.f + zoom_proportion;
 	static constexpr auto zoom_out_proportion	= 1.f - zoom_proportion;
 
-	static constexpr std::array up_keys{
+	static constexpr auto up_keys = std::array{
 		GLFW_KEY_UP,
 		GLFW_KEY_W
 	};
 
-	static constexpr std::array down_keys{
+	static constexpr auto down_keys = std::array{
 		GLFW_KEY_DOWN,
 		GLFW_KEY_S
 	};
 
-	static constexpr std::array left_keys{
+	static constexpr auto left_keys = std::array {
 		GLFW_KEY_LEFT,
 		GLFW_KEY_A
 	};
 
-	static constexpr std::array right_keys{
+	static constexpr auto right_keys = std::array {
 		GLFW_KEY_RIGHT,
 		GLFW_KEY_D
 	};
 
-	static constexpr std::array zoom_in_keys{
+	static constexpr auto zoom_in_keys = std::array{
 		GLFW_KEY_EQUAL
 	};
 
-	static constexpr std::array zoom_out_keys{
+	static constexpr auto zoom_out_keys = std::array{
 		GLFW_KEY_MINUS
 	};
 
