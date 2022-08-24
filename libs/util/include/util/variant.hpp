@@ -118,4 +118,16 @@ template<class V,
 	template<class ...> class ... Ts>
 using templated_variant_t = typename templated_variant<V, T, Ts ...>::type;
 
+template<class Variant>
+constexpr bool variant_equality(Variant&& a, Variant&& b)
+{
+	return std::visit(
+		util::visitor{
+			[]<class T>(T&& av, T&& vb){ return av == vb; },
+			[](auto&&, auto&&){ return false; }
+		},
+		a, b
+	);
+}
+
 } // end of namespace util
