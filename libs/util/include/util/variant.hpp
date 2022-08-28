@@ -77,7 +77,7 @@ V0 variant_convert(V1&& a)
 			throw std::runtime_error(
 				"Variant converter: could not convert variant");
 		}
-	}, a);
+	}, std::forward<V1>(a));
 }
 
 /*
