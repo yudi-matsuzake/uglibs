@@ -1,19 +1,52 @@
 #pragma once
 
+#include <ranges>
+#include <algorithm>
+#include <cinttypes>
 #include <array>
 
 namespace gmt{
 
+namespace rgs = std::ranges;
+namespace vws = std::views;
+
 template<class T, uint64_t Row, uint64_t Col>
 class mat : public std::array<std::array<T, Col>, Row>{
 public:
-	constexpr mat() : std::array<std::array<T, Col>, Row>{}
+	using row_t = std::array<T, Col>;
+
+	constexpr mat() : std::array<row_t, Row>{}
 	{}
+
+	template<class ... Rows>
+		requires (std::is_same_v<Rows, row_t> && ...)
+			&& (sizeof...(Rows) == Col)
+	constexpr mat(Rows&& ... rows)
+	{
+		auto i = 0UL;
+		(rgs::copy_n(rows.begin(), Col, (*this)[i++].begin()), ...);
+	}
+
+	constexpr mat(T const (&a)[Row][Col])
+	{
+		for(auto i=0UL; i<Row; ++i)
+			for(auto j=0UL; j<Col; ++j)
+				(*this)[i][j] = a[i][j];
+	}
 
 	static constexpr auto n_row = Row;
 	static constexpr auto n_col = Col;
-
 };
+
+template<class R, class ... Rows>
+	requires ((std::tuple_size_v<R> == std::tuple_size_v<Rows>) && ...)
+		&& ((std::is_same_v<std::tuple_element_t<0, R>,
+				std::tuple_element_t<0, Rows>>) && ...)
+mat(R&&, Rows&&...) -> mat<
+	std::tuple_element_t<0, R>,
+	sizeof...(Rows)+1,
+	std::tuple_size_v<R>
+>;
 
 template<class T>
 constexpr auto determinant(mat<T, 1, 1> const& m)
@@ -44,7 +77,6 @@ constexpr auto determinant(mat<T, N, N> const& m)
 				if(k != i){
 					uint64_t subi = subidx/sub_matrix.n_row;
 					uint64_t subj = subidx%sub_matrix.n_col;
-
 					sub_matrix[subi][subj] = m[j][k];
 					subidx++;
 				}

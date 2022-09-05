@@ -6,7 +6,7 @@ static constexpr auto n_rows = 5UL;
 static constexpr auto n_cols = 10UL;
 
 static constexpr auto enumeration_check(
-		gmt::mat<uint64_t, n_rows, n_cols> const& m)
+	gmt::mat<uint64_t, n_rows, n_cols> const& m)
 {
 	for(auto i=0UL; i<n_rows; i++)
 		for(auto j=0UL; j<n_cols; j++)
@@ -36,73 +36,29 @@ TEST_CASE("Determinant", "[mat]")
 {
 
 	SECTION("n = 2"){
-		constexpr auto m = []
-		{
-			gmt::mat<int64_t, 2, 2> tmp;
-		
-			tmp[0][0] = 1;
-			tmp[0][1] = 7;
-			tmp[1][0] = 2;
-			tmp[1][1] = 5;
-		
-			return tmp;
-		}();
-		
+		constexpr auto m = gmt::mat{{
+			{ 1LL, 7LL },
+			{ 2LL, 5LL }
+		}};
 		STATIC_REQUIRE(determinant(m) == -9L);
-		
 	}
 
 	SECTION("n = 3"){
-		constexpr auto m = []
-		{
-			gmt::mat<int64_t, 3, 3> tmp;
-		
-			tmp[0][0] = 1;
-			tmp[0][1] = 4;
-			tmp[0][2] = 1;
-			tmp[1][0] = 2;
-			tmp[1][1] = -1;
-			tmp[1][2] = -2;
-			tmp[2][0] = 3;
-			tmp[2][1] = -2;
-			tmp[2][2] = 0;
-		
-			return tmp;
-		}();
-
-		STATIC_REQUIRE(determinant(m) == -29L);
-		
+		constexpr auto m = gmt::mat{{
+			{ 1,  4,  1 },
+			{ 2, -1, -2 },
+			{ 3, -2,  0 }
+		}};
+		STATIC_REQUIRE(determinant(m) == -29);
 	}
 
 	SECTION("n = 4"){
-		constexpr auto m = []
-		{
-			gmt::mat<int64_t, 4, 4> tmp;
-		
-			tmp[0][0] = 1;
-			tmp[0][1] = 4;
-			tmp[0][2] = 1;
-			tmp[0][3] = 1;
-
-			tmp[1][0] = 2;
-			tmp[1][1] = -1;
-			tmp[1][2] = -2;
-			tmp[1][3] = -2;
-
-			tmp[2][0] = 3;
-			tmp[2][1] = -2;
-			tmp[2][2] = 1;
-			tmp[2][3] = -1;
-		
-			tmp[3][0] = 3;
-			tmp[3][1] = -2;
-			tmp[3][2] = -1;
-			tmp[3][3] = 2;
-		
-			return tmp;
-		}();
-
-		STATIC_REQUIRE(determinant(m) == -154L);
-		
+		constexpr auto m = gmt::mat{{
+			{ 1,  4,  1,  1 },
+			{ 2, -1, -2, -2 },
+			{ 3, -2,  1, -1 },
+			{ 3, -2, -1,  2 },
+		}};
+		STATIC_REQUIRE(determinant(m) == -154);
 	}
 }

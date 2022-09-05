@@ -32,6 +32,7 @@ if(ENABLE_TESTING)
 		./tests/gmt-tests.cpp
 		./tests/point.cpp
 		./tests/mat.cpp
+		./tests/mat-inversion.cpp
 		./tests/embedded-point.cpp
 		./tests/cross-product.cpp)
 
@@ -47,6 +48,7 @@ if(ENABLE_PCH)
 		project_options
 		INTERFACE
 		./include/gmt/mat.hpp
+		./include/gmt/mat-inversion.hpp
 		./include/gmt/point-operations.hpp
 		./include/gmt/sphere.hpp
 		./include/gmt/point.hpp
