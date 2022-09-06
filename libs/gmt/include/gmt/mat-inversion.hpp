@@ -11,9 +11,6 @@
 
 namespace gmt {
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
-
 template<typename T, uint64_t Rows, uint64_t Cols>
 class system_has_no_solution : public std::runtime_error {
 public:
@@ -49,9 +46,12 @@ constexpr auto row_operation(
 		m[a][i] = alpha*m[a][i] + beta*m[b][i];
 }
 
-template<typename T, uint64_t Rows, uint64_t Cols>
+template<typename T, uint64_t Rows, uint64_t Cols, class SwapOp, class RowOp>
 constexpr
-void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
+void gaussian_elimination(
+	mat<T, Rows, Cols>& a,
+	SwapOp&& swap_op,
+	RowOp&& row_op)
 {
 	static_assert(Rows > 1 && Cols > 1);
 
@@ -82,7 +82,7 @@ void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
 		 */
 		if(i != max_row){
 			swap_rows(a, i, max_row);
-			swap_rows(b, i, max_row);
+			swap_op(i, max_row);
 		}
 
 		/*
@@ -91,7 +91,7 @@ void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
 		auto const coef = 1./a[i][i];
 		a[i][i] = T{1};
 		row_operation(a, i, i, T{0}, coef, i+1);
-		row_operation(b, i, i, T{0}, coef, 0UL);
+		row_op(i, i, T{0}, coef);
 
 		/*
 		 * Make all cells below the diagonal equal to zero in the `i`-th column
@@ -100,7 +100,7 @@ void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
 			auto const coef = a[j][i];
 			a[j][i] = T{0};
 			row_operation(a, j, i, T{1}, -coef, i+1);
-			row_operation(b, j, i, T{1}, -coef, 0UL);
+			row_op(j, i, T{1}, -coef);
 		}
 
 	}
@@ -118,7 +118,7 @@ void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
 
 			if(coef != 0.0){
 				row_operation(a, r_idx, c_idx, T{1}, -coef, c_idx+1UL);
-				row_operation(b, r_idx, c_idx, T{1}, -coef, 0UL);
+				row_op(r_idx, c_idx, T{1}, -coef);
 			}
 		}
 	}
@@ -130,10 +130,17 @@ void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
  * resolves the system `a`, no format A*x = b
  */
 template<typename T, uint64_t Rows, uint64_t Cols>
-constexpr mat<T, Rows, 1> resolve(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
+constexpr auto resolve(
+	mat<T, Rows, Cols>& a,
+	mat<T, Rows, 1>& b)
 {
-	detail::gaussian_elimination(a, b);
-	return b;
+	detail::gaussian_elimination(
+		a, 
+		[&b](auto i, auto j){ detail::swap_rows(b, i, j); },
+		[&b](auto r, auto c, auto alpha, auto beta){
+			detail::row_operation(b, r, c, alpha, beta, 0UL);
+		}
+	);
 }
 
 };
