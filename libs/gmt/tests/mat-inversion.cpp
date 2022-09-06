@@ -2,22 +2,42 @@
 
 #include "gmt/mat-inversion.hpp"
 
-TEST_CASE("matrix inversion", "[mat-inversion]")
+TEST_CASE("system solving", "[mat-inversion]")
 {
-	constexpr auto a = gmt::mat{
-		std::array{1., 2.},
-		std::array{3., 4.}
-	};
+	{
+	constexpr auto A = gmt::mat{{
+		{1., 2.},
+		{4., 5.}
+	}};
 
-	STATIC_REQUIRE(a == gmt::mat{
-		std::array{1., 2.},
-		std::array{3., 4.}
-	});
+	constexpr auto B = gmt::mat{{
+		{3.},
+		{6.}
+	}};
 
-	STATIC_REQUIRE_FALSE(a == gmt::mat{
-		std::array{4., 3.},
-		std::array{2., 1.}
-	});
+	static constexpr auto x = gmt::resolve(A, B);
+	STATIC_REQUIRE(x == gmt::mat{{
+		{-1.},
+		{2.}
+	}});
+	}
 
-	STATIC_REQUIRE(a == gmt::mat{{{1.,2.}, {3., 4.}}});
+	{
+	constexpr auto A = gmt::mat{{
+		{ 2.f,  1.f, -1.f},
+		{-3.f, -1.f,  2.f},
+		{-2.f,  1.f,  2.f}
+	}};
+
+	constexpr auto B = gmt::mat{{
+		{  8.f},
+		{-11.f},
+		{- 3.f}
+	}};
+
+	static constexpr auto x = gmt::resolve(A, B);
+	STATIC_REQUIRE(x[0][0] == 2.f);
+	STATIC_REQUIRE(x[1][0] == 2.99999976f);
+	STATIC_REQUIRE(x[2][0] == -0.99999994f);
+	}
 }
