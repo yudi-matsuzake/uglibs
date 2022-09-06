@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ranges>
 #include <cmath>
 #include <assert.h>
 #include <stdexcept>
@@ -10,19 +11,24 @@
 
 namespace gmt {
 
-template<typename T, uint64_t l, uint64_t c>
+namespace rgs = std::ranges;
+namespace vws = std::views;
+
+template<typename T, uint64_t Rows, uint64_t Cols>
 class system_has_no_solution : public std::runtime_error {
 public:
-	system_has_no_solution(const mat<T, l, c>& A, const mat<T, l, 1> B)
+	system_has_no_solution(const mat<T, Rows, Cols>& A, const mat<T, Rows, 1> B)
 		: std::runtime_error(
 			"linear algebra error:"
 			" system has no solution"),
 		  A(A), B(B)
 	{}
 
-	mat<T, l, c> A;
-	mat<T, l, 1> B;
+	mat<T, Rows, Cols> A;
+	mat<T, Rows, 1> B;
 };
+
+namespace detail{
 
 template<class T>
 constexpr auto swap_rows(T& a, auto i, auto j)
@@ -30,26 +36,35 @@ constexpr auto swap_rows(T& a, auto i, auto j)
 	swap(a[i], a[j]);
 }
 
-template<typename T, uint64_t l, uint64_t c>
-constexpr
-mat<T, l, 1> gaussian_elimination(mat<T, l, c> const& a, mat<T, l, 1> const& b)
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto row_operation(
+	mat<T, Rows, Cols>& m,
+	auto a,
+	auto b,
+	auto alpha,
+	auto beta,
+	auto first_column)
 {
-	static_assert(l > 1 && c > 1);
+	for(auto i=first_column; i<Cols; ++i)
+		m[a][i] = alpha*m[a][i] + beta*m[b][i];
+}
 
-	mat<T, l, c> A = a;
-	mat<T, l, 1> B = b;
-	mat<T, l, 1> x;
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr
+void gaussian_elimination(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
+{
+	static_assert(Rows > 1 && Cols > 1);
 
-	for(uint64_t i=0; i<A.n_row; i++){
+	for(uint64_t i=0; i<a.n_row; i++){
 
 		/*
 		 * search for the maximal value in this column
 		 */
-		T max = std::abs(A[i][i]);
+		T max = std::abs(a[i][i]);
 		uint64_t max_row = i;
 
-		for(uint64_t j=i+1; j< A.n_row; j++){
-			T tmp = std::abs(A[j][i]);
+		for(uint64_t j=i+1; j< a.n_row; ++j){
+			T tmp = std::abs(a[j][i]);
 			if(tmp > max){
 				max_row = j;
 				max = tmp;
@@ -57,69 +72,68 @@ mat<T, l, 1> gaussian_elimination(mat<T, l, c> const& a, mat<T, l, 1> const& b)
 		}
 
 		/*
-		 * if A[max_row][i] was equal to zero, the system might
-		 * not have a solution
+		 * no pivot in this column
 		 */
-		if(A[max_row][i] == 0){
-			if(max_row <= (A.n_col-1))
-				throw system_has_no_solution<T, l, c>(a, b);
-			else
-				break; // overdetermined
-		}
+		if(a[max_row][i] == 0.0)
+			continue;
 
 		/*
 		 * swap the maximum row with the current
 		 */
 		if(i != max_row){
-			swap_rows(A, i, max_row);
-			swap_rows(B, i, max_row);
+			swap_rows(a, i, max_row);
+			swap_rows(b, i, max_row);
 		}
 
 		/*
-		 * Make all rows below this zero in the current column
+		 * make element in the diagonal equal to 1
 		 */
-		for(size_t j = i+1; j< A.n_row; j++){
-			T coef = A[j][i]/A[i][i];
+		auto const coef = 1./a[i][i];
+		a[i][i] = T{1};
+		row_operation(a, i, i, T{0}, coef, i+1);
+		row_operation(b, i, i, T{0}, coef, 0UL);
 
-			for(size_t k=i; k<A.n_col; k++){
-				if(i == k)
-					A[j][k] = 0;
-				else
-					A[j][k] -= coef*A[i][k];
-			}
-
-			B[j][0] -= coef*B[i][0];
+		/*
+		 * Make all cells below the diagonal equal to zero in the `i`-th column
+		 */
+		for(size_t j = i+1; j< a.n_row; ++j){
+			auto const coef = a[j][i];
+			a[j][i] = T{0};
+			row_operation(a, j, i, T{1}, -coef, i+1);
+			row_operation(b, j, i, T{1}, -coef, 0UL);
 		}
 
 	}
 
 	/*
-	 * resolve x with the diagonal
+	 * make all elements above diagonal equal to zero
 	 */
-	size_t i = A.n_row;
-	do{
-		i--;
-		x[i][0] = B[i][0]/A[i][i];
-		size_t j = i;
+	for(auto i=1UL; i<a.n_row; ++i){
+		auto const c_idx = a.n_row - i;
 
-		if(j != 0){
-			do{
-				j--;
-				B[j][0] -= A[j][i] * x[i][0];
-			}while(j != 0);
+		for(auto j=i+1UL; j<=a.n_row; ++j){
+			auto const r_idx = a.n_row - j;
+			auto const coef = a[r_idx][c_idx];
+			a[r_idx][c_idx] = T{0};
+
+			if(coef != 0.0){
+				row_operation(a, r_idx, c_idx, T{1}, -coef, c_idx+1UL);
+				row_operation(b, r_idx, c_idx, T{1}, -coef, 0UL);
+			}
 		}
-	}while(i != 0);
-
-	return x;
+	}
 }
+
+} // end of namespace detail
 
 /**
  * resolves the system `a`, no format A*x = b
  */
-template<typename T, uint64_t l, uint64_t c>
-constexpr mat<T, l, 1> resolve(const mat<T, l, c>& a, const mat<T, l, 1>& b)
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr mat<T, Rows, 1> resolve(mat<T, Rows, Cols>& a, mat<T, Rows, 1>& b)
 {
-	return gaussian_elimination(a, b);
+	detail::gaussian_elimination(a, b);
+	return b;
 }
 
 };

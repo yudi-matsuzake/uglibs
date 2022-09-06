@@ -48,6 +48,16 @@ mat(R&&, Rows&&...) -> mat<
 	std::tuple_size_v<R>
 >;
 
+template<class T, uint64_t N>
+constexpr auto make_identity_matrix()
+{
+	mat<T, N, N> m;
+	for(auto i=0UL; i<N; ++i)
+		for(auto j=0UL; j<N; ++j)
+			m[i][j] = (i == j)? T{1} : T{0};
+	return m;
+}
+
 template<class T>
 constexpr auto determinant(mat<T, 1, 1> const& m)
 {

@@ -4,40 +4,57 @@
 
 TEST_CASE("system solving", "[mat-inversion]")
 {
-	{
-	constexpr auto A = gmt::mat{{
-		{1., 2.},
-		{4., 5.}
-	}};
+	STATIC_REQUIRE(gmt::mat{{
+		{ 1., 0. },
+		{ 0., 1. }
+	}} == gmt::make_identity_matrix<double, 2>());
 
-	constexpr auto B = gmt::mat{{
-		{3.},
-		{6.}
-	}};
+	STATIC_REQUIRE(gmt::mat{{
+		{ 1., 0., 0. },
+		{ 0., 1., 0. },
+		{ 0., 0., 1. }
+	}} == gmt::make_identity_matrix<double, 3>());
 
-	static constexpr auto x = gmt::resolve(A, B);
-	STATIC_REQUIRE(x == gmt::mat{{
-		{-1.},
-		{2.}
-	}});
+	SECTION("2x3"){
+		auto A = gmt::mat{{
+			{1., 2.},
+			{4., 5.}
+		}};
+
+		auto b = gmt::mat{{
+			{3.},
+			{6.}
+		}};
+
+		auto x = gmt::resolve(A, b);
+		REQUIRE(x == gmt::mat{{
+			{-1.},
+			{2.}
+		}});
+
+		REQUIRE(A == gmt::make_identity_matrix<double, 2>());
 	}
 
-	{
-	constexpr auto A = gmt::mat{{
-		{ 2.f,  1.f, -1.f},
-		{-3.f, -1.f,  2.f},
-		{-2.f,  1.f,  2.f}
-	}};
+	SECTION("3x4"){
+		auto A = gmt::mat{{
+			{ 2.,  1., -1.},
+			{-3., -1.,  2.},
+			{-2.,  1.,  2.}
+		}};
 
-	constexpr auto B = gmt::mat{{
-		{  8.f},
-		{-11.f},
-		{- 3.f}
-	}};
+		auto B = gmt::mat{{
+			{  8.},
+			{-11.},
+			{- 3.}
+		}};
 
-	static constexpr auto x = gmt::resolve(A, B);
-	STATIC_REQUIRE(x[0][0] == 2.f);
-	STATIC_REQUIRE(x[1][0] == 2.99999976f);
-	STATIC_REQUIRE(x[2][0] == -0.99999994f);
+		gmt::resolve(A, B);
+		REQUIRE(A == gmt::make_identity_matrix<double, 3>());
+		INFO("B[0] = " << B[0][0]);
+		INFO("B[1] = " << B[1][0]);
+		INFO("B[2] = " << B[2][0]);
+		REQUIRE(B[0][0] == 2.);
+		REQUIRE(B[1][0] == 3.);
+		REQUIRE(B[2][0] == -0.99999999999999989);
 	}
 }
