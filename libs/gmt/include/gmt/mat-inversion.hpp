@@ -55,7 +55,8 @@ void gaussian_elimination(
 {
 	static_assert(Rows > 1 && Cols > 1);
 
-	for(uint64_t i=0; i<a.n_row; i++){
+	constexpr auto m = std::min(a.n_row, a.n_col);
+	for(uint64_t i=0; i<m; i++){
 
 		/*
 		 * search for the maximal value in this column
@@ -108,11 +109,11 @@ void gaussian_elimination(
 	/*
 	 * make all elements above diagonal equal to zero
 	 */
-	for(auto i=1UL; i<a.n_row; ++i){
-		auto const c_idx = a.n_row - i;
+	for(auto i=1UL; i<m; ++i){
+		auto const c_idx = m - i;
 
-		for(auto j=i+1UL; j<=a.n_row; ++j){
-			auto const r_idx = a.n_row - j;
+		for(auto j=i+1UL; j<=m; ++j){
+			auto const r_idx = m - j;
 			auto const coef = a[r_idx][c_idx];
 			a[r_idx][c_idx] = T{0};
 
@@ -124,7 +125,56 @@ void gaussian_elimination(
 	}
 }
 
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr
+void gaussian_elimination(mat<T, Rows, Cols>& a)
+{
+
+	constexpr auto empty_swap = [](auto i, auto j){};
+	constexpr auto empty_row = [](auto ri, auto rj, bool alpha, bool beta)
+	{};
+
+	gaussian_elimination(a, empty_swap, empty_row);
+}
+
 } // end of namespace detail
+
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto rank(mat<T, Rows, Cols>& a)
+{
+	detail::gaussian_elimination(a);
+
+	std::array<uint64_t, Rows> r;
+	std::array<uint64_t, Cols> c;
+
+	rgs::fill(r, 0UL);
+	rgs::fill(c, 0UL);
+
+	auto n_rows = 0UL, n_cols = 0UL;
+	for(auto i=0UL; i<Rows; ++i){
+		for(auto j=0UL; j<Cols; ++j){
+			if(a[i][j] == T{0}){
+				r[i]++;
+				c[j]++;
+
+				if(r[i] == Cols)
+					++n_rows;
+				if(c[j] == Rows)
+					++n_cols;
+			}
+		}
+	}
+
+	return std::min(Rows - n_rows, Cols - n_cols);
+}
+
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto rank(mat<T, Rows, Cols> const& a)
+{
+	auto M = a;
+	return rank(M);
+}
+
 
 /**
  * resolves the system `a`, no format A*x = b
@@ -142,5 +192,16 @@ constexpr auto resolve(
 		}
 	);
 }
+
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto resolve(
+	mat<T, Rows, Cols> const& a,
+	mat<T, Rows, 1> const& b)
+{
+	auto A = a;
+	auto B = b;
+	return resolve(A, B);
+}
+
 
 };

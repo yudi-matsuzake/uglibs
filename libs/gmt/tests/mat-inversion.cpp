@@ -51,7 +51,7 @@ static constexpr auto test_3x4()
 	return a_is_identity && b_is_solved;
 }
 
-TEST_CASE("system solving", "[mat-inversion]")
+TEST_CASE("identity matrix", "[mat-inversion]")
 {
 	STATIC_REQUIRE(gmt::mat{{
 		{ 1., 0. },
@@ -64,7 +64,70 @@ TEST_CASE("system solving", "[mat-inversion]")
 		{ 0., 0., 1. }
 	}} == gmt::make_identity_matrix<double, 3>());
 
+	STATIC_REQUIRE(gmt::mat{{
+		{ 1., 0., 0., 0. },
+		{ 0., 1., 0., 0. },
+		{ 0., 0., 1., 0. },
+		{ 0., 0., 0., 1. }
+	}} == gmt::make_identity_matrix<double, 4>());
+}
+
+TEST_CASE("system solving", "[mat-inversion]")
+{
 	STATIC_REQUIRE(test_2x3());
 	STATIC_REQUIRE(test_3x4());
+}
 
+TEST_CASE("rank", "[mat-inversion]")
+{
+	{
+	constexpr auto m = gmt::mat{{
+		{  1.,  0., 1. },
+		{ -2., -3., 1. },
+		{  3.,  3., 0. }
+	}};
+	STATIC_REQUIRE(gmt::rank(m) == 2);
+	STATIC_REQUIRE_FALSE(gmt::rank(m) == 3);
+	STATIC_REQUIRE_FALSE(gmt::rank(m) == 1);
+	}
+
+	{
+	constexpr auto m = gmt::mat{{
+		{  1.,  1., 0.,  2. },
+		{ -1., -1., 0., -2. },
+	}};
+	STATIC_REQUIRE(gmt::rank(m) == 1);
+	}
+
+	{
+	constexpr auto m = gmt::mat{{
+		{ 1., -1. },
+		{ 1., -1. },
+		{ 0.,  0. },
+		{ 2., -2. },
+	}};
+	STATIC_REQUIRE(gmt::rank(m) == 1);
+	}
+
+	{
+	constexpr auto m = gmt::mat{{
+		{ 1., 2. },
+		{ 3., 6. }
+	}};
+	STATIC_REQUIRE(gmt::rank(m) == 1);
+	}
+
+	/*
+	 * TODO: make this example work
+	 * 	this example do not work because of floating point
+	 * 	rounding errors
+	 */
+	/* { */
+	/* constexpr auto m = gmt::mat{{ */
+	/* 	{  1.f,  2.f, 1.f }, */
+	/* 	{ -2.f, -3.f, 1.f }, */
+	/* 	{  3.f,  5.f, 0.f } */
+	/* }}; */
+	/* STATIC_REQUIRE(gmt::rank(m) == 2); */
+	/* } */
 }
