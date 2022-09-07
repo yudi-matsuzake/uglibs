@@ -203,5 +203,23 @@ constexpr auto resolve(
 	return resolve(A, B);
 }
 
+template<typename T, uint64_t N>
+constexpr auto inverse(mat<T, N, N> const& m)
+{
+	auto inv = make_identity_matrix<T, N>();
+
+	auto a = m;
+
+	detail::gaussian_elimination(
+		a, 
+		[&inv](auto i, auto j){ detail::swap_rows(inv, i, j); },
+		[&inv](auto r, auto c, auto alpha, auto beta){
+			detail::row_operation(inv, r, c, alpha, beta, 0UL);
+		}
+	);
+
+	return inv;
+}
+
 
 };

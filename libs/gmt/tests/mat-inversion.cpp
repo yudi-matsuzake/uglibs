@@ -131,3 +131,59 @@ TEST_CASE("rank", "[mat-inversion]")
 	/* STATIC_REQUIRE(gmt::rank(m) == 2); */
 	/* } */
 }
+
+template<class T, uint64_t N>
+static constexpr auto test_for()
+{
+	auto const inv = gmt::inverse(gmt::make_identity_matrix<T, N>());
+	return inv == gmt::make_identity_matrix<T, N>();
+};
+
+TEST_CASE("inversion", "[mat-inversion]")
+{
+
+	{
+	constexpr auto m = gmt::mat{{
+		{  1.,  2. },
+		{ -2., -3. }
+	}};
+
+	STATIC_REQUIRE(gmt::inverse(m) == gmt::mat{{
+		{ -3., -2. },
+		{  2.,  1. },
+	}});
+	}
+
+	STATIC_REQUIRE(test_for<double, 2>());
+	STATIC_REQUIRE(test_for<double, 3>());
+	STATIC_REQUIRE(test_for<double, 4>());
+
+	/*
+	 * TODO: make these examples work
+	 */
+	/* { */
+	/* Catch::StringMaker<double>::precision = std::numeric_limits<double>::max_digits10; */
+	/* constexpr auto m = gmt::mat{{ */
+	/* 	{ 1.,  2.,  3. }, */
+	/* 	{ 3.,  2.,  1. }, */
+	/* 	{ 2.,  1.,  3. } */
+	/* }}; */
+	/* REQUIRE(gmt::inverse(m) == gmt::mat{{ */
+	/* 	{ -5./12.,   1./4.,  1./3. }, */
+	/* 	{ 7./12.,   1./4., -2./3. }, */
+	/* 	{ 1./12., -1./4.,  1./3. }, */
+	/* }}); */
+	/* } */
+	/* { */
+	/* constexpr auto m = gmt::mat{{ */
+	/* 	{ 1.,  4.,  1. }, */
+	/* 	{ 2., -1., -2. }, */
+	/* 	{ 3., -2.,  0. } */
+	/* }}; */
+	/* REQUIRE(gmt::inverse(m) == gmt::mat{{ */
+	/* 	{ 4./29.,   2./29.,  7./29. }, */
+	/* 	{ 6./29.,   3./29., -4./29. }, */
+	/* 	{ 1./29., -14./29.,  9./29. }, */
+	/* }}); */
+	/* } */
+}
