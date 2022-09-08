@@ -35,6 +35,7 @@ TEST_CASE("matrix initialization", "[mat]")
 
 	STATIC_REQUIRE(a == gmt::mat{{{1.,2.}, {3., 4.}}});
 }
+
 TEST_CASE("Simple operations on mat", "[mat]")
 {
 
@@ -79,5 +80,94 @@ TEST_CASE("Determinant", "[mat]")
 			{ 3, -2, -1,  2 },
 		}};
 		STATIC_REQUIRE(determinant(m) == -154);
+	}
+}
+
+TEST_CASE("mat multiplication", "[mat]")
+{
+	static constexpr auto mult_with_identity = []<class T, uint64_t N>
+		(gmt::mat<T, N, N> const& a)
+	{
+		auto I = gmt::make_identity_matrix<T, N>();
+		return a*I == a;
+	};
+
+	SECTION("identity"){
+		STATIC_REQUIRE(mult_with_identity(
+			gmt::make_identity_matrix<int64_t, 1>()
+		));
+		STATIC_REQUIRE(mult_with_identity(
+			gmt::make_identity_matrix<int64_t, 2>()
+		));
+		STATIC_REQUIRE(mult_with_identity(
+			gmt::make_identity_matrix<int64_t, 3>()
+		));
+		STATIC_REQUIRE(mult_with_identity(
+			gmt::make_identity_matrix<int64_t, 4>()
+		));
+		STATIC_REQUIRE(mult_with_identity(
+			gmt::make_identity_matrix<int64_t, 5>()
+		));
+	}
+
+	SECTION("2x2"){
+		static constexpr auto a = gmt::mat{{
+			{ 1,  2 },
+			{ 5,  6 }
+		}};
+
+		STATIC_REQUIRE(mult_with_identity(a));
+
+		static constexpr auto b = gmt::mat{{
+			{ 6,  5 },
+			{ 2,  1 }
+		}};
+
+		STATIC_REQUIRE(a*b == gmt::mat{{
+			{10, 7},
+			{42, 31}
+		}});
+	}
+
+	SECTION("3x3"){
+		static constexpr auto a = gmt::mat{{
+			{ 1,   2,  3 },
+			{ 5,   6,  7 },
+			{ 9,  10, 11 },
+		}};
+		STATIC_REQUIRE(mult_with_identity(a));
+
+		static constexpr auto b = gmt::mat{{
+			{ 11, 10, 9 },
+			{  7,  6, 5 },
+			{  3,  2, 1 },
+		}};
+
+		STATIC_REQUIRE(a*b == gmt::mat{{
+			{ 34,  28,  22},
+			{118, 100,  82},
+			{202, 172, 142}
+		}});
+	}
+
+	SECTION("5x2"){
+		static constexpr auto a = gmt::mat{{
+			{ 1,  2},
+			{ 3,  4},
+			{ 5,  6},
+			{ 7,  8},
+			{ 9, 10}
+		}};
+		static constexpr auto b = gmt::mat{{
+			{ 1, 2, 3, 4, 5 },
+			{ 6, 7, 8, 9, 10}
+		}};
+		STATIC_REQUIRE(a*b == gmt::mat{{
+			{ 13, 16,  19,  22,  25 },
+			{ 27, 34,  41,  48,  55 },
+			{ 41, 52,  63,  74,  85 },
+			{ 55, 70,  85, 100, 115 },
+			{ 69, 88, 107, 126, 145 }
+		}});
 	}
 }

@@ -48,6 +48,24 @@ mat(R&&, Rows&&...) -> mat<
 	std::tuple_size_v<R>
 >;
 
+template<class T, uint64_t N, uint64_t M, uint64_t K>
+[[nodiscard]] constexpr
+auto operator*(mat<T, N, M> const& a, mat<T, M, K> const& b) -> mat<T, N, K>
+{
+	mat<T, N, K> r;
+
+	for(auto i=0UL; i<N; ++i){
+		for(auto j=0UL; j<K; ++j){
+			r[i][j] = T{0};
+
+			for(auto k=0UL; k<M; ++k)
+				r[i][j] += a[i][k] * b[k][j];
+		}
+	}
+
+	return r;
+}
+
 template<class T, uint64_t N>
 constexpr auto make_identity_matrix()
 {
@@ -99,6 +117,5 @@ constexpr auto determinant(mat<T, N, N> const& m)
 
 	return det;
 }
-
 
 } // end of namespace gmt
