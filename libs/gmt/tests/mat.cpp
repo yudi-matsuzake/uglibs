@@ -171,3 +171,11 @@ TEST_CASE("mat multiplication", "[mat]")
 		}});
 	}
 }
+
+TEST_CASE("translation matrix", "[mat]")
+{
+	using vec_t = gmt::vector<double, 3>;
+	constexpr auto t = gmt::make_translation_matrix(vec_t{1., 2., 3.});
+	STATIC_REQUIRE(t*vec_t::all(0.0) == vec_t{ 1., 2., 3. });
+	STATIC_REQUIRE(t*t*vec_t::all(0.0) == vec_t{ 2., 4., 6. });
+}

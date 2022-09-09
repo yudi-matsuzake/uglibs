@@ -6,6 +6,9 @@
 #include <array>
 #include <vector>
 
+#include "gmt/point.hpp"
+#include "gmt/vector.hpp"
+
 namespace gmt{
 
 namespace rgs = std::ranges;
@@ -67,6 +70,27 @@ auto operator*(mat<T, N, M> const& a, mat<T, M, K> const& b) -> mat<T, N, K>
 	return r;
 }
 
+template<class T, uint64_t N, class C>
+[[nodiscard]] constexpr
+auto operator*(mat<T, N+1UL, N+1UL> const& m, point<T, N, C> const& v) -> point<T, N, C>
+{
+
+	auto rm = [&]{
+		mat<T, N+1UL, 1UL> vm;
+		for(auto i=0UL; i<N; ++i)
+			vm[i].front() = v[i];
+		vm.back().front() = T{1};
+
+		return m*vm;
+	}();
+
+	C r;
+	for(auto i=0UL; i<N; ++i)
+		r[i] = rm[i].front();
+
+	return r;
+}
+
 template<class T, uint64_t N>
 constexpr auto make_identity_matrix()
 {
@@ -119,9 +143,16 @@ constexpr auto determinant(mat<T, N, N> const& m)
 	return det;
 }
 
-/* template<class T, uint64_t N, class C> */
-/* constexpr auto make_translation_matrix(vector<T, N, C> const& t) */
-/* { */
-/* } */
+template<class T, uint64_t N, class C>
+constexpr auto make_translation_matrix(vector<T, N, C> const& t)
+{
+	constexpr auto identity = make_identity_matrix<T, N+1UL>();
+
+	auto tm = identity;
+	for(auto i=0; i<N; ++i)
+		tm[i].back() = t[i];
+
+	return tm;
+}
 
 } // end of namespace gmt
