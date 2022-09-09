@@ -14,7 +14,7 @@ static constexpr auto test_2x3()
 		{6.}
 	}};
 
-	gmt::resolve(A, b);
+	gmt::detail::resolve(A, b);
 
 	auto a_is_identity = A == gmt::make_identity_matrix<double, 2>();
 	auto b_is_solved = b == gmt::mat{{
@@ -39,7 +39,7 @@ static constexpr auto test_3x4()
 		{- 3.}
 	}};
 
-	gmt::resolve(A, b);
+	gmt::detail::resolve(A, b);
 
 	auto a_is_identity = A == gmt::make_identity_matrix<double, 3>();
 	auto b_is_solved = b == gmt::mat{{

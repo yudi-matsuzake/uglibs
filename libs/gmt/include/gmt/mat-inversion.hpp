@@ -137,8 +137,6 @@ void gaussian_elimination(mat<T, Rows, Cols>& a)
 	gaussian_elimination(a, empty_swap, empty_row);
 }
 
-} // end of namespace detail
-
 template<typename T, uint64_t Rows, uint64_t Cols>
 constexpr auto rank(mat<T, Rows, Cols>& a)
 {
@@ -168,14 +166,6 @@ constexpr auto rank(mat<T, Rows, Cols>& a)
 	return std::min(Rows - n_rows, Cols - n_cols);
 }
 
-template<typename T, uint64_t Rows, uint64_t Cols>
-constexpr auto rank(mat<T, Rows, Cols> const& a)
-{
-	auto M = a;
-	return rank(M);
-}
-
-
 /**
  * resolves the system `a`, no format A*x = b
  */
@@ -193,6 +183,15 @@ constexpr auto resolve(
 	);
 }
 
+} // end of namespace detail
+
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto rank(mat<T, Rows, Cols> const& a)
+{
+	auto M = a;
+	return detail::rank(M);
+}
+
 template<typename T, uint64_t Rows, uint64_t Cols>
 constexpr auto resolve(
 	mat<T, Rows, Cols> const& a,
@@ -200,7 +199,8 @@ constexpr auto resolve(
 {
 	auto A = a;
 	auto B = b;
-	return resolve(A, B);
+	resolve(A, B);
+	return B;
 }
 
 template<typename T, uint64_t N>
@@ -220,6 +220,5 @@ constexpr auto inverse(mat<T, N, N> const& m)
 
 	return inv;
 }
-
 
 };

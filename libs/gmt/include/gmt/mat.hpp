@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cinttypes>
 #include <array>
+#include <vector>
 
 namespace gmt{
 
@@ -117,5 +118,10 @@ constexpr auto determinant(mat<T, N, N> const& m)
 
 	return det;
 }
+
+/* template<class T, uint64_t N, class C> */
+/* constexpr auto make_translation_matrix(vector<T, N, C> const& t) */
+/* { */
+/* } */
 
 } // end of namespace gmt
