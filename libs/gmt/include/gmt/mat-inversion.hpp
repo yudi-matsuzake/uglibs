@@ -1,29 +1,14 @@
 #pragma once
 
-#include <ranges>
 #include <cmath>
-#include <assert.h>
-#include <stdexcept>
+#include <ranges>
+#include <optional>
 
 #include <list>
 
 #include "gmt/mat.hpp"
 
 namespace gmt {
-
-template<typename T, uint64_t Rows, uint64_t Cols>
-class system_has_no_solution : public std::runtime_error {
-public:
-	system_has_no_solution(const mat<T, Rows, Cols>& A, const mat<T, Rows, 1> B)
-		: std::runtime_error(
-			"linear algebra error:"
-			" system has no solution"),
-		  A(A), B(B)
-	{}
-
-	mat<T, Rows, Cols> A;
-	mat<T, Rows, 1> B;
-};
 
 namespace detail{
 
@@ -205,8 +190,10 @@ constexpr auto resolve(
 
 template<typename T, uint64_t N>
 constexpr auto inverse(mat<T, N, N> const& m)
+	-> std::optional<mat<T, N, N>>
 {
-	auto inv = make_identity_matrix<T, N>();
+	constexpr auto identity = make_identity_matrix<T, N>();
+	auto inv = identity;
 
 	auto a = m;
 
@@ -217,6 +204,9 @@ constexpr auto inverse(mat<T, N, N> const& m)
 			detail::row_operation(inv, r, c, alpha, beta, 0UL);
 		}
 	);
+
+	if(a != identity)
+		return std::nullopt;
 
 	return inv;
 }

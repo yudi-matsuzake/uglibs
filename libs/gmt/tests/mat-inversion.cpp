@@ -136,27 +136,38 @@ template<class T, uint64_t N>
 static constexpr auto test_for()
 {
 	auto const inv = gmt::inverse(gmt::make_identity_matrix<T, N>());
-	return inv == gmt::make_identity_matrix<T, N>();
+	return inv.has_value()
+		&& inv.value() == gmt::make_identity_matrix<T, N>();
 };
 
 TEST_CASE("inversion", "[mat-inversion]")
 {
 
-	{
-	constexpr auto m = gmt::mat{{
-		{  1.,  2. },
-		{ -2., -3. }
-	}};
+	SECTION("simple test"){
+		constexpr auto m = gmt::mat{{
+			{  1.,  2. },
+			{ -2., -3. }
+		}};
 
-	STATIC_REQUIRE(gmt::inverse(m) == gmt::mat{{
-		{ -3., -2. },
-		{  2.,  1. },
-	}});
+		STATIC_REQUIRE(gmt::inverse(m).value() == gmt::mat{{
+			{ -3., -2. },
+			{  2.,  1. },
+		}});
 	}
 
-	STATIC_REQUIRE(test_for<double, 2>());
-	STATIC_REQUIRE(test_for<double, 3>());
-	STATIC_REQUIRE(test_for<double, 4>());
+	SECTION("test for identity matrices"){
+		STATIC_REQUIRE(test_for<double, 2>());
+		STATIC_REQUIRE(test_for<double, 3>());
+		STATIC_REQUIRE(test_for<double, 4>());
+	}
+
+	SECTION("test when there is no inverse"){
+		STATIC_REQUIRE_FALSE(gmt::inverse(gmt::mat{{
+			{ 1., 2., 3. },
+			{ 4., 5., 6. },
+			{ 7., 8., 9. }
+		}}).has_value());
+	}
 
 	/*
 	 * TODO: make these examples work
