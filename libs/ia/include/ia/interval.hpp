@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <iostream>
 #include <algorithm>
 #include <limits>
@@ -392,3 +393,13 @@ auto operator*=(interval<A>& a, S scalar)
 }
 
 } // end of namespace ia
+
+template<class T>
+struct std::common_type<T, ia::interval<T>> {
+	using type = ia::interval<T>;
+};
+
+template<class T>
+struct std::common_type<ia::interval<T>, T> {
+	using type = ia::interval<T>;
+};

@@ -74,10 +74,12 @@ void gaussian_elimination(
 		/*
 		 * make element in the diagonal equal to 1
 		 */
-		auto const coef = 1./a[i][i];
-		a[i][i] = T{1};
-		row_operation(a, i, i, T{0}, coef, i+1);
-		row_op(i, i, T{0}, coef);
+		{
+			auto const coef = 1./a[i][i];
+			a[i][i] = T{1};
+			row_operation(a, i, i, T{0}, coef, i+1);
+			row_op(i, i, T{0}, coef);
+		}
 
 		/*
 		 * Make all cells below the diagonal equal to zero in the `i`-th column
