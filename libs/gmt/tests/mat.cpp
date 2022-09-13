@@ -199,7 +199,7 @@ TEST_CASE("basis matrix", "[mat]")
 {
 
 	SECTION("simple initialization"){
-		constexpr auto m = gmt::make_basis_matrix(
+		constexpr auto m = gmt::make_basis_column_matrix(
 			gmt::vector{{ 1., 2., 3. }},
 			gmt::vector{{ 4., 5., 6. }},
 			gmt::vector{{ 7., 8., 9. }}
@@ -213,7 +213,7 @@ TEST_CASE("basis matrix", "[mat]")
 	}
 
 
-	constexpr auto b = gmt::make_basis_matrix(
+	constexpr auto b = gmt::make_basis_column_matrix(
 		gmt::vector{{ 1., 2., 3. }},
 		gmt::vector{{ 1., 0., 1. }}
 	);
@@ -226,4 +226,21 @@ TEST_CASE("basis matrix", "[mat]")
 
 	INFO("x = " << x[0][0] << ' ' << x[0][1] << ' ' << x[0][2]);
 	STATIC_REQUIRE(x == to_mat(gmt::vector{{ -3., 11., 0.0}}));
+}
+
+TEST_CASE("projection matrix", "[mat]")
+{
+	SECTION("example a"){
+		constexpr auto a = make_basis_column_matrix(
+			gmt::vector{{ 1., 0., 0., 1. }},
+			gmt::vector{{ 0., 1., 0., 1. }}
+		);
+
+		STATIC_REQUIRE(make_projection_matrix(a) == 1./3. * gmt::mat{{
+			{  2., -1., 0., 1. },
+			{ -1.,  2., 0., 1. },
+			{  0.,  0., 0., 0. },
+			{  1.,  1., 0., 2. }
+		}});
+	}
 }

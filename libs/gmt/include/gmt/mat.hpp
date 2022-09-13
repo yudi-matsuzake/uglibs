@@ -125,6 +125,31 @@ auto operator*(mat<T, R, C> const& m, vector<Q, C, Op> const& v)
 	return r;
 }
 
+template<class T, uint64_t R, uint64_t C>
+[[nodiscard]] constexpr
+auto operator*(mat<T, R, C> const& a, T const& s)
+{
+	using result_t = mat<T, R, C>;
+
+	result_t r;
+
+	for(auto i : vws::iota(0UL, R)){
+		for(auto j : vws::iota(0UL, C)){
+			r[i][j] = a[i][j] * s;
+		}
+	}
+
+	return r;
+}
+
+template<class T, class Q, uint64_t R, uint64_t C>
+	requires std::common_with<T, Q>
+[[nodiscard]] constexpr
+auto operator*(Q const& s, mat<T, R, C> const& a)
+{
+	return a*s;
+}
+
 template<class T, uint64_t N>
 constexpr auto make_identity_matrix()
 {
@@ -205,14 +230,14 @@ namespace detail{
 
 template<class Matrix, class First, class ... PointType>
 [[nodiscard]] inline constexpr
-auto make_basis_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
+auto make_basis_column_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
 	noexcept
 {
 	for(auto i : vws::iota(0UL, m.n_row))
 		m[i][col] = p[i];
 
 	if constexpr(sizeof...(PointType)){
-		make_basis_matrix(
+		make_basis_column_matrix(
 			m,
 			col+1UL,
 			std::forward<PointType>(vecs) ...
@@ -223,7 +248,7 @@ auto make_basis_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
 } // end of namespace detail
 
 template<class First, class ... PointType>
-[[nodiscard]] constexpr auto make_basis_matrix(
+[[nodiscard]] constexpr auto make_basis_column_matrix(
 	First&& p,
 	PointType&& ... vecs) noexcept
 {
@@ -234,13 +259,30 @@ template<class First, class ... PointType>
 	>;
 
 	result_t m;
-	detail::make_basis_matrix(
+	detail::make_basis_column_matrix(
 		m,
 		0UL,
 		std::forward<First>(p),
 		std::forward<PointType>(vecs)...
 	);
 	return m;
+}
+
+template<class T, uint64_t R, uint64_t C>
+[[nodiscard]] constexpr
+auto make_projection_matrix(mat<T, R, C> const& a)
+{
+	auto const t = transpose(a);
+	auto const& inv = inverse(t*a).value();
+	return a * inv * t;
+}
+
+template<class T, uint64_t R, uint64_t C>
+[[nodiscard]] constexpr
+auto make_orthonormal_projection_matrix(mat<T, R, C> const& a) noexcept
+{
+	auto const t = transpose(a);
+	return a * t;
 }
 
 } // end of namespace gmt
