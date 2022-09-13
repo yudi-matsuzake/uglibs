@@ -12,7 +12,6 @@
 namespace gmt{
 
 namespace rgs = std::ranges;
-namespace vws = std::views;
 
 template<class T, uint64_t Row, uint64_t Col>
 class mat : public std::array<std::array<T, Col>, Row>{

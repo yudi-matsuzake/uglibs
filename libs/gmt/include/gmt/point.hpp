@@ -58,6 +58,12 @@ public:
 		: std::array<T, N>{ args ...  }
 	{}
 
+	constexpr point(T const (&a)[N]) noexcept
+	{
+		for(auto i=0UL; i<N; ++i)
+			(*this)[i] = a[i];
+	}
+
 };
 
 template<class ToPointType, class PointType>
