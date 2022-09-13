@@ -12,6 +12,7 @@
 namespace gmt{
 
 namespace rgs = std::ranges;
+namespace vws = std::views;
 
 template<class T, uint64_t Row, uint64_t Col>
 class mat : public std::array<std::array<T, Col>, Row>{
@@ -174,6 +175,18 @@ constexpr auto determinant(mat<T, N, N> const& m)
 	}
 
 	return det;
+}
+
+template<class T, uint64_t R, uint64_t C>
+constexpr auto transpose(mat<T, R, C> const& m)
+{
+	mat<T, C, R> t;
+
+	for(auto r : vws::iota(0UL, R))
+		for(auto c : vws::iota(0UL, C))
+			t[c][r] = m[r][c];
+
+	return t;
 }
 
 template<class T, uint64_t N, class C>

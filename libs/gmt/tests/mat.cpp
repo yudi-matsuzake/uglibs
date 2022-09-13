@@ -181,6 +181,20 @@ TEST_CASE("translation matrix", "[mat]")
 	STATIC_REQUIRE(t*t*vec_t::all(0.0) == vec_t{ 2., 4., 6. });
 }
 
+TEST_CASE("transpose", "[mat]")
+{
+	STATIC_REQUIRE(gmt::transpose(gmt::mat{{
+		{ 1., 2., 3., 4. },
+		{ 5., 6., 7., 8. },
+		{ 9., 10., 11., 12. }
+	}}) == gmt::mat{{
+		{ 1., 5., 9. },
+		{ 2., 6., 10. },
+		{ 3., 7., 11. },
+		{ 4., 8., 12. }
+	}});
+}
+
 TEST_CASE("basis matrix", "[mat]")
 {
 
