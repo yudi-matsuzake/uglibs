@@ -2,9 +2,15 @@
 
 #include "gmt/point.hpp"
 
-TEST_CASE(
-	"simple point arithmetic",
-	"[gmt]")
+TEST_CASE("pointlike concept", "[gmt]")
+{
+	STATIC_REQUIRE(gmt::pointlike<gmt::point<double, 2>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::point<int, 2>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::point<double, 3>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::point<char, 2>>);
+}
+
+TEST_CASE("simple point arithmetic", "[gmt]")
 {
 	using point2d = gmt::point<double, 2>;
 	point2d p{ 1., 2. };

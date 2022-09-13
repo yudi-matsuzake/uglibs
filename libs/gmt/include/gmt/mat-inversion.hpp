@@ -41,40 +41,36 @@ void gaussian_elimination(
 	static_assert(Rows > 1 && Cols > 1);
 
 	constexpr auto m = std::min(a.n_row, a.n_col);
-	for(uint64_t i=0; i<m; i++){
+	for(uint64_t i=0UL; i<m; i++){
 
 		/*
 		 * search for the maximal value in this column
 		 */
-		T max = std::abs(a[i][i]);
-		uint64_t max_row = i;
-
-		for(uint64_t j=i+1; j< a.n_row; ++j){
-			T tmp = std::abs(a[j][i]);
-			if(tmp > max){
-				max_row = j;
-				max = tmp;
-			}
-		}
+		auto pivot = [&]{
+			for(auto j=i; j<a.n_row; ++j)
+				if(a[j][i] != T{0})
+					return j;
+			return a.n_row;
+		}();
 
 		/*
 		 * no pivot in this column
 		 */
-		if(a[max_row][i] == 0.0)
+		if(pivot == a.n_row)
 			continue;
 
 		/*
 		 * swap the maximum row with the current
 		 */
-		if(i != max_row){
-			swap_rows(a, i, max_row);
-			swap_op(i, max_row);
+		if(i != pivot){
+			swap_rows(a, i, pivot);
+			swap_op(i, pivot);
 		}
 
 		/*
 		 * make element in the diagonal equal to 1
 		 */
-		{
+		if(a[i][i] != T{1}){
 			auto const coef = 1./a[i][i];
 			a[i][i] = T{1};
 			row_operation(a, i, i, T{0}, coef, i+1);
@@ -186,7 +182,7 @@ constexpr auto resolve(
 {
 	auto A = a;
 	auto B = b;
-	resolve(A, B);
+	detail::resolve(A, B);
 	return B;
 }
 

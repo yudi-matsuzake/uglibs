@@ -1,6 +1,7 @@
 #include "catch2/catch.hpp"
 
 #include "gmt/mat.hpp"
+#include "gmt/mat-inversion.hpp"
 
 static constexpr auto n_rows = 5UL;
 static constexpr auto n_cols = 10UL;
@@ -178,4 +179,37 @@ TEST_CASE("translation matrix", "[mat]")
 	constexpr auto t = gmt::make_translation_matrix(vec_t{1., 2., 3.});
 	STATIC_REQUIRE(t*vec_t::all(0.0) == vec_t{ 1., 2., 3. });
 	STATIC_REQUIRE(t*t*vec_t::all(0.0) == vec_t{ 2., 4., 6. });
+}
+
+TEST_CASE("basis matrix", "[mat]")
+{
+
+	SECTION("simple initialization"){
+		constexpr auto m = gmt::make_basis_matrix(
+			gmt::vector{{ 1., 2., 3. }},
+			gmt::vector{{ 4., 5., 6. }},
+			gmt::vector{{ 7., 8., 9. }}
+		);
+
+		STATIC_REQUIRE(m == gmt::mat{{
+			{ 1., 4., 7. },
+			{ 2., 5., 8. },
+			{ 3., 6., 9. }
+		}});
+	}
+
+
+	constexpr auto b = gmt::make_basis_matrix(
+		gmt::vector{{ 1., 2., 3. }},
+		gmt::vector{{ 1., 0., 1. }}
+	);
+
+	constexpr auto vb = gmt::vector{{ 7., -4. }};
+	STATIC_REQUIRE(b*vb == gmt::vector{{ 3., 14., 17. }});
+
+	constexpr auto vd = gmt::vector{{ 8., -6.,  2. }};
+	constexpr auto x = gmt::resolve(b, to_mat(vd));
+
+	INFO("x = " << x[0][0] << ' ' << x[0][1] << ' ' << x[0][2]);
+	STATIC_REQUIRE(x == to_mat(gmt::vector{{ -3., 11., 0.0}}));
 }

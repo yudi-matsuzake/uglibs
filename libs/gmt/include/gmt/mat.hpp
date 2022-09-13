@@ -71,6 +71,15 @@ auto operator*(mat<T, N, M> const& a, mat<Q, M, K> const& b) -> mat<Q, N, K>
 	return r;
 }
 
+template<class T, uint64_t N, class Op>
+constexpr auto to_mat(gmt::vector<T, N, Op> const& v)
+{
+	mat<T, N, 1UL> m;
+	for(auto i=0UL; i<N; ++i)
+		m[i].front() = v[i];
+	return m;
+}
+
 template<class T, class Q, uint64_t N, class C>
 	requires std::common_with<T, Q>
 		&& std::is_same_v<std::common_type_t<T, Q>, Q>
@@ -89,6 +98,27 @@ auto operator*(mat<T, N+1UL, N+1UL> const& m, point<Q, N, C> const& v) -> C
 
 	C r;
 	for(auto i=0UL; i<N; ++i)
+		r[i] = rm[i].front();
+
+	return r;
+}
+
+template<class T, class Q, uint64_t R, uint64_t C, class Op>
+	requires std::common_with<T, Q>
+[[nodiscard]] constexpr
+auto operator*(mat<T, R, C> const& m, vector<Q, C, Op> const& v)
+{
+	using result_value_t = std::common_type_t<T, Q>;
+	using result_t = vector<
+		result_value_t,
+		R,
+		Op
+	>;
+
+	auto rm = m*to_mat(v);
+
+	result_t r;
+	for(auto i=0UL; i<R; ++i)
 		r[i] = rm[i].front();
 
 	return r;
@@ -156,6 +186,48 @@ constexpr auto make_translation_matrix(vector<T, N, C> const& t)
 		tm[i].back() = t[i];
 
 	return tm;
+}
+
+namespace detail{
+
+template<class Matrix, class First, class ... PointType>
+[[nodiscard]] inline constexpr
+auto make_basis_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
+	noexcept
+{
+	for(auto i=0UL; i<m.n_row; ++i)
+		m[i][col] = p[i];
+
+	if constexpr(sizeof...(PointType)){
+		make_basis_matrix(
+			m,
+			col+1UL,
+			std::forward<PointType>(vecs) ...
+		);
+	}
+}
+
+} // end of namespace detail
+
+template<class First, class ... PointType>
+[[nodiscard]] constexpr auto make_basis_matrix(
+	First&& p,
+	PointType&& ... vecs) noexcept
+{
+	using result_t = gmt::mat<
+		typename First::element_type,
+		First::dim,
+		sizeof...(PointType) + 1UL
+	>;
+
+	result_t m;
+	detail::make_basis_matrix(
+		m,
+		0UL,
+		std::forward<First>(p),
+		std::forward<PointType>(vecs)...
+	);
+	return m;
 }
 
 } // end of namespace gmt

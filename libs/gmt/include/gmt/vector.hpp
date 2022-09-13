@@ -28,6 +28,11 @@ public:
 		std::copy(begin(p), end(p), this->begin());
 	}
 
+	constexpr vector(T const (&a)[N]) noexcept
+	{
+		for(auto i=0UL; i<N; ++i)
+			(*this)[i] = a[i];
+	}
 };
 
 template<class Vector, class T = typename Vector::element_type>

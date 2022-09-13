@@ -31,17 +31,23 @@ struct defaulted_type{
 	using type = std::conditional_t<std::is_same_v<T, void>, DefaultType, T>;
 };
 
+template<class T, class DefaultType>
+using defaulted_type_t = typename defaulted_type<T, DefaultType>::type;
+
 template<
 	class T,
 	uint64_t N,
 	class OperationOutputType = void>
 class point :	public std::array<T, N>,
 		public point_operations<
-			typename defaulted_type<OperationOutputType, point<T, N>>::type>
+			defaulted_type_t<OperationOutputType, point<T, N>>>
 {
 public:
 	using point_type = point<T, N, OperationOutputType>;
 	using element_type = T;
+	using operation_output_type = defaulted_type_t<
+		OperationOutputType, point<T, N>>;
+
 	static constexpr auto dim = N;
 
 	constexpr point() = default;
@@ -104,5 +110,24 @@ constexpr auto point_floor(PointType const& p)
 	);
 	return r;
 }
+
+template<class Point>
+using point_type = typename std::decay_t<Point>::point_type;
+
+template<class Point>
+using element_type = typename std::decay_t<Point>::element_type;
+
+template<class Point>
+using operation_output_type = typename
+	std::decay_t<Point>::operation_output_type;
+
+template<class Point>
+concept pointlike = requires(Point&& p)
+{
+	typename element_type<Point>;
+	typename point_type<Point>;
+	typename operation_output_type<Point>;
+	{ Point::dim } -> std::convertible_to<uint64_t>;
+} && std::is_base_of_v<point_type<Point>, Point>;
 
 }

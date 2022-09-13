@@ -45,7 +45,7 @@ static constexpr auto test_3x4()
 	auto b_is_solved = b == gmt::mat{{
 		{ 2. },
 		{ 3. },
-		{ -0.99999999999999989 }
+		{ -1. }
 	}};
 
 	return a_is_identity && b_is_solved;
