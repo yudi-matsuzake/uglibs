@@ -132,8 +132,8 @@ constexpr auto rank(mat<T, Rows, Cols>& a)
 	rgs::fill(c, 0UL);
 
 	auto n_rows = 0UL, n_cols = 0UL;
-	for(auto i=0UL; i<Rows; ++i){
-		for(auto j=0UL; j<Cols; ++j){
+	for(auto i : vws::iota(0UL, Rows)){
+		for(auto j : vws::iota(0UL, Cols)){
 			if(a[i][j] == T{0}){
 				r[i]++;
 				c[j]++;

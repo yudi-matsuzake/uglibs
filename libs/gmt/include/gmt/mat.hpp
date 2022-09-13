@@ -33,8 +33,8 @@ public:
 
 	constexpr mat(T const (&a)[Row][Col])
 	{
-		for(auto i=0UL; i<Row; ++i)
-			for(auto j=0UL; j<Col; ++j)
+		for(auto i : vws::iota(0UL, Row))
+			for(auto j : vws::iota(0UL, Col))
 				(*this)[i][j] = a[i][j];
 	}
 
@@ -60,11 +60,11 @@ auto operator*(mat<T, N, M> const& a, mat<Q, M, K> const& b) -> mat<Q, N, K>
 {
 	mat<Q, N, K> r;
 
-	for(auto i=0UL; i<N; ++i){
-		for(auto j=0UL; j<K; ++j){
+	for(auto i : vws::iota(0UL, N)){
+		for(auto j : vws::iota(0UL, K)){
 			r[i][j] = Q{0};
 
-			for(auto k=0UL; k<M; ++k)
+			for(auto k : vws::iota(0UL, M))
 				r[i][j] += Q{a[i][k]} * b[k][j];
 		}
 	}
@@ -76,7 +76,7 @@ template<class T, uint64_t N, class Op>
 constexpr auto to_mat(gmt::vector<T, N, Op> const& v)
 {
 	mat<T, N, 1UL> m;
-	for(auto i=0UL; i<N; ++i)
+	for(auto i : vws::iota(0UL, N))
 		m[i].front() = v[i];
 	return m;
 }
@@ -90,7 +90,7 @@ auto operator*(mat<T, N+1UL, N+1UL> const& m, point<Q, N, C> const& v) -> C
 
 	auto rm = [&]{
 		mat<Q, N+1UL, 1UL> vm;
-		for(auto i=0UL; i<N; ++i)
+		for(auto i : vws::iota(0UL, N))
 			vm[i].front() = v[i];
 		vm.back().front() = Q{1};
 
@@ -98,7 +98,7 @@ auto operator*(mat<T, N+1UL, N+1UL> const& m, point<Q, N, C> const& v) -> C
 	}();
 
 	C r;
-	for(auto i=0UL; i<N; ++i)
+	for(auto i : vws::iota(0UL, N))
 		r[i] = rm[i].front();
 
 	return r;
@@ -119,7 +119,7 @@ auto operator*(mat<T, R, C> const& m, vector<Q, C, Op> const& v)
 	auto rm = m*to_mat(v);
 
 	result_t r;
-	for(auto i=0UL; i<R; ++i)
+	for(auto i : vws::iota(0UL, R))
 		r[i] = rm[i].front();
 
 	return r;
@@ -129,8 +129,8 @@ template<class T, uint64_t N>
 constexpr auto make_identity_matrix()
 {
 	mat<T, N, N> m;
-	for(auto i=0UL; i<N; ++i)
-		for(auto j=0UL; j<N; ++j)
+	for(auto i : vws::iota(0UL, N))
+		for(auto j : vws::iota(0UL, N))
 			m[i][j] = (i == j)? T{1} : T{0};
 	return m;
 }
@@ -195,7 +195,7 @@ constexpr auto make_translation_matrix(vector<T, N, C> const& t)
 	constexpr auto identity = make_identity_matrix<T, N+1UL>();
 
 	auto tm = identity;
-	for(auto i=0UL; i<N; ++i)
+	for(auto i : vws::iota(0UL, N))
 		tm[i].back() = t[i];
 
 	return tm;
@@ -208,7 +208,7 @@ template<class Matrix, class First, class ... PointType>
 auto make_basis_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
 	noexcept
 {
-	for(auto i=0UL; i<m.n_row; ++i)
+	for(auto i : vws::iota(0UL, m.n_row))
 		m[i][col] = p[i];
 
 	if constexpr(sizeof...(PointType)){
