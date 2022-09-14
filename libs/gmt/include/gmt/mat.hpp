@@ -247,7 +247,7 @@ auto make_basis_column_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ..
 
 } // end of namespace detail
 
-template<class First, class ... PointType>
+template<pointlike First, pointlike ... PointType>
 [[nodiscard]] constexpr auto make_basis_column_matrix(
 	First&& p,
 	PointType&& ... vecs) noexcept
@@ -265,6 +265,22 @@ template<class First, class ... PointType>
 		std::forward<First>(p),
 		std::forward<PointType>(vecs)...
 	);
+	return m;
+}
+
+template<class T, uint64_t N, class C, uint64_t Size>
+[[nodiscard]] constexpr
+auto make_basis_column_matrix(std::array<vector<T, N, C>, Size> const& a)
+	noexcept
+{
+	using result_t = gmt::mat<T, N, Size>;
+
+	result_t m;
+
+	for(auto r : vws::iota(0UL, N))
+		for(auto c : vws::iota(0UL, Size))
+			m[r][c] = a[c][r];
+
 	return m;
 }
 

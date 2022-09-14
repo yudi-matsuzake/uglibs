@@ -212,6 +212,23 @@ TEST_CASE("basis matrix", "[mat]")
 		}});
 	}
 
+	SECTION("simple initialization with array"){
+		constexpr auto m = gmt::make_basis_column_matrix(
+			std::array{
+				gmt::vector{{ 1., 2., 3. }},
+				gmt::vector{{ 4., 5., 6. }},
+				gmt::vector{{ 7., 8., 9. }}
+			}
+		);
+
+		STATIC_REQUIRE(m == gmt::mat{{
+			{ 1., 4., 7. },
+			{ 2., 5., 8. },
+			{ 3., 6., 9. }
+		}});
+	}
+
+
 
 	constexpr auto b = gmt::make_basis_column_matrix(
 		gmt::vector{{ 1., 2., 3. }},
