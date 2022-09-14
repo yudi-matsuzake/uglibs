@@ -349,4 +349,35 @@ auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& vs)
 	return base;
 }
 
+template<uint64_t N, std::floating_point T>
+auto make_givens_rotation_matrix(uint64_t i, uint64_t j,  T theta)
+{
+	gmt::mat<T, N, N> m;
+
+	auto const cos = std::cos(theta);
+	auto const sin = std::sin(theta);
+
+	for(auto r : vws::iota(0UL, N)){
+		for(auto c : vws::iota(0UL, N)){
+			m[i][j] = [&]{
+				if(r == c){
+					if(r == i || r == j)
+						return T{cos};
+					else
+						return T{1};
+				}else if((r == i || r == j) && (cos == i || cos == j)){
+					if(r < cos)
+						return T{sin};
+					else
+						return T{sin*-1};
+				}
+
+				return T{0};
+			}();
+		}
+	}
+
+	return m;
+}
+
 } // end of namespace gmt

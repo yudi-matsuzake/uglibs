@@ -1,5 +1,7 @@
 #include "catch2/catch.hpp"
 
+#include <numbers>
+
 #include "gmt/mat.hpp"
 #include "gmt/mat-inversion.hpp"
 
@@ -315,5 +317,36 @@ TEST_CASE("orthonormal basis", "[mat]")
 		REQUIRE(v
 			==
 			(gmt::vector{{ 3., 1. }}*1./std::sqrt(10.)));
+	}
+}
+
+TEST_CASE("givens matrix", "[mat]")
+{
+	SECTION("N == 3"){
+		constexpr auto theta = std::numbers::pi;
+		auto xy = gmt::make_givens_rotation_matrix<3>(0, 1, theta);
+		auto xz = gmt::make_givens_rotation_matrix<3>(0, 2, theta);
+		auto yz = gmt::make_givens_rotation_matrix<3>(1, 2, theta);
+
+		auto const cos = std::cos(theta);
+		auto const sin = std::sin(theta);
+
+		REQUIRE(xy == gmt::mat{{
+			{ cos, -sin, 0. },
+			{ sin,  cos, 0. },
+			{  0.,   0., 1. }
+		}});
+
+		REQUIRE(xz == gmt::mat{{
+			{ cos,  0., -sin },
+			{  0.,  1., 0. },
+			{ sin,  0., cos }
+		}});
+
+		REQUIRE(xy == gmt::mat{{
+			{ 1.,  0., 0. },
+			{ 0., cos, -sin },
+			{ 0., sin, cos }
+		}});
 	}
 }
