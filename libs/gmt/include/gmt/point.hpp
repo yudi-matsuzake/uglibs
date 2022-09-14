@@ -59,7 +59,7 @@ public:
 	constexpr point_type& operator=(point_type const&)= default;
 
 	template<class ... Ts>
-	constexpr point(Ts&& ... args)
+	explicit constexpr point(Ts&& ... args)
 		requires (std::is_same_v<std::decay_t<Ts>, T> && ...)
 		: std::array<T, N>{ args ...  }
 	{}

@@ -307,7 +307,7 @@ auto make_orthonormal_projection_matrix(mat<T, R, C> const& a) noexcept
   */
 template<class T, uint64_t N, class C, uint64_t Size>
 [[nodiscard]]
-auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& v)
+auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& vs)
 {
 	using result_t = std::array<vector<T, N, C>, Size>;
 
@@ -333,17 +333,17 @@ auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& v)
 		return u * (dot(u, v) / dot(u, u));
 	};
 
-	base.front() = to_versor(v.front());
+	base.front() = to_versor(vs.front());
 
 	for(auto i : vws::iota(1UL, Size)){
 		auto const proj_sum = [&]{
 			auto s = gmt::vector<T, N, C>::all(T{0});
 			for(auto j : vws::iota(0UL, i))
-				s += proj(base[j], v[i]);
+				s += proj(base[j], vs[i]);
 			return s;
 		}();
 
-		base[i] = to_versor(v[i] - proj_sum);
+		base[i] = to_versor(vs[i] - proj_sum);
 	}
 
 	return base;

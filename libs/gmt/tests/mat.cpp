@@ -309,5 +309,11 @@ TEST_CASE("orthonormal basis", "[mat]")
 		REQUIRE(almost_equal(ortho_base[0][1], gt[0][1]));
 		REQUIRE(almost_equal(ortho_base[1][0], gt[1][0]));
 		REQUIRE(almost_equal(ortho_base[1][1], gt[1][1]));
+
+		auto const x = 1./std::sqrt(10.);
+		auto v = (gmt::vector{{ 3., 1. }}*x);
+		REQUIRE(v
+			==
+			(gmt::vector{{ 3., 1. }}*1./std::sqrt(10.)));
 	}
 }
