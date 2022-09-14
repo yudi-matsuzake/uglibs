@@ -3,6 +3,9 @@
 #include "gmt/mat.hpp"
 #include "gmt/mat-inversion.hpp"
 
+namespace rgs = std::ranges;
+namespace vws = std::views;
+
 static constexpr auto n_rows = 5UL;
 static constexpr auto n_cols = 10UL;
 
@@ -15,6 +18,15 @@ static constexpr auto enumeration_check(
 				return false;
 
 	return true;
+}
+
+template<class T>
+	requires (!std::numeric_limits<T>::is_integer)
+[[nodiscard]] auto almost_equal(T x, T y)
+{
+	auto const d = std::fabs(x-y);
+	// ULPs (units in the last place)
+	return d <= 0.000001;
 }
 
 TEST_CASE("matrix initialization", "[mat]")
@@ -259,5 +271,43 @@ TEST_CASE("projection matrix", "[mat]")
 			{  0.,  0., 0., 0. },
 			{  1.,  1., 0., 2. }
 		}});
+	}
+}
+
+TEST_CASE("orthonormal basis", "[mat]")
+{
+	SECTION("wikipedia example"){
+		constexpr auto s = std::array{
+			gmt::vector{{ 3., 1. }},
+			gmt::vector{{ 2., 2. }}
+		};
+
+		auto ortho_base = gmt::compute_orthonormal_basis(s);
+		for(auto v : ortho_base)
+			REQUIRE(almost_equal(norm(v), 1.0));
+		for(auto i : vws::iota(0UL, ortho_base.size())){
+			for(auto j : vws::iota(0UL, ortho_base.size())){
+				auto const d = gmt::dot(
+					ortho_base[i],
+					ortho_base[j]
+				);
+
+				if(i == j){
+					REQUIRE(almost_equal(d, 1.));
+				}else{
+					REQUIRE(almost_equal(d, 0.));
+				}
+			}
+		}
+
+		auto gt = std::array{
+			gmt::vector{{ 3., 1. }} * (1./std::sqrt(10.)),
+			gmt::vector{{ -1., 3. }} * (1./std::sqrt(10.))
+		};
+
+		REQUIRE(almost_equal(ortho_base[0][0], gt[0][0]));
+		REQUIRE(almost_equal(ortho_base[0][1], gt[0][1]));
+		REQUIRE(almost_equal(ortho_base[1][0], gt[1][0]));
+		REQUIRE(almost_equal(ortho_base[1][1], gt[1][1]));
 	}
 }

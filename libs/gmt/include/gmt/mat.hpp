@@ -301,4 +301,52 @@ auto make_orthonormal_projection_matrix(mat<T, R, C> const& a) noexcept
 	return a * t;
 }
 
+/**
+  * Computes the orthonormal basis for the `N` vectors in `v`
+  * using gram-schmidt process
+  */
+template<class T, uint64_t N, class C, uint64_t Size>
+[[nodiscard]]
+auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& v)
+{
+	using result_t = std::array<vector<T, N, C>, Size>;
+
+	result_t base;
+
+	auto const to_versor = [](auto const& v)
+	{
+		auto const len = norm(v);
+		if(len == T{0}){
+			throw std::runtime_error(
+				"could not create orthonormal basis with"
+				" zero length vector!"
+			);
+		}
+
+		return (len != T{1})
+			? v / len
+			: v;
+	};
+
+	auto const proj = [](auto const& u, auto const& v)
+	{
+		return u * (dot(u, v) / dot(u, u));
+	};
+
+	base.front() = to_versor(v.front());
+
+	for(auto i : vws::iota(1UL, Size)){
+		auto const proj_sum = [&]{
+			auto s = gmt::vector<T, N, C>::all(T{0});
+			for(auto j : vws::iota(0UL, i))
+				s += proj(base[j], v[i]);
+			return s;
+		}();
+
+		base[i] = to_versor(v[i] - proj_sum);
+	}
+
+	return base;
+}
+
 } // end of namespace gmt
