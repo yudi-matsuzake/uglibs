@@ -177,4 +177,15 @@ constexpr auto to_unsigned(T v) noexcept
 	return static_cast<std::make_unsigned_t<T>>(v);
 }
 
+template<class T, uint64_t N, uint64_t M>
+constexpr auto concatenate_arrays(
+	std::array<T, N> const& a,
+	std::array<T, M> const& b)
+{
+	std::array<T, N+M> r;
+	rgs::copy(a, r.begin());
+	rgs::copy(b, r.begin() + N);
+	return r;
+}
+
 }

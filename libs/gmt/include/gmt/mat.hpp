@@ -6,6 +6,7 @@
 #include <array>
 #include <vector>
 
+#include "util/misc.hpp"
 #include "gmt/point.hpp"
 #include "gmt/vector.hpp"
 
@@ -359,17 +360,17 @@ auto make_givens_rotation_matrix(uint64_t i, uint64_t j,  T theta)
 
 	for(auto r : vws::iota(0UL, N)){
 		for(auto c : vws::iota(0UL, N)){
-			m[i][j] = [&]{
+			m[r][c] = [&]{
 				if(r == c){
 					if(r == i || r == j)
 						return T{cos};
 					else
 						return T{1};
-				}else if((r == i || r == j) && (cos == i || cos == j)){
-					if(r < cos)
+				}else if((r == i && c == j) || (r == j && c == i)){
+					if(c < r)
 						return T{sin};
 					else
-						return T{sin*-1};
+						return T{-sin};
 				}
 
 				return T{0};
@@ -379,5 +380,74 @@ auto make_givens_rotation_matrix(uint64_t i, uint64_t j,  T theta)
 
 	return m;
 }
+
+template<class T, uint64_t N, class C>
+constexpr auto make_standard_basis()
+{
+	std::array<vector<T, N, C>, N> b;
+	
+	for(auto i : vws::iota(0UL, N)){
+		for(auto j : vws::iota(0UL, N)){
+			if(i == j)
+				b[i][j] = T{1};
+			else
+				b[i][j] = T{0};
+		}
+	}
+	return b;
+}
+
+/**
+  * receives a basis with `Size` <= `N` vectors with `N` dimensions
+  * and enlarge it to `N` vector basis
+  */
+/* template<class T, uint64_t N, class C, uint64_t Size> */
+/* 	requires (Size <= N) */
+/* constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b) */
+/* { */
+/* 	auto vs = util::concatenate_arrays(b, make_standard_basis<T, N, C>()); */
+/* 	mat<T, N, N> m; */
+/* 	uint64_t curr = 0UL; */
+/* } */
+
+/* template<std::floating_point T, uint64_t N, class C> */
+/* auto make_rotation_matrix( */
+/* 	gmt::vector<T, N, C> const& x, */
+/* 	gmt::vector<T, N, C> const& y, */
+/* 	T theta) */
+/* { */
+/* 	static_assert( */
+/* 		N >= 2, */
+/* 		"this rotation matrix is not defined to for dimension" */
+/* 		" smaller than 2" */
+/* 	); */
+
+/* 	using vec_t = gmt::vector<T, N, C>; */
+
+/* 	auto ortho_basis = compute_orthonormal_basis(std::array{x, y}); */
+/* 	auto basis_matrix = make_basis_column_matrix(ortho_basis); */
+/* 	auto const xm = resolve(basis_matrix, x); */
+/* 	auto const ym = resolve(basis_matrix, y); */
+
+/* 	auto const x_prime = gmt::vector<T, 2, C>{xm[0], xm[1]}; */
+/* 	auto const y_prime = gmt::vector<T, 2, C>{ym[0], ym[1]}; */
+
+/* 	auto givens = make_givens_rotation_matrix<2>(0UL, 1UL, theta); */
+
+/* 	/1* auto x_prime = gmt::resolve( *1/ */
+
+/* 	/1* std::array<vec_t, N> n_dimensional_basis; *1/ */
+
+/* 	/1* n_dimensional_basis[0] = ortho_basis[0]; *1/ */
+/* 	/1* n_dimensional_basis[1] = ortho_basis[1]; *1/ */
+
+/* 	/1* for(auto&& b : n_dimensional_basis | vws::drop(2)) *1/ */
+/* 	/1* 	b = vec_t::all(0.0); *1/ */
+
+/* 	auto base_matrix = make_basis_column_matrix(n_dimensional_basis); */
+/* 	auto givens = make_givens_rotation_matrix<N>(0UL, 1UL, theta); */
+/* 	auto ins = inverse(base_matrix).value(); */
+/* 	return ins * givens * base_matrix; */
+/* } */
 
 } // end of namespace gmt

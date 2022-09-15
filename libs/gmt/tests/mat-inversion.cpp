@@ -122,14 +122,14 @@ TEST_CASE("rank", "[mat-inversion]")
 	 * 	this example do not work because of floating point
 	 * 	rounding errors
 	 */
-	/* { */
-	/* constexpr auto m = gmt::mat{{ */
-	/* 	{  1.f,  2.f, 1.f }, */
-	/* 	{ -2.f, -3.f, 1.f }, */
-	/* 	{  3.f,  5.f, 0.f } */
-	/* }}; */
-	/* STATIC_REQUIRE(gmt::rank(m) == 2); */
-	/* } */
+	{
+	constexpr auto m = gmt::mat{{
+		{  1.f,  2.f, 1.f },
+		{ -2.f, -3.f, 1.f },
+		{  3.f,  5.f, 0.f }
+	}};
+	STATIC_REQUIRE(gmt::rank(m) == 2);
+	}
 }
 
 template<class T, uint64_t N>
