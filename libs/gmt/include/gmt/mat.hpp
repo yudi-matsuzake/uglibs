@@ -366,7 +366,8 @@ auto make_givens_rotation_matrix(uint64_t i, uint64_t j,  T theta)
 						return T{cos};
 					else
 						return T{1};
-				}else if((r == i && c == j) || (r == j && c == i)){
+				}else if((r == i && c == j)
+						|| (r == j && c == i)){
 					if(c < r)
 						return T{sin};
 					else
@@ -401,14 +402,30 @@ constexpr auto make_standard_basis()
   * receives a basis with `Size` <= `N` vectors with `N` dimensions
   * and enlarge it to `N` vector basis
   */
-/* template<class T, uint64_t N, class C, uint64_t Size> */
-/* 	requires (Size <= N) */
-/* constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b) */
-/* { */
-/* 	auto vs = util::concatenate_arrays(b, make_standard_basis<T, N, C>()); */
-/* 	mat<T, N, N> m; */
-/* 	uint64_t curr = 0UL; */
-/* } */
+template<class T, uint64_t N, class C, uint64_t Size>
+	requires (Size <= N)
+constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b)
+{
+	auto vs = util::concatenate_arrays(b, make_standard_basis<T, N, C>());
+	mat<T, N, N> m;
+
+	rgs::fill(m, []
+	{
+		std::array<T, N> a;
+		rgs::fill(a, T{0});
+		return a;
+	}());
+
+	for(auto i=0UL, c_vs=0UL; i<N && c_vs<vs.size(); ++c_vs){
+		for(auto j=0; j<N; ++j)
+			m[i][j] = vs[c_vs][j];
+
+		if(rank(m) == (i+1UL))
+			++i;
+	}
+
+	return transpose(m);
+}
 
 /* template<std::floating_point T, uint64_t N, class C> */
 /* auto make_rotation_matrix( */

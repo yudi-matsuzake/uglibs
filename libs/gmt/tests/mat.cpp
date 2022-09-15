@@ -350,3 +350,46 @@ TEST_CASE("givens matrix", "[mat]")
 		}});
 	}
 }
+
+TEST_CASE("enlarge basis", "[mat]")
+{
+	SECTION("example a"){
+		constexpr auto m = gmt::enlarge_basis(std::array{
+			gmt::vector{{ 1.,  1., 1. }},
+			gmt::vector{{ 1., -1., 1. }}
+		});
+
+		STATIC_REQUIRE(m == gmt::mat{{
+			{ 1.,  1., 1. },
+			{ 1., -1., 0. },
+			{ 1., 1., 0. },
+		}});
+	}
+
+	SECTION("example b"){
+		constexpr auto m = gmt::enlarge_basis(std::array{
+			gmt::vector{{ 1., 0., 0. }},
+			gmt::vector{{ 0., 1., 0. }}
+		});
+
+		STATIC_REQUIRE(m == gmt::mat{{
+			{ 1.,  0., 0. },
+			{ 0.,  1., 0. },
+			{ 0., 0., 1. },
+		}});
+	}
+
+	SECTION("example c"){
+		constexpr auto m = gmt::enlarge_basis(std::array{
+			gmt::vector{{ 1., 0., 0., 0. }},
+			gmt::vector{{ 0., 1., 0., 0. }}
+		});
+
+		STATIC_REQUIRE(m == gmt::mat{{
+			{ 1.,  0., 0., 0. },
+			{ 0.,  1., 0., 0. },
+			{ 0., 0., 1. , 0.},
+			{ 0., 0., 0. , 1.},
+		}});
+	}
+}
