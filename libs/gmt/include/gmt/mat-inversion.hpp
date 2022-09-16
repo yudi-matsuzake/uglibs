@@ -40,15 +40,14 @@ void gaussian_elimination(
 {
 	static_assert(Rows > 1 && Cols > 1);
 
-	constexpr auto m = std::min(a.n_row, a.n_col);
-	for(uint64_t i=0UL; i<m; i++){
+	for(uint64_t c=0UL, r=0UL, first_candidate=0UL; c<a.n_col; c++){
 
 		/*
 		 * search for the maximal value in this column
 		 */
 		auto pivot = [&]{
-			for(auto j=i; j<a.n_row; ++j)
-				if(a[j][i] != T{0})
+			for(auto j=first_candidate; j<a.n_row; ++j)
+				if(a[j][c] != T{0})
 					return j;
 			return a.n_row;
 		}();
@@ -58,33 +57,39 @@ void gaussian_elimination(
 		 */
 		if(pivot == a.n_row)
 			continue;
+		first_candidate = pivot + 1UL;
 
 		/*
 		 * swap the maximum row with the current
 		 */
-		if(i != pivot){
-			swap_rows(a, i, pivot);
-			swap_op(i, pivot);
+		if(r != pivot){
+			swap_rows(a, r, pivot);
+			swap_op(r, pivot);
+			pivot = r;
+		}
+		++r;
+
+		/*
+		 * make pivot element equal to 1
+		 */
+		if(a[pivot][c] != T{1}){
+			auto const coef = 1./a[pivot][c];
+			a[pivot][c] = T{1};
+			row_operation(a, pivot, pivot, T{0}, coef, c+1);
+			row_op(pivot, pivot, T{0}, coef);
 		}
 
 		/*
-		 * make element in the diagonal equal to 1
+		 * Make all cells below the pivot element
+		 * equal to zero
 		 */
-		if(a[i][i] != T{1}){
-			auto const coef = 1./a[i][i];
-			a[i][i] = T{1};
-			row_operation(a, i, i, T{0}, coef, i+1);
-			row_op(i, i, T{0}, coef);
-		}
-
-		/*
-		 * Make all cells below the diagonal equal to zero in the `i`-th column
-		 */
-		for(size_t j = i+1; j< a.n_row; ++j){
-			auto const coef = a[j][i];
-			a[j][i] = T{0};
-			row_operation(a, j, i, T{1}, -coef, i+1);
-			row_op(j, i, T{1}, -coef);
+		for(auto j : vws::iota(pivot+1, a.n_row)){
+			auto const coef = a[j][c];
+			if(coef != T{0}){
+				a[j][c] = T{0};
+				row_operation(a, j, pivot, T{1}, -coef, c+1);
+				row_op(j, pivot, T{1}, -coef);
+			}
 		}
 
 	}
@@ -92,20 +97,41 @@ void gaussian_elimination(
 	/*
 	 * make all elements above diagonal equal to zero
 	 */
-	for(auto i=1UL; i<m; ++i){
-		auto const c_idx = m - i;
+	for(auto r : vws::iota(0UL, a.n_row) | vws::reverse){
+		auto const pivot_indices = vws::iota(0UL, a.n_col);
+		auto const pivot = rgs::find_if(
+			pivot_indices,
+			[&a, r](auto i){ return a[r][i] != T{0}; }
+		);
 
-		for(auto j=i+1UL; j<=m; ++j){
-			auto const r_idx = m - j;
-			auto const coef = a[r_idx][c_idx];
-			a[r_idx][c_idx] = T{0};
+		if(pivot == pivot_indices.end())
+			continue;
 
-			if(coef != 0.0){
-				row_operation(a, r_idx, c_idx, T{1}, -coef, c_idx+1UL);
-				row_op(r_idx, c_idx, T{1}, -coef);
+		for(auto i : vws::iota(0UL, r) | vws::reverse){
+			auto const coef = a[i][*pivot];
+			a[i][*pivot] = T{0};
+
+			if(coef != T{0}){
+				row_operation(a, i, r, T{1}, -coef, *pivot+1UL);
+				row_op(i, r, T{1}, -coef);
 			}
 		}
 	}
+
+	/* for(auto i=1UL; i<m; ++i){ */
+	/* 	auto const c_idx = m - i; */
+
+	/* 	for(auto j=i+1UL; j<=m; ++j){ */
+	/* 		auto const r_idx = m - j; */
+	/* 		auto const coef = a[r_idx][c_idx]; */
+	/* 		a[r_idx][c_idx] = T{0}; */
+
+	/* 		if(coef != T{0}){ */
+	/* 			row_operation(a, r_idx, c_idx, T{1}, -coef, c_idx+1UL); */
+	/* 			row_op(r_idx, c_idx, T{1}, -coef); */
+	/* 		} */
+	/* 	} */
+	/* } */
 }
 
 template<typename T, uint64_t Rows, uint64_t Cols>
@@ -184,6 +210,14 @@ constexpr auto resolve(
 	auto B = b;
 	detail::resolve(A, B);
 	return B;
+}
+
+template<typename T, uint64_t Rows, uint64_t Cols>
+constexpr auto gaussian_elimination(mat<T, Rows, Cols> const& a)
+{
+	auto A = a;
+	detail::gaussian_elimination(A);
+	return A;
 }
 
 template<typename T, uint64_t N>

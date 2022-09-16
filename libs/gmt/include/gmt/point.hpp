@@ -122,12 +122,15 @@ using operation_output_type = typename
 	std::decay_t<Point>::operation_output_type;
 
 template<class Point>
+constexpr auto point_dimension = std::decay_t<Point>::dim;
+
+template<class Point>
 concept pointlike = requires(Point&& p)
 {
 	typename element_type<Point>;
 	typename point_type<Point>;
 	typename operation_output_type<Point>;
-	{ Point::dim } -> std::convertible_to<uint64_t>;
-} && std::is_base_of_v<point_type<Point>, Point>;
+	{ point_dimension<Point> } -> std::convertible_to<uint64_t>;
+} && std::is_base_of_v<point_type<Point>, std::decay_t<Point>>;
 
 }

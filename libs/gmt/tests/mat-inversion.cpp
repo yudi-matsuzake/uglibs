@@ -76,6 +76,32 @@ TEST_CASE("system solving", "[mat-inversion]")
 {
 	STATIC_REQUIRE(test_2x3());
 	STATIC_REQUIRE(test_3x4());
+
+	STATIC_REQUIRE(gmt::gaussian_elimination(gmt::mat{{
+		{1., 0., 0. },
+		{0., 0., 1. }
+	}}) == gmt::mat{{
+		{1., 0., 0. },
+		{0., 0., 1. }
+	}});
+
+	STATIC_REQUIRE(gmt::gaussian_elimination(gmt::mat{{
+		{1., 0. },
+		{0., 0. },
+		{0., 1. }
+	}}) == gmt::mat{{
+		{1., 0. },
+		{0., 1. },
+		{0., 0. }
+	}});
+
+	STATIC_REQUIRE(gmt::gaussian_elimination(gmt::mat{{
+		{1., 1., 1. },
+		{0., 0., 1. }
+	}}) == gmt::mat{{
+		{1., 1., 0. },
+		{0., 0., 1. }
+	}});
 }
 
 TEST_CASE("rank", "[mat-inversion]")
@@ -117,11 +143,6 @@ TEST_CASE("rank", "[mat-inversion]")
 	STATIC_REQUIRE(gmt::rank(m) == 1);
 	}
 
-	/*
-	 * TODO: make this example work
-	 * 	this example do not work because of floating point
-	 * 	rounding errors
-	 */
 	{
 	constexpr auto m = gmt::mat{{
 		{  1.f,  2.f, 1.f },
@@ -169,9 +190,7 @@ TEST_CASE("inversion", "[mat-inversion]")
 		}}).has_value());
 	}
 
-	/*
-	 * TODO: make these examples work
-	 */
+	/* TODO: make these examples work */
 	/* { */
 	/* Catch::StringMaker<double>::precision = std::numeric_limits<double>::max_digits10; */
 	/* constexpr auto m = gmt::mat{{ */

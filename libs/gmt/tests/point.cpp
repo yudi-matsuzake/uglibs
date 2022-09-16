@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include "gmt/point.hpp"
+#include "gmt/vector.hpp"
 
 TEST_CASE("pointlike concept", "[gmt]")
 {
@@ -8,6 +9,11 @@ TEST_CASE("pointlike concept", "[gmt]")
 	STATIC_REQUIRE(gmt::pointlike<gmt::point<int, 2>>);
 	STATIC_REQUIRE(gmt::pointlike<gmt::point<double, 3>>);
 	STATIC_REQUIRE(gmt::pointlike<gmt::point<char, 2>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::vector<double, 2>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::vector<double, 3>>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::vector<double, 2>&>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::vector<double, 2>&&>);
+	STATIC_REQUIRE(gmt::pointlike<gmt::vector<double, 2> const&>);
 }
 
 TEST_CASE("simple point arithmetic", "[gmt]")

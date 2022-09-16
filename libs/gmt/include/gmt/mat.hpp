@@ -254,8 +254,8 @@ template<pointlike First, pointlike ... PointType>
 	PointType&& ... vecs) noexcept
 {
 	using result_t = gmt::mat<
-		typename First::element_type,
-		First::dim,
+		element_type<First>,
+		std::decay_t<First>::dim,
 		sizeof...(PointType) + 1UL
 	>;
 
@@ -285,6 +285,22 @@ auto make_basis_column_matrix(std::array<vector<T, N, C>, Size> const& a)
 	return m;
 }
 
+template<class T, uint64_t N, class C, uint64_t Size>
+[[nodiscard]] constexpr
+auto make_basis_row_matrix(std::array<vector<T, N, C>, Size> const& a)
+	noexcept
+{
+	using result_t = gmt::mat<T, Size, N>;
+
+	result_t m;
+
+	for(auto r : vws::iota(0UL, m.n_row))
+		for(auto c : vws::iota(0UL, m.n_col))
+			m[r][c] = a[r][c];
+
+	return m;
+}
+
 template<class T, uint64_t R, uint64_t C>
 [[nodiscard]] constexpr
 auto make_projection_matrix(mat<T, R, C> const& a)
@@ -303,7 +319,7 @@ auto make_orthonormal_projection_matrix(mat<T, R, C> const& a) noexcept
 }
 
 /**
-  * Computes the orthonormal basis for the `N` vectors in `v`
+  * Computes the orthonormal basis for the `N` vectors in `vs`
   * using gram-schmidt process
   */
 template<class T, uint64_t N, class C, uint64_t Size>
@@ -417,54 +433,46 @@ constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b)
 	}());
 
 	for(auto i=0UL, c_vs=0UL; i<N && c_vs<vs.size(); ++c_vs){
-		for(auto j=0; j<N; ++j)
-			m[i][j] = vs[c_vs][j];
+		rgs::copy(vs[c_vs], m[i].begin());
 
 		if(rank(m) == (i+1UL))
 			++i;
 	}
 
-	return transpose(m);
+	std::array<vector<T, N, C>, N> basis;
+	for(auto r : vws::iota(0UL, m.n_row))
+		rgs::copy(m[r], basis[r].begin());
+
+	return basis;
 }
 
-/* template<std::floating_point T, uint64_t N, class C> */
-/* auto make_rotation_matrix( */
-/* 	gmt::vector<T, N, C> const& x, */
-/* 	gmt::vector<T, N, C> const& y, */
-/* 	T theta) */
+/* auto row_basis_matrix_to_vectors() */
 /* { */
-/* 	static_assert( */
-/* 		N >= 2, */
-/* 		"this rotation matrix is not defined to for dimension" */
-/* 		" smaller than 2" */
-/* 	); */
-
-/* 	using vec_t = gmt::vector<T, N, C>; */
-
-/* 	auto ortho_basis = compute_orthonormal_basis(std::array{x, y}); */
-/* 	auto basis_matrix = make_basis_column_matrix(ortho_basis); */
-/* 	auto const xm = resolve(basis_matrix, x); */
-/* 	auto const ym = resolve(basis_matrix, y); */
-
-/* 	auto const x_prime = gmt::vector<T, 2, C>{xm[0], xm[1]}; */
-/* 	auto const y_prime = gmt::vector<T, 2, C>{ym[0], ym[1]}; */
-
-/* 	auto givens = make_givens_rotation_matrix<2>(0UL, 1UL, theta); */
-
-/* 	/1* auto x_prime = gmt::resolve( *1/ */
-
-/* 	/1* std::array<vec_t, N> n_dimensional_basis; *1/ */
-
-/* 	/1* n_dimensional_basis[0] = ortho_basis[0]; *1/ */
-/* 	/1* n_dimensional_basis[1] = ortho_basis[1]; *1/ */
-
-/* 	/1* for(auto&& b : n_dimensional_basis | vws::drop(2)) *1/ */
-/* 	/1* 	b = vec_t::all(0.0); *1/ */
-
-/* 	auto base_matrix = make_basis_column_matrix(n_dimensional_basis); */
-/* 	auto givens = make_givens_rotation_matrix<N>(0UL, 1UL, theta); */
-/* 	auto ins = inverse(base_matrix).value(); */
-/* 	return ins * givens * base_matrix; */
 /* } */
+
+template<std::floating_point T, uint64_t N, class C>
+auto make_rotation_matrix(
+	gmt::vector<T, N, C> const& x,
+	gmt::vector<T, N, C> const& y,
+	T theta)
+{
+	static_assert(
+		N >= 2,
+		"this rotation matrix is not defined to for dimension"
+		" smaller than 2"
+	);
+
+	using vec_t = gmt::vector<T, N, C>;
+
+	auto const basis = make_basis_column_matrix(x, y);
+	auto const enlarged = enlarge_basis(std::array{ x, y });
+	auto const ortho = make_basis_column_matrix(
+		compute_orthonormal_basis(enlarged)
+	);
+	auto const givens = make_givens_rotation_matrix<N>(0UL, 1UL, theta);
+	auto const inv = inverse(ortho).value();
+
+	return inv * givens * ortho;
+}
 
 } // end of namespace gmt

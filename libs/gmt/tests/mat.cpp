@@ -359,11 +359,11 @@ TEST_CASE("enlarge basis", "[mat]")
 			gmt::vector{{ 1., -1., 1. }}
 		});
 
-		STATIC_REQUIRE(m == gmt::mat{{
-			{ 1.,  1., 1. },
-			{ 1., -1., 0. },
-			{ 1., 1., 0. },
-		}});
+		STATIC_REQUIRE(m == std::array{
+			gmt::vector{{ 1.,  1., 1. }},
+			gmt::vector{{ 1., -1., 1. }},
+			gmt::vector{{ 1., 0., 0. }},
+		});
 	}
 
 	SECTION("example b"){
@@ -372,11 +372,11 @@ TEST_CASE("enlarge basis", "[mat]")
 			gmt::vector{{ 0., 1., 0. }}
 		});
 
-		STATIC_REQUIRE(m == gmt::mat{{
-			{ 1.,  0., 0. },
-			{ 0.,  1., 0. },
-			{ 0., 0., 1. },
-		}});
+		STATIC_REQUIRE(m == std::array{
+			gmt::vector{{ 1., 0., 0. }},
+			gmt::vector{{ 0., 1., 0. }},
+			gmt::vector{{ 0., 0., 1.  }},
+		});
 	}
 
 	SECTION("example c"){
@@ -385,11 +385,71 @@ TEST_CASE("enlarge basis", "[mat]")
 			gmt::vector{{ 0., 1., 0., 0. }}
 		});
 
-		STATIC_REQUIRE(m == gmt::mat{{
-			{ 1.,  0., 0., 0. },
-			{ 0.,  1., 0., 0. },
-			{ 0., 0., 1. , 0.},
-			{ 0., 0., 0. , 1.},
-		}});
+		STATIC_REQUIRE(m == std::array{
+			gmt::vector{{ 1.,  0., 0., 0. }},
+			gmt::vector{{ 0.,  1., 0., 0. }},
+			gmt::vector{{ 0., 0., 1. , 0. }},
+			gmt::vector{{ 0., 0., 0. , 1. }},
+		});
 	}
 }
+
+/* TEST_CASE("rotation matrix", "[mat]") */
+/* { */
+/* 	SECTION("example a"){ */
+/* 	auto const theta = std::numbers::pi/4.; */
+
+/* 	auto const r = gmt::make_rotation_matrix( */
+/* 		gmt::vector{{ 1., 0., 0. }}, */
+/* 		gmt::vector{{ 0., 1., 0. }}, */
+/* 		theta */
+/* 	); */
+
+/* 	auto const cos = std::cos(theta); */
+/* 	auto const sin = std::sin(theta); */
+
+/* 	REQUIRE(r == gmt::mat{{ */
+/* 		{ cos, -sin, 0. }, */
+/* 		{ sin,  cos, 0. }, */
+/* 		{  0.,   0., 1. } */
+/* 	}}); */
+/* 	} */
+
+/* 	SECTION("example b"){ */
+/* 	auto const theta = std::numbers::pi/4.; */
+
+/* 	auto const r = gmt::make_rotation_matrix( */
+/* 		gmt::vector{{ 1., 0., 0. }}, */
+/* 		gmt::vector{{ 0., 0., 1. }}, */
+/* 		theta */
+/* 	); */
+
+/* 	auto const cos = std::cos(theta); */
+/* 	auto const sin = std::sin(theta); */
+
+/* 	REQUIRE(r == gmt::mat{{ */
+/* 		{ cos,  0., -sin }, */
+/* 		{  0.,  1., 0. }, */
+/* 		{ sin,  0., cos } */
+/* 	}}); */
+/* 	} */
+
+/* 	/1* SECTION("example c"){ *1/ */
+/* 	/1* auto const theta = std::numbers::pi/4.; *1/ */
+
+/* 	/1* auto const r = gmt::make_rotation_matrix( *1/ */
+/* 	/1* 	gmt::vector{{ 1., 0., 0. }}, *1/ */
+/* 	/1* 	gmt::vector{{ 0., 0., 1. }}, *1/ */
+/* 	/1* 	theta *1/ */
+/* 	/1* ); *1/ */
+
+/* 	/1* auto const cos = std::cos(theta); *1/ */
+/* 	/1* auto const sin = std::sin(theta); *1/ */
+
+/* 	/1* REQUIRE(r == gmt::mat{{ *1/ */
+/* 	/1* 	{ 1.,  0., 0. }, *1/ */
+/* 	/1* 	{ 0., cos, -sin }, *1/ */
+/* 	/1* 	{ 0., sin, cos } *1/ */
+/* 	/1* }}); *1/ */
+/* 	/1* } *1/ */
+/* } */
