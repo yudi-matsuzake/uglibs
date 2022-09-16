@@ -464,7 +464,7 @@ auto make_rotation_matrix(
 
 	using vec_t = gmt::vector<T, N, C>;
 
-	auto const basis = make_basis_column_matrix(x, y);
+	/* auto const basis = make_basis_column_matrix(x, y); */
 	auto const enlarged = enlarge_basis(std::array{ x, y });
 	auto const ortho = make_basis_column_matrix(
 		compute_orthonormal_basis(enlarged)
