@@ -117,21 +117,6 @@ void gaussian_elimination(
 			}
 		}
 	}
-
-	/* for(auto i=1UL; i<m; ++i){ */
-	/* 	auto const c_idx = m - i; */
-
-	/* 	for(auto j=i+1UL; j<=m; ++j){ */
-	/* 		auto const r_idx = m - j; */
-	/* 		auto const coef = a[r_idx][c_idx]; */
-	/* 		a[r_idx][c_idx] = T{0}; */
-
-	/* 		if(coef != T{0}){ */
-	/* 			row_operation(a, r_idx, c_idx, T{1}, -coef, c_idx+1UL); */
-	/* 			row_op(r_idx, c_idx, T{1}, -coef); */
-	/* 		} */
-	/* 	} */
-	/* } */
 }
 
 template<typename T, uint64_t Rows, uint64_t Cols>
@@ -139,8 +124,8 @@ constexpr
 void gaussian_elimination(mat<T, Rows, Cols>& a)
 {
 
-	constexpr auto empty_swap = [](auto i, auto j){};
-	constexpr auto empty_row = [](auto ri, auto rj, bool alpha, bool beta)
+	constexpr auto empty_swap = [](auto&&, auto&&){};
+	constexpr auto empty_row = [](auto&&, auto&&, bool, bool)
 	{};
 
 	gaussian_elimination(a, empty_swap, empty_row);

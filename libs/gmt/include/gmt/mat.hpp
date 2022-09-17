@@ -82,6 +82,30 @@ constexpr auto to_mat(gmt::vector<T, N, Op> const& v)
 	return m;
 }
 
+/**
+  * given an transformation represented by `m`
+  * returns the same transformation with a matrix
+  * N+1xN+1 `m'` which `m[N][N] == 1`
+  */
+template<class T, uint64_t N>
+constexpr auto to_homogeneous_mat(mat<T, N, N> const& m)
+{
+	mat<T, N+1UL, N+1UL> m_prime;
+
+	for(auto r : vws::iota(0UL, m_prime.n_row)){
+		for(auto c : vws::iota(0UL, m_prime.n_col)){
+			m_prime[r][c] = (r < N && c < N)
+				? m[r][c]
+				: ((r == N && c == N)
+					? T{1}
+					: T{0});
+
+		}
+	}
+
+	return m_prime;
+}
+
 template<class T, class Q, uint64_t N, class C>
 	requires std::common_with<T, Q>
 		&& std::is_same_v<std::common_type_t<T, Q>, Q>
@@ -462,9 +486,6 @@ auto make_rotation_matrix(
 		" smaller than 2"
 	);
 
-	using vec_t = gmt::vector<T, N, C>;
-
-	/* auto const basis = make_basis_column_matrix(x, y); */
 	auto const enlarged = enlarge_basis(std::array{ x, y });
 	auto const ortho = make_basis_column_matrix(
 		compute_orthonormal_basis(enlarged)
