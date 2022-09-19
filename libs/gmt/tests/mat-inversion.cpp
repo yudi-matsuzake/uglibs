@@ -164,7 +164,7 @@ static constexpr auto test_for()
 TEST_CASE("inversion", "[mat-inversion]")
 {
 
-	SECTION("simple test"){
+	SECTION("simple test a"){
 		constexpr auto m = gmt::mat{{
 			{  1.,  2. },
 			{ -2., -3. }
@@ -173,6 +173,20 @@ TEST_CASE("inversion", "[mat-inversion]")
 		STATIC_REQUIRE(gmt::inverse(m).value() == gmt::mat{{
 			{ -3., -2. },
 			{  2.,  1. },
+		}});
+	}
+
+	SECTION("simple test b"){
+		constexpr auto m = gmt::mat{{
+			{ 1.,  0., 0. },
+			{ 0.,  0., 1. },
+			{ 0., -1., 0. }
+		}};
+
+		STATIC_REQUIRE(gmt::inverse(m).value() == gmt::mat{{
+			{ 1.,  0., 0. },
+			{ 0.,  0., -1. },
+			{ 0.,  1., 0. }
 		}});
 	}
 

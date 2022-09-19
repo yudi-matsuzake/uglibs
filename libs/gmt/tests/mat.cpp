@@ -452,4 +452,23 @@ TEST_CASE("rotation matrix", "[mat]")
 			{ -sin, 0., cos }
 		}});
 	}
+
+	SECTION("example d"){
+		auto const theta = std::numbers::pi/2.;
+
+		auto const r = gmt::make_rotation_matrix(
+			gmt::vector{{ 1., 0.,  0. }},
+			gmt::vector{{ 0., 0.,  1. }},
+			theta
+		);
+
+		auto const cos = std::cos(theta);
+		auto const sin = std::sin(theta);
+
+		REQUIRE(r == gmt::mat{{
+			{ 1.,  0., 0. },
+			{ 0., cos, -sin },
+			{ 0., sin, cos }
+		}});
+	}
 }

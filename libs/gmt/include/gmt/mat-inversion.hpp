@@ -57,7 +57,6 @@ void gaussian_elimination(
 		 */
 		if(pivot == a.n_row)
 			continue;
-		first_candidate = pivot + 1UL;
 
 		/*
 		 * swap the maximum row with the current
@@ -67,6 +66,8 @@ void gaussian_elimination(
 			swap_op(r, pivot);
 			pivot = r;
 		}
+
+		first_candidate = pivot + 1UL;
 		++r;
 
 		/*
