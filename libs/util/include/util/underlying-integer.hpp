@@ -67,5 +67,10 @@ struct underlying_integer
 	>;
 };
 
+template<
+	uint8_t N,
+	util::signess S = util::signed_flag,
+	util::mutability M = util::mutable_flag>
+using underlying_integer_t = typename underlying_integer<N, S, M>::type;
 
 } // end of namespace util

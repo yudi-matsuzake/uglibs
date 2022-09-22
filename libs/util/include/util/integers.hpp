@@ -141,13 +141,23 @@ struct integer_info<T>{
 	static constexpr auto type_name = integer::type_name();
 };
 
+template<util::arbitrary_integer T>
+using underlying_integer_for_t = util::underlying_integer_t<
+	T::n_bits,
+	typename T::signess,
+	util::mutable_flag
+>;
+
 } // end of namespace util
 
 template<util::arbitrary_integer T>
 class std::numeric_limits<T>{
 public:
-	using underlying_integer_t = typename util::underlying_integer<
-		T::n_bits, typename T::signess, util::mutable_flag>::type;
+	using underlying_integer_t = util::underlying_integer_t<
+		T::n_bits,
+		typename T::signess,
+		util::mutable_flag
+	>;
 
 	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
 		std::make_unsigned_t<underlying_integer_t>
