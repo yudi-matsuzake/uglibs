@@ -457,8 +457,8 @@ TEST_CASE("rotation matrix", "[mat]")
 		auto const theta = std::numbers::pi/2.;
 
 		auto const r = gmt::make_rotation_matrix(
-			gmt::vector{{ 1., 0.,  0. }},
-			gmt::vector{{ 0., 0.,  1. }},
+			gmt::vector{{ 0.,  0.,  -1. }},
+			gmt::vector{{ 0., -1.,  0. }},
 			theta
 		);
 
