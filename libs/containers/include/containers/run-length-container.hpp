@@ -26,14 +26,20 @@ constexpr bool operator==(
 	return a.value == b.value && a.count == b.count;
 }
 
+template<class T, class A>
+using rl_default_underlying_container_t = std::vector<run_length_item<T>, A>;
+
 /**
   * represents a run-length container for sparse arrays, with the same interface
   * as possible as the std::vector
   */
-template<class T, class Alloc = std::allocator<run_length_item<T>>>
-class run_length_container : private std::vector<run_length_item<T>, Alloc> {
+template<
+	class T,
+	class Alloc = std::allocator<run_length_item<T>>,
+	class UnderlyingContainer = rl_default_underlying_container_t<T, Alloc>>
+class run_length_container : private UnderlyingContainer {
 public:
-	using underling_container = std::vector<run_length_item<T>, Alloc>;
+	using underling_container = UnderlyingContainer;
 private:
 
 	template<class It>
@@ -46,7 +52,7 @@ private:
 
 	constexpr auto find_rl_iterator(uint64_t index) const
 	{
-		return find_rl_iterator(base().begin(), base().end(), index);
+		return find_rl_iterator(base().cbegin(), base().cend(), index);
 	}
 
 	/**
@@ -88,11 +94,6 @@ private:
 				uint64_t a_index)
 			: m_rlc(a_rlc), m_index(a_index)
 		{}
-
-		constexpr auto rlc()
-		{
-			return m_rlc;
-		}
 
 		constexpr auto rlc() const
 		{
@@ -136,6 +137,27 @@ private:
 			requires (!std::is_const_v<RLC>)
 		{
 			this->rlc()->set(this->index(), e);
+			return *this;
+		}
+
+		constexpr element_wrapper& operator=(T&& e)
+			requires (!std::is_const_v<RLC> && !std::is_const_v<T>)
+		{
+			this->rlc()->set(this->index(), std::forward<T>(e));
+			return *this;
+		}
+
+		constexpr element_wrapper const& operator=(T const& e) const
+			requires (!std::is_const_v<RLC>)
+		{
+			this->rlc()->set(this->index(), e);
+			return *this;
+		}
+
+		constexpr element_wrapper const& operator=(T&& e) const
+			requires (!std::is_const_v<RLC> && !std::is_const_v<T>)
+		{
+			this->rlc()->set(this->index(), std::forward<T>(e));
 			return *this;
 		}
 
@@ -197,115 +219,120 @@ public:
 
 	template<class RLC>
 	class rl_iterator : public run_length_consistent_type<RLC> {
-	public:
-	using iterator_category = std::random_access_iterator_tag;
-	using value_type = T;
-	using difference_type = int64_t;
-	using reference = element_wrapper<RLC>;
-	using pointer = rl_iterator<RLC>;
+		public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = T;
+		using difference_type = int64_t;
+		using reference = element_wrapper<RLC>;
+		using pointer = rl_iterator<RLC>;
 
-	static_assert(uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
-		"For the sentinel iterator work properly, we must have the maximum value"
-		" of uint64_t be the same value as uint64_t{0} - 1");
+		static_assert(uint64_t{0} - 1 == std::numeric_limits<uint64_t>::max(),
+			"For the sentinel iterator work properly, we must have the maximum value"
+			" of uint64_t be the same value as uint64_t{0} - 1");
 
-	static constexpr auto sentinel_value = std::numeric_limits<uint64_t>::max();
+		static constexpr auto sentinel_value = std::numeric_limits<uint64_t>::max();
 
-	public:
-		constexpr rl_iterator()
-		{}
+		public:
+			constexpr rl_iterator()
+			{}
 
-		constexpr explicit rl_iterator(
-				RLC* a_rlc,
-				uint64_t a_index)
-			: run_length_consistent_type<RLC>(a_rlc, a_index)
-		{}
+			constexpr explicit rl_iterator(
+					RLC* a_rlc,
+					uint64_t a_index)
+				: run_length_consistent_type<RLC>(a_rlc, a_index)
+			{}
 
-		constexpr auto operator*()
-		{
-			return element_wrapper(this->rlc(), this->index());
-		}
-
-		constexpr rl_iterator& operator++()
-		{
-			return (*this) += 1;
-		}
-
-		constexpr rl_iterator& operator--()
-		{
-			return (*this) += -1;
-		}
-
-		constexpr rl_iterator operator++(int)
-		{
-			auto it = *this;
-			++(*this);
-			return it;
-		}
-
-		constexpr rl_iterator operator--(int)
-		{
-			auto it = *this;
-			--(*this);
-			return it;
-		}
-
-		friend constexpr rl_iterator operator+(rl_iterator a, int64_t scalar)
-		{
-			return a += scalar;
-		}
-
-		friend constexpr rl_iterator operator-(rl_iterator a, int64_t scalar)
-		{
-			return a += (-scalar);
-		}
-
-		constexpr rl_iterator& operator+=(int64_t scalar)
-		{
-			if(scalar < 0){
-				if(auto const abs = static_cast<uint64_t>(-scalar); abs > this->m_index)
-					this->m_index = sentinel_value;
-				else
-					this->m_index -= abs;
-			}else{
-				this->m_index += static_cast<uint64_t>(scalar);
+			constexpr auto operator*()
+			{
+				return element_wrapper(this->rlc(), this->index());
 			}
 
-			return *this;
-		}
+			constexpr auto operator*() const
+			{
+				return element_wrapper(this->rlc(), this->index());
+			}
 
-		constexpr auto operator<=>(rl_iterator const& other)
-		{
-			return (*this) - other;
-		}
+			constexpr rl_iterator& operator++()
+			{
+				return (*this) += 1;
+			}
 
-		friend constexpr int64_t operator-(rl_iterator a, rl_iterator b)
-		{
-			return static_cast<int64_t>(a.index()) - static_cast<int64_t>(b.index());
-		}
+			constexpr rl_iterator& operator--()
+			{
+				return (*this) += -1;
+			}
 
-		friend constexpr bool operator==(rl_iterator a, rl_iterator b)
-		{
-			if(a.rlc() != b.rlc())
-				return false;
+			constexpr rl_iterator operator++(int)
+			{
+				auto it = *this;
+				++(*this);
+				return it;
+			}
 
-			auto const max = a.rlc()->base().back().count;
-			bool a_is_out = a.index() >= max || a.index() == sentinel_value;
-			bool b_is_out = b.index() >= max || b.index() == sentinel_value;
+			constexpr rl_iterator operator--(int)
+			{
+				auto it = *this;
+				--(*this);
+				return it;
+			}
 
-			if(a_is_out && b_is_out)
-				return true;
+			friend constexpr rl_iterator operator+(rl_iterator a, int64_t scalar)
+			{
+				return a += scalar;
+			}
 
-			return a.m_index == b.m_index;
-		}
+			friend constexpr rl_iterator operator-(rl_iterator a, int64_t scalar)
+			{
+				return a += (-scalar);
+			}
 
-		friend constexpr bool operator!=(rl_iterator a, rl_iterator b)
-		{
-			return !(a == b);
-		}
+			constexpr rl_iterator& operator+=(int64_t scalar)
+			{
+				if(scalar < 0){
+					if(auto const abs = static_cast<uint64_t>(-scalar); abs > this->m_index)
+						this->m_index = sentinel_value;
+					else
+						this->m_index -= abs;
+				}else{
+					this->m_index += static_cast<uint64_t>(scalar);
+				}
+
+				return *this;
+			}
+
+			constexpr auto operator<=>(rl_iterator const& other)
+			{
+				return (*this) - other;
+			}
+
+			friend constexpr int64_t operator-(rl_iterator a, rl_iterator b)
+			{
+				return static_cast<int64_t>(a.index()) - static_cast<int64_t>(b.index());
+			}
+
+			friend constexpr bool operator==(rl_iterator a, rl_iterator b)
+			{
+				if(a.rlc() != b.rlc())
+					return false;
+
+				auto const max = a.rlc()->base().back().count;
+				bool a_is_out = a.index() >= max || a.index() == sentinel_value;
+				bool b_is_out = b.index() >= max || b.index() == sentinel_value;
+
+				if(a_is_out && b_is_out)
+					return true;
+
+				return a.m_index == b.m_index;
+			}
+
+			friend constexpr bool operator!=(rl_iterator a, rl_iterator b)
+			{
+				return !(a == b);
+			}
 	};
 
 	static constexpr auto sentinel_value = rl_iterator<
-		run_length_container<T>>::sentinel_value;
+		run_length_container>::sentinel_value;
 
 	template<class It>
 	constexpr auto find_rl_index(It first, It last, uint64_t index) const
@@ -338,8 +365,10 @@ public:
 		return first;
 	}
 
-	template<class ForwardIt, class U>
-	constexpr static ForwardIt erase(std::vector<U>& v, ForwardIt to_erase)
+	template<class ForwardIt>
+	constexpr static ForwardIt erase(
+		UnderlyingContainer& v,
+		ForwardIt to_erase)
 	{
 		auto it = remove(to_erase, v.end());
 		return v.erase(it, v.end());
@@ -492,17 +521,17 @@ public:
 
 public:
 
-	using const_reference	= element_wrapper<run_length_container<T> const>;
-	using reference		= element_wrapper<run_length_container<T>>;
+	using const_reference	= element_wrapper<run_length_container const>;
+	using reference		= element_wrapper<run_length_container>;
 	using value_type	= T;
 	using size_type		= uint64_t;
 	using difference_type	= int64_t;
-	using pointer 		= rl_iterator<run_length_container<T>>;
-	using const_pointer	= rl_iterator<const run_length_container<T>>;
-	using iterator		= rl_iterator<run_length_container<T>>;
-	using const_iterator	= rl_iterator<const run_length_container<T>>;
-	using reverse_iterator	= rl_iterator<run_length_container<T>>;
-	using const_reverse_iterator= rl_iterator<const run_length_container<T>>;
+	using pointer 		= rl_iterator<run_length_container>;
+	using const_pointer	= rl_iterator<run_length_container const>;
+	using iterator		= rl_iterator<run_length_container>;
+	using const_iterator	= rl_iterator<run_length_container const>;
+	using reverse_iterator	= rl_iterator<run_length_container>;
+	using const_reverse_iterator= rl_iterator<run_length_container const>;
 	using allocator_type	= Alloc;
 
 	/*

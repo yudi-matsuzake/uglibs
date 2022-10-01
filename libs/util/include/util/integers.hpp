@@ -141,12 +141,28 @@ struct integer_info<T>{
 	static constexpr auto type_name = integer::type_name();
 };
 
+template<class T>
+struct underlying_integer_for {};
+
 template<util::arbitrary_integer T>
-using underlying_integer_for_t = util::underlying_integer_t<
-	T::n_bits,
-	typename T::signess,
-	util::mutable_flag
->;
+struct underlying_integer_for<T>{
+	using type = util::underlying_integer_t<
+		T::n_bits,
+		typename T::signess,
+		util::mutable_flag
+	>;
+};
+
+template<std::integral T>
+struct underlying_integer_for<T>{
+	using type = T;
+};
+
+template<class T>
+using underlying_integer_for_t = typename underlying_integer_for<T>::type;
+
+template<class T>
+concept integer_like = (std::integral<T> or util::arbitrary_integer<T>);
 
 } // end of namespace util
 
