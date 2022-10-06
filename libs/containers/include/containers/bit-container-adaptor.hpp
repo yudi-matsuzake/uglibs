@@ -201,7 +201,7 @@ public:
 
 	constexpr auto rbegin() noexcept
 	{
-		return iterator{ m_data, size() };
+		return iterator{ m_data, static_cast<int64_t>(size()) };
 	}
 
 	constexpr auto rend() noexcept

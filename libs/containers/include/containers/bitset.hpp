@@ -78,8 +78,7 @@ private:
 };
 
 template<uint64_t N>
-[[nodiscard]] constexpr
-void add_one(bitset<N>& bs)
+constexpr void add_one(bitset<N>& bs)
 {
 	for(auto&& bi : bs | vws::reverse)
 	{
