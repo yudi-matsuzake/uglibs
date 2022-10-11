@@ -35,7 +35,6 @@ if(ENABLE_TESTING)
 	add_executable(
 		ia-tests
 		tests/scoped-round-mode.cpp
-		tests/ia-tests.cpp
 		tests/interval.cpp)
 
 	target_link_libraries(ia-tests ia Catch2::Catch2)

@@ -27,7 +27,6 @@ if(ENABLE_TESTING)
 	enable_testing()
 	add_executable(
 		containers-tests
-		tests/containers-tests.cpp
 		tests/bit-container-adaptor.cpp
 		tests/tight-integer-container.cpp
 		tests/bitset.cpp

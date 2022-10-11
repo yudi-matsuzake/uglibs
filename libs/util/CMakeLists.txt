@@ -43,7 +43,6 @@ if(ENABLE_TESTING)
 		util-tests
 		./tests/integers.cpp
 		./tests/static-string.cpp
-		./tests/util-tests.cpp
 		./tests/variants.cpp
 		./tests/pairwise-tuple.cpp
 		./tests/bits.cpp

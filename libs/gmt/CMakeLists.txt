@@ -29,7 +29,6 @@ if(ENABLE_TESTING)
 	enable_testing()
 	add_executable(
 		gmt-tests
-		./tests/gmt-tests.cpp
 		./tests/point.cpp
 		./tests/mat.cpp
 		./tests/mat-inversion.cpp
