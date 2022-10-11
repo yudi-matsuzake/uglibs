@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 #include <compare>
+#include <algorithm>
 
 namespace containers{
 

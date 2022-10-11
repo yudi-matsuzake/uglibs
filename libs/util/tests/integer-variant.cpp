@@ -1,7 +1,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "catch2/catch_all.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 #include "util/integers.hpp"
 #include "util/integer-variant.hpp"

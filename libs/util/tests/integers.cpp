@@ -3,7 +3,7 @@
 #include <optional>
 #include <variant>
 
-#include "catch2/catch_all.hpp"
+#include "catch2/catch_test_macros.hpp"
 #include "util/integers.hpp"
 
 template<class Integer, util::static_string str>
