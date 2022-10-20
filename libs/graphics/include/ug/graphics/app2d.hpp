@@ -31,7 +31,7 @@ public:
 	virtual void draw_ui() override;
 
 	std::tuple<int32_t, int32_t> compute_cell_index_of_cursor_position(
-			std::optional<glm::vec2> const& space_point_cursor = std::nullopt
+		std::optional<glm::vec2> const& space_point_cursor = std::nullopt
 	);
 
 	glm::vec2 compute_space_point_of_cursor_position() const;

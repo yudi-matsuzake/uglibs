@@ -1,98 +1,128 @@
-cmake_minimum_required(VERSION 3.14)
-
+cmake_minimum_required(VERSION 3.16)
 project(graphics
-	VERSION 0.0.0
 	DESCRIPTION "ug-graphics is a graphics library comprised of window, input, and graphics abstraction/facilities"
-	LANGUAGES C CXX
-)
+	VERSION 0.0.0
+	LANGUAGES C CXX)
+
 
 # export information about compilation
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
-# including extra scripts and subdirectories
-include(./tools/cmake/warnings.cmake)
-include(./tools/cmake/glad.cmake)
-include(./tools/cmake/imgui.cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
-# set(GLM_TEST_ENABLE FALSE)
-# set(GLM_QUIET ON)
-# set(GLM_TEST_ENABLE_CXX_17 ON)
-# add_subdirectory(./external/glm)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
+
 
 # debug flags
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 endif()
 
+# including extra scripts and subdirectories
+include(./tools/cmake/warnings.cmake)
+
+include(./tools/cmake/conan.cmake)
+run_conan()
+
 # find_package(Catch2 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(glm REQUIRED)
+find_package(glm REQUIRED VERSION 0.9.9.8)
+find_package(glad REQUIRED VERSION 0.1.36)
+find_package(imgui REQUIRED VERSION 0.1.36)
 
-# ug graphics library
-add_library(
-	graphics STATIC
+add_library(ugimgui
+	"imgui-bindings/imgui_impl_glfw.h"
+	"imgui-bindings/imgui_impl_glfw.cpp"
+	"imgui-bindings/imgui_impl_opengl3.h"
+	"imgui-bindings/imgui_impl_opengl3.cpp")
 
-	# graphics
-	./src/opengl-error.cpp
-	./src/component.cpp
-	./src/misc.cpp
-	./src/ball2d-render.cpp
-	./src/shader.cpp
-	./src/grid2d-render.cpp
-	./src/vao.cpp
-	./src/program.cpp
-	./src/window.cpp
-	./src/app.cpp
-	./src/app2d.cpp
-	./src/app3d.cpp
-	./src/component-manager.cpp
-	./src/buffers.cpp
-	./src/render.cpp
-	./src/texture2d.cpp
-	./src/camera.cpp
-	./src/camera2d-controller.cpp
-	./src/segment2d-render.cpp
-	./src/scene.cpp
-	./src/mesh3d-render.cpp
-	./src/mesh3d.cpp
-
-	./include/ug/graphics/program.hpp
-	./include/ug/graphics/misc.hpp
-	./include/ug/graphics/shader.hpp
-	./include/ug/graphics/vao.hpp
-	./include/ug/graphics/opengl-error.hpp
-	./include/ug/graphics/grid2d-render.hpp
-	./include/ug/graphics/component-manager.hpp
-	./include/ug/graphics/component.hpp
-	./include/ug/graphics/buffers.hpp
-	./include/ug/graphics/window.hpp
-	./include/ug/graphics/app.hpp
-	./include/ug/graphics/app2d.hpp
-	./include/ug/graphics/app3d.hpp
-	./include/ug/graphics/ball2d-render.hpp
-	./include/ug/graphics/render.hpp
-	./include/ug/graphics/texture2d.hpp
-	./include/ug/graphics/camera.hpp
-	./include/ug/graphics/camera2d-controller.hpp
-	./include/ug/graphics/segment2d-render.hpp
-	./include/ug/graphics/scene.hpp
-	./include/ug/graphics/mesh3d.hpp
-	./include/ug/graphics/mesh3d-render.hpp
+target_link_libraries(ugimgui PUBLIC imgui::imgui)
+target_include_directories(ugimgui
+	PUBLIC
+		"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
+		"$<INSTALL_INTERFACE:include/imgui-bindings>"
 )
+
+add_library(graphics STATIC
+	include/ug/graphics/inputs.hpp
+	include/ug/graphics/camera2d-controller.hpp
+	include/ug/graphics/texture2d.hpp
+	include/ug/graphics/misc.hpp
+	include/ug/graphics/app.hpp
+	include/ug/graphics/ball2d-render.hpp
+	include/ug/graphics/camera.hpp
+	include/ug/graphics/buffers.hpp
+	include/ug/graphics/app3d.hpp
+	include/ug/graphics/component.hpp
+	include/ug/graphics/app2d.hpp
+	include/ug/graphics/segment2d-render.hpp
+	include/ug/graphics/grid2d-render.hpp
+	include/ug/graphics/vao.hpp
+	include/ug/graphics/window.hpp
+	include/ug/graphics/program.hpp
+	include/ug/graphics/scene.hpp
+	include/ug/graphics/mesh3d.hpp
+	include/ug/graphics/render.hpp
+	include/ug/graphics/opengl-error.hpp
+	include/ug/graphics/component-manager.hpp
+	include/ug/graphics/mesh3d-render.hpp
+	include/ug/graphics/shader.hpp
+
+	src/misc.cpp
+	src/component.cpp
+	src/segment2d-render.cpp
+	src/camera2d-controller.cpp
+	src/window.cpp
+	src/vao.cpp
+	src/shader.cpp
+	src/program.cpp
+	src/camera.cpp
+	src/component-manager.cpp
+	src/grid2d-render.cpp
+	src/render.cpp
+	src/buffers.cpp
+	src/scene.cpp
+	src/app.cpp
+	src/mesh3d-render.cpp
+	src/texture2d.cpp
+	src/app3d.cpp
+	src/app2d.cpp
+	src/mesh3d.cpp
+	src/opengl-error.cpp
+	src/ball2d-render.cpp
+)
+
+add_library(ug::graphics ALIAS graphics)
+
+target_include_directories(
+	graphics PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+
+target_compile_features(graphics PUBLIC cxx_std_20)
+
 target_link_libraries(
 	graphics
 	PUBLIC
 		ug-graphics-warnings
 		glfw
 		OpenGL::GL
-		imgui
-		glad
+		glad::glad
 		${OpenCV_LIBS}
 		stdc++fs
-		glm
+		glm::glm
+		imgui::imgui
 )
+
+target_link_libraries(graphics PRIVATE ugimgui)
+
+
+target_compile_definitions(graphics PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
 	graphics
@@ -101,6 +131,7 @@ target_include_directories(
 		$<INSTALL_INTERFACE:include>
 		${OpenCV_INCLUDE_DIRS}
 )
+
 target_include_directories(
 	graphics
 	SYSTEM PUBLIC
@@ -112,7 +143,37 @@ target_include_directories(
 
 		# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/glm>
 )
-target_compile_features(graphics PUBLIC cxx_std_20)
+
+if(ENABLE_PCH)
+	target_precompile_headers(
+		project_options
+		INTERFACE
+		include/ug/graphics/inputs.hpp
+		include/ug/graphics/camera2d-controller.hpp
+		include/ug/graphics/texture2d.hpp
+		include/ug/graphics/misc.hpp
+		include/ug/graphics/app.hpp
+		include/ug/graphics/ball2d-render.hpp
+		include/ug/graphics/camera.hpp
+		include/ug/graphics/buffers.hpp
+		include/ug/graphics/app3d.hpp
+		include/ug/graphics/component.hpp
+		include/ug/graphics/app2d.hpp
+		include/ug/graphics/segment2d-render.hpp
+		include/ug/graphics/grid2d-render.hpp
+		include/ug/graphics/vao.hpp
+		include/ug/graphics/window.hpp
+		include/ug/graphics/program.hpp
+		include/ug/graphics/scene.hpp
+		include/ug/graphics/mesh3d.hpp
+		include/ug/graphics/render.hpp
+		include/ug/graphics/opengl-error.hpp
+		include/ug/graphics/component-manager.hpp
+		include/ug/graphics/mesh3d-render.hpp
+		include/ug/graphics/shader.hpp
+)
+endif()
+
 
 # test programs
 option(GRAPHICS_TEST "Add test programs for graphics library" ON)
@@ -128,22 +189,28 @@ if(${GRAPHICS_TEST})
 	target_link_libraries(hello-scene PRIVATE graphics)
 endif()
 
-# installing ------------------------------------------------------------------
+set_property(TARGET graphics PROPERTY VERSION ${PROJECT_VERSION})
+set_property(TARGET graphics PROPERTY SOVERSION ${PROJECT_VERSION_MAJOR})
+set_property(TARGET graphics
+	APPEND PROPERTY
+	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-# installing headers
-install(DIRECTORY ./include/ug DESTINATION include)
-install(FILES ${IMGUI_HEADER} DESTINATION include/ug/imgui)
+install(TARGETS graphics ug-graphics-warnings ugimgui EXPORT graphicsTargets
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION bin
+	INCLUDES DESTINATION include)
 
-# FIXME: this will install glad.c instead of installing only the header files
-install(DIRECTORY ${GLAD_DIR} DESTINATION include/ug)
+install(EXPORT graphicsTargets
+	FILE graphicsTargets.cmake
+	NAMESPACE ug::
+	DESTINATION lib/cmake/graphics)
 
-# installation of libraries
-install(TARGETS imgui glad graphics ug-graphics-warnings EXPORT ugConfig
-	ARCHIVE  DESTINATION lib/ug
-	LIBRARY  DESTINATION lib/ug
-	RUNTIME  DESTINATION bin/ug
-)
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+	"${CMAKE_CURRENT_BINARY_DIR}/graphicsConfigVersion.cmake"
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY SameMajorVersion)
 
-install(EXPORT ugConfig NAMESPACE ug:: DESTINATION share/ug/cmake)
-# This makes the project importable from the build directory
-export(TARGETS glad imgui graphics ug-graphics-warnings FILE ugConfig.cmake)
+install(FILES graphicsConfig.cmake graphicsConfigVersion.cmake
+	DESTINATION lib/cmake/graphics)

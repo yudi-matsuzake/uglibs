@@ -2,6 +2,8 @@
 #include <stdexcept>
 
 #include "ug/graphics/app.hpp"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 namespace ug::graphics{
 
@@ -20,9 +22,9 @@ static void framebuffer_size_callback(GLFWwindow* w, int width, int height)
  * ================================
  */
 app::app(
-		int32_t width, int32_t height,
-		char const* window_title,
-		enum ug::graphics::app::projection_type proj_type)
+	int32_t width, int32_t height,
+	char const* window_title,
+	enum ug::graphics::app::projection_type proj_type)
 
 	: window(width, height, window_title),
 	  m_viewport{
@@ -37,7 +39,10 @@ app::app(
 	if(!gladLoadGL())
 		throw std::runtime_error("glad could not be loaded");
 
-	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	if(!gladLoadGLLoader(
+		reinterpret_cast<GLADloadproc>(glfwGetProcAddress))){
+		throw std::runtime_error("Failed to initialize Opengl context");
+	}
 
 	GL(glEnable(GL_BLEND));
 	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
