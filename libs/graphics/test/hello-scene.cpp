@@ -199,14 +199,28 @@ public:
 
 	void draw() override
 	{
+		auto const t = static_cast<float>(this->get_delta()*M_PI)
+			*m_rotation_speed;
+
 		scene.meshes[0]->transform(
-			glm::rotate(
-				static_cast<float>(this->get_delta()*M_PI),
-				glm::vec3{ 1.f, 1.f, 1.f }
-			)
+			glm::rotate(t, glm::vec3{ 1.f, 1.f, 1.f })
 		);
 
 		mesh_render(scene, *scene.meshes[0]);
+	}
+
+	void draw_ui() override
+	{
+		app3d::draw_ui();
+		if(auto view = this->ui_window_view("hello scene")){
+			ImGui::Text("Hello scene");
+			ImGui::SliderFloat(
+				"rotation speed",
+				&m_rotation_speed,
+				0.01f,
+				10.f
+			);
+		}
 	}
 
 private:
@@ -222,6 +236,8 @@ private:
 	};
 
 	ug::graphics::mesh3d_render mesh_render = ug::graphics::mesh3d_render(this);
+
+	float m_rotation_speed = 1.f;
 
 };
 

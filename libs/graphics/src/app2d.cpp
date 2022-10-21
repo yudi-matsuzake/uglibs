@@ -48,51 +48,31 @@ void app2d::update()
 void app2d::draw_ui()
 {
 	app::draw_ui();
-	ImGuiWindowFlags window_flags =
-		ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_NoScrollbar
-		| ImGuiWindowFlags_NoMove
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoCollapse 
-		| ImGuiWindowFlags_NoNav;
 
-	bool p_open = true;
+	if(ImGui::Begin("app2d options")){
+		auto fr = static_cast<double>(ImGui::GetIO().Framerate);
+		ImGui::Text("%3.2f FPS		", fr);
 
-	auto [ width, height ] = get_framebuffer_size();
+		auto [ cx, cy ] = compute_cell_index_of_cursor_position();
 
-	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(
-		ImVec2(static_cast<float>(width), 20.f),
-		ImGuiCond_Always
-	);
-	ImGui::Begin("app2d options", &p_open, window_flags);
+		ImGui::Text("cell index: (%5d, %5d)		", cx, cy);
 
-	auto fr = static_cast<double>(ImGui::GetIO().Framerate);
-	ImGui::Text("%3.2f FPS		", fr);
+		ImGui::Checkbox("show grid		", &m_show_grid);
 
-	auto [ cx, cy ] = compute_cell_index_of_cursor_position();
+		ImGui::ColorEdit3(
+			"background color		",
+			glm::value_ptr(m_background_color),
+			ImGuiColorEditFlags_NoInputs
+		);
 
-	ImGui::SameLine();
-	ImGui::Text("cell index: (%5d, %5d)		", cx, cy);
+		ImGui::ColorEdit3(
+			"grid color",
+			glm::value_ptr(m_grid_color),
+			ImGuiColorEditFlags_NoInputs
+		);
 
-	ImGui::SameLine();
-	ImGui::Checkbox("show grid		", &m_show_grid);
-
-	ImGui::SameLine();
-	ImGui::ColorEdit3(
-		"background color		",
-		glm::value_ptr(m_background_color),
-		ImGuiColorEditFlags_NoInputs
-	);
-
-	ImGui::SameLine();
-	ImGui::ColorEdit3(
-		"grid color",
-		glm::value_ptr(m_grid_color),
-		ImGuiColorEditFlags_NoInputs
-	);
-
-	ImGui::End();
+		ImGui::End();
+	}
 }
 
 void app2d::draw()

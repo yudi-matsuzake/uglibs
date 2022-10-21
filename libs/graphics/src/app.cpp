@@ -20,9 +20,9 @@ static void framebuffer_size_callback(GLFWwindow* w, int width, int height)
  * ================================
  */
 app::app(
-		int32_t width, int32_t height,
-		char const* window_title,
-		enum ug::graphics::app::projection_type proj_type)
+	int32_t width, int32_t height,
+	char const* window_title,
+	enum ug::graphics::app::projection_type proj_type)
 
 	: window(width, height, window_title),
 	  m_viewport{
@@ -51,7 +51,8 @@ app::app(
 	ImGui::CreateContext();
 	ImGui::GetIO().ConfigFlags |=
 		ImGuiConfigFlags_NavEnableKeyboard
-		| ImGuiConfigFlags_NavEnableGamepad;
+		| ImGuiConfigFlags_NavEnableGamepad
+		| ImGuiConfigFlags_DockingEnable;
 	// style
 	ImGui::StyleColorsDark();
 	// render
@@ -166,6 +167,17 @@ void app::on_drop_path(path_input const& input)
 
 void app::on_key_input(key_input const& input)
 {
+	auto toggle_menubar = [](auto key)
+	{
+		for(auto&& k : show_menubar_keys)
+			if(k == key)
+				return true;
+		return false;
+	};
+
+	if(input.action == GLFW_RELEASE && toggle_menubar(input.key))
+		m_enable_menu_bar = !m_enable_menu_bar;
+
 	for(auto&& [ id, ptr ] : m_component_manager){
 		if(auto c = ptr.lock())
 			c->on_key_input(input);
@@ -232,7 +244,54 @@ void app::draw_all()
 }
 
 void app::draw_ui()
-{}
+{
+	if(m_enabled_views.size() && m_enable_menu_bar){
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar |
+			ImGuiWindowFlags_NoDocking |
+			ImGuiWindowFlags_NoBackground |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus;
+
+		ImGuiDockNodeFlags dockspace_flags =
+			ImGuiDockNodeFlags_PassthruCentralNode;
+
+		ImGui::Begin("ug_main_ui", &m_enable_menu_bar, window_flags);
+
+		ImGui::PopStyleVar(2);
+
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("ug_dockspace");
+			ImGui::DockSpace(
+				dockspace_id,
+				ImVec2(0.0f, 0.0f),
+				dockspace_flags
+			);
+		}
+
+		if (ImGui::BeginMenuBar()){
+			if(ImGui::BeginMenu("views")){
+				for(auto& [k, v] : m_enabled_views)
+					ImGui::MenuItem(k.c_str(), NULL, &v);
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+		ImGui::End();
+	}
+}
 
 void app::draw_components_ui()
 {
@@ -397,5 +456,28 @@ cv::Mat app::get_current_frame_image() const
 	return flipped;
 }
 
+auto app::ui_window_view(
+	std::string_view str,
+	ImGuiWindowFlags flags)
+		 -> std::optional<ui_window_view_t>
+{
+	auto itr = [&vws = m_enabled_views, &str]{
+		if(auto it = vws.find(str); it != vws.end()){
+			return it;
+		}
+		auto&& [result, b] = vws.emplace(str, true);
+		return result;
+	}();
+
+	if(itr->second){
+		return app::ui_window_view_t{
+			itr->first.c_str(),
+			&(itr->second),
+			flags
+		};
+	}
+
+	return std::nullopt;
+}
 
 }

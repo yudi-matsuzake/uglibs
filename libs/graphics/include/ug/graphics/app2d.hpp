@@ -14,8 +14,7 @@ public:
 	static constexpr auto default_fheight = static_cast<float>(default_height);
 
 	static constexpr std::array exit_keys{
-		GLFW_KEY_ESCAPE,
-		GLFW_KEY_Q
+		GLFW_KEY_ESCAPE
 	};
 
 	app2d(int width, int height, char const* title);
@@ -31,7 +30,7 @@ public:
 	virtual void draw_ui() override;
 
 	std::tuple<int32_t, int32_t> compute_cell_index_of_cursor_position(
-			std::optional<glm::vec2> const& space_point_cursor = std::nullopt
+		std::optional<glm::vec2> const& space_point_cursor = std::nullopt
 	);
 
 	glm::vec2 compute_space_point_of_cursor_position() const;
