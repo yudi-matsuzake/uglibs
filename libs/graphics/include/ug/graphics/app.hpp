@@ -135,10 +135,14 @@ public:
 
 		ui_window_view_t& operator=(ui_window_view_t&& other)
 		{
-			m_window_name = std::exchange(other.m_window_name, nullptr);
-			m_popen = std::exchange(other.m_popen, nullptr);
-			m_flags = std::exchange(other.m_flags, 0);
-			other.m_close = false;
+			if(this != &other){
+				m_window_name = std::exchange(
+					other.m_window_name, nullptr
+				);
+				m_popen = std::exchange(other.m_popen, nullptr);
+				m_flags = std::exchange(other.m_flags, 0);
+				other.m_close = false;
+			}
 			return *this;
 		}
 

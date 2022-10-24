@@ -49,7 +49,7 @@ void app2d::draw_ui()
 {
 	app::draw_ui();
 
-	if(ImGui::Begin("app2d options")){
+	if(auto view = this->ui_window_view("app2d options")){
 		auto fr = static_cast<double>(ImGui::GetIO().Framerate);
 		ImGui::Text("%3.2f FPS		", fr);
 
@@ -70,8 +70,6 @@ void app2d::draw_ui()
 			glm::value_ptr(m_grid_color),
 			ImGuiColorEditFlags_NoInputs
 		);
-
-		ImGui::End();
 	}
 }
 
