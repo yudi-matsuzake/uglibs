@@ -2,28 +2,15 @@
 
 #include <cstdint>
 
-#include "ug/graphics/misc.hpp"
+#include "ug/graphics/basic-texture.hpp"
 
 namespace ug::graphics{
 
-enum class wrap_type : int32_t {
-	CLAMP_TO_EDGE		= GL_CLAMP_TO_EDGE,
-	CLAMP_TO_BORDER		= GL_CLAMP_TO_BORDER,
-	MIRRORED_REPEAT		= GL_MIRRORED_REPEAT,
-	REPEAT			= GL_REPEAT,
-	MIRROR_CLAMP_TO_EDGE	= GL_MIRROR_CLAMP_TO_EDGE
-};
-
-enum class filter_type : int32_t {
-	NEAREST = GL_NEAREST,
-	LINEAR = GL_LINEAR
-};
-
-class texture2d{
-public:
-
+class texture2d : public basic_texture {
+private:
 	texture2d();
-	texture2d(
+public:
+	explicit texture2d(
 		unsigned char const* data,
 		int32_t width,
 		int32_t height,
@@ -33,27 +20,15 @@ public:
 		filter_type mag_filter = filter_type::LINEAR
 	);
 
-	virtual ~texture2d();
+	texture2d(texture2d&&);
+	texture2d& operator=(texture2d&&);
 
-	uint32_t id() const;
-	void bind() const;
-
-	void set_texture_wrap_s(wrap_type wrap);
-	void set_texture_wrap_t(wrap_type wrap);
-
-	void set_texture_magnifier_filter(filter_type filter);
-	void set_texture_minifier_filter(filter_type filter);
-
-	void set_border_color(color4 const& border_color) const;
-
-	void generate_mipmap();
-
-	void set_data(unsigned char const* data, int32_t width, int32_t height);
-
+	void set_data(unsigned char const* data) override;
 	void activate(uint32_t texture_unit) const;
 
-protected:
-	uint32_t m_id;
+private:
+	int32_t m_width = -1;
+	int32_t m_height = -1;
 };
 
 } // end of namespace graphics

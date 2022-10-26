@@ -50,6 +50,7 @@ add_library(
 	./src/component-manager.cpp
 	./src/buffers.cpp
 	./src/render.cpp
+	./src/basic-texture.cpp
 	./src/texture2d.cpp
 	./src/camera.cpp
 	./src/camera2d-controller.cpp
@@ -73,6 +74,7 @@ add_library(
 	./include/ug/graphics/app3d.hpp
 	./include/ug/graphics/ball2d-render.hpp
 	./include/ug/graphics/render.hpp
+	./include/ug/graphics/basic-texture.hpp
 	./include/ug/graphics/texture2d.hpp
 	./include/ug/graphics/camera.hpp
 	./include/ug/graphics/camera2d-controller.hpp
