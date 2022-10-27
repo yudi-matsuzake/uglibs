@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 #include "glm/vec2.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -20,6 +22,45 @@ namespace ug::graphics{
 using color4 = glm::vec4;
 using color3 = glm::vec3;
 using scalar = double;
+
+enum class color_type : uint32_t {
+	R = GL_RED,
+	RG = GL_RG,
+	RGB = GL_RGB,
+	RGBA = GL_RGBA,
+	BGR = GL_BGR,
+	BGRA = GL_BGRA
+};
+
+template<class T>
+struct type_code;
+
+template<>
+struct type_code<uint8_t>
+{
+	static constexpr uint32_t value = GL_UNSIGNED_BYTE;
+};
+
+template<>
+struct type_code<uint16_t>
+{
+	static constexpr uint32_t value = GL_UNSIGNED_SHORT;
+};
+
+template<>
+struct type_code<uint32_t>
+{
+	static constexpr uint32_t value = GL_UNSIGNED_INT;
+};
+
+template<>
+struct type_code<float>
+{
+	static constexpr uint32_t value = GL_FLOAT;
+};
+
+template<class T>
+static constexpr auto type_code_v = type_code<T>::value;
 
 struct rect2d{
 	glm::vec2 position;

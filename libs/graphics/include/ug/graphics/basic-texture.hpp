@@ -47,8 +47,6 @@ public:
 
 	void activate(uint32_t texture_unit) const;
 
-	virtual void set_data(unsigned char const* data) = 0;
-
 protected:
 	std::optional<uint32_t> m_id;
 	uint32_t m_target;
