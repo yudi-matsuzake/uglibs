@@ -128,6 +128,9 @@ struct is_specialization_of<Primary<Args...>, Primary>  : std::true_type {};
 template<class T, template<class...> class Primary>
 constexpr bool is_specialization_of_v = is_specialization_of<T, Primary>::value;
 
+template<class T, template<class ...> class Primary>
+concept specialization_of = is_specialization_of_v<T, Primary>;
+
 // queue
 
 template<class T>
