@@ -53,9 +53,14 @@ void app2d::draw_ui()
 		auto fr = static_cast<double>(ImGui::GetIO().Framerate);
 		ImGui::Text("%3.2f FPS		", fr);
 
-		auto [ cx, cy ] = compute_cell_index_of_cursor_position();
+		auto const mv = compute_space_point_of_cursor_position();
+		auto [ cx, cy ] = compute_cell_index_of_cursor_position(mv);
 
-		ImGui::Text("cell index: (%5d, %5d)		", cx, cy);
+		ImGui::Text("index point: (%5d, %5d)		", cx, cy);
+		ImGui::Text("space point: (%5f, %5f)		",
+			static_cast<double>(mv.x),
+			static_cast<double>(mv.y)
+		);
 
 		ImGui::Checkbox("show grid		", &m_show_grid);
 

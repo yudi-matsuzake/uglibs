@@ -16,23 +16,20 @@ public:
 	template<rgs::range R>
 	explicit texture1d(
 		R const& data,
-		int32_t width,
+		color_type internal_format,
+		color_type pixel_format,
 		wrap_type s_wrap,
-		wrap_type t_wrap,
 		filter_type min_filter,
 		filter_type mag_filter)
 
 		: texture1d()
 	{
-		m_width = width;
-
 		set_texture_wrap_s(s_wrap);
-		set_texture_wrap_t(t_wrap);
 
 		set_texture_minifier_filter(min_filter);
 		set_texture_magnifier_filter(mag_filter);
 
-		set_data(data, color_type::RGB, color_type::RGBA);
+		set_data(data, internal_format, pixel_format);
 		generate_mipmap();
 	}
 
@@ -52,16 +49,13 @@ public:
 			m_target,
 			0,
 			static_cast<int32_t>(internal_format),
-			m_width,
+			static_cast<int32_t>(rgs::size(data)),
 			0,
 			static_cast<uint32_t>(pixel_format),
 			type_code_v<rgs::range_value_t<R>>,
-			data
+			rgs::cdata(data)
 		));
 	}
-
-private:
-	int32_t m_width = -1;
 };
 
 } // end of namespace graphics

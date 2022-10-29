@@ -1,9 +1,12 @@
 #pragma once
 
+#include <ranges>
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/shader.hpp"
 
 namespace ug::graphics{
+
+namespace rgs = std::ranges;
 
 class program{
 public:
@@ -32,6 +35,18 @@ public:
 	void set_uniform(char const* name, bool b) const;
 
 	void set_uniform(char const* name, int32_t n) const;
+
+	template<class R>
+	void set_uniform(char const* name, R const& r) const
+	{
+		int32_t id;
+		GL(id = glGetUniformLocation(m_id, name));
+		GL(glUniform1fv(
+			id,
+			static_cast<int32_t>(rgs::size(r)),
+			rgs::cdata(r))
+		);
+	}
 
 protected:
 	uint32_t m_id;

@@ -10,18 +10,13 @@ texture1d::texture1d()
 
 texture1d::texture1d(texture1d&& other)
 	: basic_texture(std::forward<texture1d>(other))
-{
-	if(this != &other){
-		m_width = std::exchange(other.m_width, -1);
-	}
-}
+{}
 
 texture1d& texture1d::operator=(texture1d&& other)
 {
 	if(this != &other){
 		basic_texture& base = *this;
 		base = std::forward<texture1d>(other);
-		m_width = std::exchange(other.m_width, -1);
 	}
 	return *this;
 }

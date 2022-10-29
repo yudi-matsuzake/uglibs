@@ -103,8 +103,8 @@ void basic_texture::generate_mipmap()
 
 void basic_texture::activate(uint32_t texture_unit) const
 {
-	GL(glActiveTexture(GL_TEXTURE0 + texture_unit));
 	bind();
+	GL(glActiveTexture(GL_TEXTURE0 + texture_unit));
 }
 
 } // end of namespace ug::graphics
