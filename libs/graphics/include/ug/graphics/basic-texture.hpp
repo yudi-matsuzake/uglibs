@@ -33,7 +33,7 @@ public:
 
 
 	uint32_t id() const;
-	void bind() const;
+	virtual void bind() const;
 
 	void set_texture_wrap_s(wrap_type wrap);
 	void set_texture_wrap_t(wrap_type wrap);
