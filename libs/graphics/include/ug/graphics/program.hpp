@@ -36,12 +36,26 @@ public:
 
 	void set_uniform(char const* name, int32_t n) const;
 
-	template<class R>
+	template<rgs::range R>
+		requires (std::is_same_v<rgs::range_value_t<R>, float>)
 	void set_uniform(char const* name, R const& r) const
 	{
 		int32_t id;
 		GL(id = glGetUniformLocation(m_id, name));
 		GL(glUniform1fv(
+			id,
+			static_cast<int32_t>(rgs::size(r)),
+			rgs::cdata(r))
+		);
+	}
+
+	template<rgs::range R>
+		requires (std::is_same_v<rgs::range_value_t<R>, int32_t>)
+	void set_uniform(char const* name, R const& r) const
+	{
+		int32_t id;
+		GL(id = glGetUniformLocation(m_id, name));
+		GL(glUniform1iv(
 			id,
 			static_cast<int32_t>(rgs::size(r)),
 			rgs::cdata(r))

@@ -67,7 +67,6 @@ void program::use() const
 	GL(glUseProgram(m_id));
 }
 
-
 void program::set_uniform(char const* name, float f1) const
 {
 	int32_t id;
