@@ -30,7 +30,7 @@ glm::vec2 rect2d::center() const
 {
 	return {
 		position.x + width/2.f,
-		position.y + height/2.f
+		position.y - height/2.f
 	};
 }
 
