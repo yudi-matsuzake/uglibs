@@ -132,6 +132,9 @@ if(${GRAPHICS_TEST})
 
 	add_executable(hello-scene ./test/hello-scene.cpp)
 	target_link_libraries(hello-scene PRIVATE graphics)
+
+	add_executable(raymarching-primitives ./test/raymarching-primitives.cpp)
+	target_link_libraries(raymarching-primitives PRIVATE graphics)
 endif()
 
 # installing ------------------------------------------------------------------
