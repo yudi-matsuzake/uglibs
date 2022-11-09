@@ -18,9 +18,6 @@ public:
 	);
 
 	virtual ~app3d() = default;
-
-	virtual void draw_ui() override;
-
 };
 
 

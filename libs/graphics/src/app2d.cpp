@@ -50,9 +50,6 @@ void app2d::draw_ui()
 	app::draw_ui();
 
 	if(auto view = this->ui_window_view("app2d options")){
-		auto fr = static_cast<double>(ImGui::GetIO().Framerate);
-		ImGui::Text("%3.2f FPS		", fr);
-
 		auto const mv = compute_space_point_of_cursor_position();
 		auto [ cx, cy ] = compute_cell_index_of_cursor_position(mv);
 

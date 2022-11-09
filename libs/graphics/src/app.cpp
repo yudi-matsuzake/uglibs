@@ -40,8 +40,9 @@ app::app(
 	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 
 	GL(glEnable(GL_BLEND));
-	GL(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
-
+	GL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	GL(glEnable(GL_LINE_SMOOTH));
+	GL(glHint(GL_LINE_SMOOTH_HINT, GL_NICEST));
 
 	/*
 	 * imgui context
@@ -279,6 +280,11 @@ void app::draw_ui()
 				ImVec2(0.0f, 0.0f),
 				dockspace_flags
 			);
+		}
+
+		if(auto view = this->ui_window_view("info")){
+			auto fr = static_cast<double>(ImGui::GetIO().Framerate);
+			ImGui::Text("%3.2f FPS		", fr);
 		}
 
 		if (ImGui::BeginMenuBar()){
