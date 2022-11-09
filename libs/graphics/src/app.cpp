@@ -390,9 +390,10 @@ void app::on_scroll_input_components(scroll_input const& input)
 	}
 }
 
-rect2d app::compute_projected_viewport(
+auto app::compute_projected_corners(
 	std::optional<glm::mat4> const& pm,
 	std::optional<glm::mat4> const& vm) const
+	-> std::tuple<glm::vec4, glm::vec4>
 {
 	auto const p = pm.has_value() ? pm.value() : compute_projection_matrix();
 	auto const v = vm.has_value() ? vm.value() : get_view_matrix();
@@ -402,6 +403,14 @@ rect2d app::compute_projected_viewport(
 	auto ul = vp*glm::vec4{ -1.f,  1.f, 0.f, 1.f };
 	auto dr = vp*glm::vec4{  1.f, -1.f, 0.f, 1.f };
 
+	return std::tuple{ ul, dr };
+}
+
+rect2d app::compute_projected_viewport(
+	std::optional<glm::mat4> const& pm,
+	std::optional<glm::mat4> const& vm) const
+{
+	auto [ul, dr] = compute_projected_corners(pm, vm);
 	return rect2d{
 		{ ul.x, ul.y },
 		dr.x - ul.x,

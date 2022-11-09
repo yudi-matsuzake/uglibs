@@ -18,5 +18,15 @@ app3d::app3d(
 	set_clear_flags(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void app3d::draw_ui()
+{
+	app::draw_ui();
+
+	if(auto view = this->ui_window_view("app3d info")){
+		auto fr = static_cast<double>(ImGui::GetIO().Framerate);
+		ImGui::Text("%3.2f FPS		", fr);
+	}
+}
+
 
 } // end of namespace ug::graphics

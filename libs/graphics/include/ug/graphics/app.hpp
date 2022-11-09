@@ -92,6 +92,11 @@ public:
 	void on_key_input_components(key_input const& input);
 	void on_scroll_input_components(scroll_input const& input);
 
+	auto compute_projected_corners(
+		std::optional<glm::mat4> const& pm = std::nullopt,
+		std::optional<glm::mat4> const& vm = std::nullopt
+	) const -> std::tuple<glm::vec4, glm::vec4>;
+
 	rect2d compute_projected_viewport(
 		std::optional<glm::mat4> const& pm = std::nullopt,
 		std::optional<glm::mat4> const& vm = std::nullopt
