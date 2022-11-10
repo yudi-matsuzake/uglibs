@@ -154,7 +154,7 @@ bool app::is_key_pressed(int32_t key) const
 
 bool app::is_mouse_button_pressed(int32_t mouse_button) const
 {
-	return !ui_want_capture_keyboard()
+	return !ui_want_capture_mouse()
 		&& window::is_mouse_button_pressed(mouse_button);
 }
 

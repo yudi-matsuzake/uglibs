@@ -1,5 +1,6 @@
 #include "ug/graphics/app2d.hpp"
 
+
 namespace ug::graphics{
 
 app2d::app2d(int width, int height, char const* title)

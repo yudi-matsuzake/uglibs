@@ -39,7 +39,6 @@ public:
 
 	std::tuple<int32_t, int32_t> get_framebuffer_size() const;
 
-	std::tuple<double, double> get_cursor_position() const;
 	glm::vec2 get_cursor_vector() const;
 
 	void poll_events() const;
@@ -53,6 +52,7 @@ public:
 	virtual void on_key_input(key_input const& input);
 	virtual void on_scroll_input(scroll_input const& input);
 	virtual void on_mouse_button(mouse_button_input const& input);
+	virtual std::tuple<double, double> get_cursor_position() const;
 
 	void swap_buffers() const;
 

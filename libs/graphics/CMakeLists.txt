@@ -56,6 +56,7 @@ add_library(
 	./src/texture2d.cpp
 	./src/camera.cpp
 	./src/camera2d-controller.cpp
+	./src/camera3d-controller.cpp
 	./src/segment2d-render.cpp
 	./src/scene.cpp
 	./src/mesh3d-render.cpp
@@ -82,6 +83,7 @@ add_library(
 	./include/ug/graphics/texture2d.hpp
 	./include/ug/graphics/camera.hpp
 	./include/ug/graphics/camera2d-controller.hpp
+	./include/ug/graphics/camera3d-controller.hpp
 	./include/ug/graphics/segment2d-render.hpp
 	./include/ug/graphics/scene.hpp
 	./include/ug/graphics/mesh3d.hpp
