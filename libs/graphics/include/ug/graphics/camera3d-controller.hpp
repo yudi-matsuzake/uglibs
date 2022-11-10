@@ -44,6 +44,13 @@ public:
 			GLFW_KEY_S
 		};
 
+		static constexpr auto left_rotation = std::array {
+			GLFW_KEY_Q
+		};
+
+		static constexpr auto right_rotation = std::array {
+			GLFW_KEY_E
+		};
 	} keymap = {};
 
 	camera3d_controller(app*);
@@ -59,6 +66,8 @@ public:
 		bool right = false;
 		bool forward = false;
 		bool backward = false;
+		bool left_rotation = false;
+		bool right_rotation = false;
 	};
 
 	struct scroll_type {
@@ -79,10 +88,15 @@ public:
 
 private:
 	// speed in pixels per second
-	float m_speed = 10.f;
+	float m_translation_speed = 10.f;
+
+	// rotate by an angle of pi per second
+	float m_rotation_speed = 1.0f;
+	glm::vec3 rotation_anchor_point = glm::vec3{0.f};
 
 	mouse_type process_mouse_input() const;
 	glm::vec3 build_translation_vector(intentions_type const&) const;
+	glm::vec2 build_rotation_vector(intentions_type const&) const;
 
 };
 

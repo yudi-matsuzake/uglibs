@@ -57,11 +57,32 @@ void camera3d_controller::update()
 		.forward = is_at_least_one_pressed(get_app(), keymap.forward)
 			|| (m_scroll.y_offset > 0.f),
 		.backward = is_at_least_one_pressed(get_app(), keymap.backward)
-			|| (m_scroll.y_offset < 0.f)
+			|| (m_scroll.y_offset < 0.f),
+		.left_rotation = is_at_least_one_pressed(
+			get_app(),
+			keymap.left_rotation),
+		.right_rotation = is_at_least_one_pressed(
+			get_app(),
+			keymap.right_rotation)
 	};
 
-	auto const v = build_translation_vector(intentions);
-	get_app()->get_camera().translate(v);
+	auto& cam = get_app()->get_camera();
+
+	auto const t = build_translation_vector(intentions);
+	cam.translate(t);
+
+	auto const r = build_rotation_vector(intentions);
+
+	if(r.x != 0.f){
+		cam.position = glm::rotateY(cam.position, r.x);
+		cam.aim_to(glm::vec3{ 0.f });
+	}
+
+	if(r.y != 0.f){
+		cam.position = glm::rotateX(cam.position, r.y);
+		cam.aim_to(glm::vec3{ 0.f });
+	}
+
 
 	m_scroll = scroll_type{};
 	m_mouse = process_mouse_input();
@@ -101,7 +122,7 @@ glm::vec3 camera3d_controller::build_translation_vector(
 {
 	auto const button_t = make_button_translation(
 		get_app(),
-		intetions, m_speed
+		intetions, m_translation_speed
 	);
 
 	auto const mouse_t = glm::vec3{
@@ -113,5 +134,44 @@ glm::vec3 camera3d_controller::build_translation_vector(
 
 	return button_t + mouse_t;
 }
+
+static glm::vec2 make_button_rotation(
+	ug::graphics::app const* app,
+	camera3d_controller::intentions_type const& intetions,
+	float speed)
+{
+	glm::vec2 t{ .0f, .0f };
+	if(intetions.left_rotation)	t.r -= 1.f;
+	if(intetions.right_rotation)	t.r += 1.f;
+
+	auto l = glm::length(t);
+	if(l > 0.f){
+		auto fd = static_cast<float>(app->get_delta());
+		auto length = speed * glm::pi<float>() * fd;
+		t = glm::normalize(t)*length;
+	}
+
+	return t;
+}
+
+
+glm::vec2 camera3d_controller::build_rotation_vector(
+	camera3d_controller::intentions_type const& intentions) const
+{
+	auto const mouse_r = glm::vec2{
+		(m_mouse.mode == mouse_mode::ROTATION)
+		? m_mouse.t
+		: glm::vec2(0.f)
+	} * static_cast<float>(get_app()->get_delta());
+
+	auto const button_r = make_button_rotation(
+		get_app(),
+		intentions,
+		m_rotation_speed
+	);
+
+	return button_r + mouse_r;
+}
+
 
 } // end of namespace ug::graphics
