@@ -160,7 +160,7 @@ glm::vec2 camera3d_controller::build_rotation_vector(
 {
 	auto const mouse_r = glm::vec2{
 		(m_mouse.mode == mouse_mode::ROTATION)
-		? m_mouse.t
+		? (m_mouse.t * glm::vec2{ -1.f, 1.f })
 		: glm::vec2(0.f)
 	} * static_cast<float>(get_app()->get_delta());
 
