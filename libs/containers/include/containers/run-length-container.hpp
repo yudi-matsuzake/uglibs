@@ -90,6 +90,9 @@ private:
 			return m_rl_index_cache.value();
 		}
 
+		constexpr run_length_consistent_type()
+		{}
+
 		constexpr run_length_consistent_type(
 				RLC* a_rlc,
 				uint64_t a_index)
