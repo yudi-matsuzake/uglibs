@@ -51,7 +51,7 @@ if(ENABLE_TESTING)
 		./tests/integer-variant.cpp
 		./tests/arithmetic-friends.cpp)
 
-	target_link_libraries(util-tests util Catch2::Catch2)
+	target_link_libraries(util-tests util Catch2::Catch2 Catch2::Catch2WithMain)
 
 	include(CTest)
 	include(Catch)

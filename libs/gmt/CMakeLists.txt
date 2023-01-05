@@ -35,7 +35,7 @@ if(ENABLE_TESTING)
 		./tests/embedded-point.cpp
 		./tests/cross-product.cpp)
 
-	target_link_libraries(gmt-tests gmt util::util Catch2::Catch2)
+	target_link_libraries(gmt-tests gmt util::util Catch2::Catch2 Catch2::Catch2WithMain)
 
 	include(CTest)
 	include(Catch)

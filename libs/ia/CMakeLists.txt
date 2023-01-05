@@ -37,7 +37,7 @@ if(ENABLE_TESTING)
 		tests/scoped-round-mode.cpp
 		tests/interval.cpp)
 
-	target_link_libraries(ia-tests ia Catch2::Catch2)
+	target_link_libraries(ia-tests ia Catch2::Catch2 Catch2::Catch2WithMain)
 
 	include(CTest)
 	include(Catch)

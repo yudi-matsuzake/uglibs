@@ -32,7 +32,7 @@ if(ENABLE_TESTING)
 		tests/bitset.cpp
 		tests/run-length-container.cpp)
 
-	target_link_libraries(containers-tests Catch2::Catch2 containers util::util)
+	target_link_libraries(containers-tests Catch2::Catch2 Catch2::Catch2WithMain containers util::util)
 
 	include(CTest)
 	include(Catch)
