@@ -1,15 +1,9 @@
 #pragma once
 
 #include <array>
-#include <concepts>
-#include <ranges>
-#include <algorithm>
 #include <iostream>
-#include <iterator>
 
 #include "util/misc.hpp"
-
-#include "range/v3/numeric/accumulate.hpp"
 
 namespace util{
 
@@ -29,7 +23,8 @@ public:
 		requires (S <= E && S >= 0 && E <= N)
 	{
 		basic_static_string<T, E - S + 1> ss;
-		rgs::copy(this->begin() + S, this->begin() + E, ss.begin());
+		for(auto i = 0UL; i < ss.size(); ++i)
+			ss[i] = (*this)[S + i];
 		ss.back() = '\0';
 		return ss;
 	}
@@ -42,9 +37,12 @@ constexpr auto operator+(
 	basic_static_string<T, M> const& b)
 {
 	basic_static_string<T, N + M - 1> result;
-	auto a_str = rgs::subrange(a.begin(), a.end() - 1);
-	rgs::copy(a_str, result.begin());
-	rgs::copy(b, result.begin() + rgs::size(a_str));
+	for(auto i=0UL; (i + 1UL) < a.size(); ++i)
+		result[i] = a[i];
+
+	for(auto i=0UL; i<b.size(); ++i)
+		result[a.size() - 1 + i] = b[i];
+
 	return result;
 }
 
@@ -69,7 +67,10 @@ constexpr auto operator==(
 	basic_static_string<T, N> const& a,
 	basic_static_string<T, N> const& b)
 {
-	return rgs::equal(a, b);
+	for(auto i=0UL; i<N; ++i)
+		if(a[i] != b[i])
+			return false;
+	return true;
 }
 
 template<class T, uint64_t N>
@@ -93,12 +94,19 @@ constexpr std::ostream& operator<<(
 	std::ostream& out,
 	basic_static_string<T, N> const& s)
 {
-	rgs::copy(s, std::ostream_iterator<T>{out, ""});
+	for(auto i=0UL; i<s.size(); ++i)
+		out << s[i];
 	return out;
 }
 
 template<uint64_t N>
-using static_string = basic_static_string<char, N>;
+class static_string : public basic_static_string<char, N> {
+public:
+	using basic_static_string<char, N>::basic_static_string;
+};
+
+template<uint64_t N>
+static_string(char const (&)[N]) -> static_string<N>;
 
 template<uint64_t N>
 constexpr auto to_static_string()
@@ -106,20 +114,18 @@ constexpr auto to_static_string()
 	constexpr auto n_digits = number_of_digits(N, 10UL);
 	static_string<n_digits + 1> a;
 
-	auto n = N;
+	auto make_next = [n = N]() mutable {
+		auto const ni = n % 10;
+		n /= 10;
+		return '0' + ni;
+	};
+
+	for(auto i=0UL; (i+1UL) < a.size(); ++i) {
+		a[a.size() - i - 2] = make_next();
+	}
 
 	a.back() = '\0';
 
-	rgs::generate(
-		vws::reverse(a) | vws::drop(1),
-		[n]() mutable
-		{
-			auto const ni = n % 10;
-			n /= 10;
-			return '0' + ni;
-		}
-	);
-	
 	return a;
 }
 
@@ -128,14 +134,11 @@ constexpr uint64_t from_static_string(static_string<N> const& str)
 {
 	uint64_t acc = 0;
 
-	rgs::for_each(
-		vws::reverse(str) | vws::drop(1),
-		[i=0, &acc](char c) mutable
-		{
-			uint64_t ci = c - '0';
-			acc += ci * pow(10, i++);
-		}
-	);
+	for(auto i=0; (i + 1UL) < str.size(); ++i) {
+		auto const c = str[str.size() - i - 2];
+		uint64_t ci = c - '0';
+		acc += ci * pow(10, i);
+	}
 
 	return acc;
 }

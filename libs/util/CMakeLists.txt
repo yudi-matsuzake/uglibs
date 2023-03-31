@@ -34,7 +34,7 @@ target_include_directories(
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
-target_compile_features(util PUBLIC cxx_std_20)
+target_compile_features(util PUBLIC cxx_std_23)
 
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)
