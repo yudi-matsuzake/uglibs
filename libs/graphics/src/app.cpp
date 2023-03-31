@@ -447,7 +447,7 @@ cv::Mat app::get_current_frame_image() const
 	auto h = static_cast<int>(vp.height);
 
 	static cv::Mat img;
-	img.create(h, w, CV_8UC4);
+	img.create(h, w, CV_8UC3);
 
 	//use fast 4-byte alignment (default anyway) if possible
 	GL(glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4));
@@ -461,7 +461,7 @@ cv::Mat app::get_current_frame_image() const
 	GL(glReadPixels(
 		0, 0,
 		img.cols, img.rows,
-		GL_BGRA,
+		GL_BGR,
 		GL_UNSIGNED_BYTE,
 		img.data
 	));

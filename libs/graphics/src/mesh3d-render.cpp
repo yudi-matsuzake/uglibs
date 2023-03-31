@@ -135,9 +135,9 @@ void mesh3d_render::operator()(
 	scene const& s,
 	mesh3d const& mesh)
 {
-	if(triangles.draw){
-		common_program_setup(s, mesh);
+	common_program_setup(s, mesh);
 
+	if(triangles.draw){
 		m_program.set_uniform("u_color", triangles.color);
 		m_program.set_uniform(
 			"u_use_attr_color",
@@ -147,10 +147,8 @@ void mesh3d_render::operator()(
 	}
 
 	if(lines.draw){
-		common_program_setup(s, mesh);
 		float saved_line_width;
 		GL(glGetFloatv(GL_LINE_WIDTH, &saved_line_width));
-
 		GL(glLineWidth(lines.line_width));
 		m_program.set_uniform("u_color", lines.color);
 		m_program.set_uniform(
