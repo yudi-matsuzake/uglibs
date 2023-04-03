@@ -330,7 +330,7 @@ template<class T, uint64_t R, uint64_t C>
 auto make_projection_matrix(mat<T, R, C> const& a)
 {
 	auto const t = transpose(a);
-	auto const& inv = inverse(t*a).value();
+	auto const inv = inverse(t*a).value();
 	return a * inv * t;
 }
 
