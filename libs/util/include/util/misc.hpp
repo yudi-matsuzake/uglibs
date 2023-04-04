@@ -14,7 +14,7 @@
 namespace util{
 
 namespace rgs = std::ranges;
-namespace vws = std::views;
+namespace vws = std::ranges::views;
 
 template<class str_iterator, class ext_iterator>
 bool ends_with(

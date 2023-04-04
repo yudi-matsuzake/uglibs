@@ -64,15 +64,19 @@ auto cast(interval<F> const& a)
 template<class T>
 auto sqrt(interval<T> const& in)
 {
+	auto std_sqrt = [](auto x){ return std::sqrt(x); };
+
 	if(in.is_empty() || in.hi() < T{0}){
 		return interval<T>::empty();
 	}else if(in.lo() <= T{0}){
-		return interval<T>{ T{0}, execute_upward(::sqrt, in.hi()) };
+		return ia::interval<T>{
+			T{0}, ia::execute_upward(std_sqrt, in.hi())
+		};
 	}
 
 	return interval<T>{
-		execute_downward(::sqrt, in.lo()),
-		execute_upward(::sqrt, in.hi())
+		ia::execute_downward(std_sqrt, in.lo()),
+		ia::execute_upward(std_sqrt, in.hi())
 	};
 }
 
@@ -82,7 +86,13 @@ constexpr auto abs(interval<T> const& in)
 	if(in.is_empty())
 		return interval<T>::empty();
 
-	auto [ lo, hi ] = util::minmax(std::abs(in.lo()), std::abs(in.hi()));
+	auto abs = [](T x) {
+		if(x < T{0}) 
+			return -x;
+		return x;
+	};
+
+	auto [ lo, hi ] = util::minmax(abs(in.lo()), abs(in.hi()));
 
 	return (in.lo() < T{0} && in.hi() > T{0})
 		? interval<T>{ T{0}, hi }

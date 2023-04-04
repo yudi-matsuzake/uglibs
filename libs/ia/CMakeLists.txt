@@ -29,6 +29,21 @@ target_link_libraries(ia PUBLIC util::util)
 
 target_compile_features(ia PUBLIC cxx_std_20)
 
+target_compile_options(ia PUBLIC
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++>
+)
+
+target_link_options(ia PUBLIC
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++
+			-lc++abi>
+)
+
+
+
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)
 	enable_testing()
@@ -37,7 +52,7 @@ if(ENABLE_TESTING)
 		tests/scoped-round-mode.cpp
 		tests/interval.cpp)
 
-	target_link_libraries(ia-tests ia Catch2::Catch2 Catch2::Catch2WithMain)
+	target_link_libraries(ia-tests ia Catch2::Catch2WithMain Catch2::Catch2)
 
 	include(CTest)
 	include(Catch)

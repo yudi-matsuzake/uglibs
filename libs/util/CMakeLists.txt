@@ -36,6 +36,20 @@ target_include_directories(
 
 target_compile_features(util PUBLIC cxx_std_23)
 
+target_compile_options(util PUBLIC
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++>
+)
+
+target_link_options(util PUBLIC
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++
+			-lc++abi>
+)
+
+
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)
 	enable_testing()
@@ -51,7 +65,7 @@ if(ENABLE_TESTING)
 		./tests/integer-variant.cpp
 		./tests/arithmetic-friends.cpp)
 
-	target_link_libraries(util-tests util Catch2::Catch2 Catch2::Catch2WithMain)
+	target_link_libraries(util-tests util Catch2::Catch2WithMain Catch2::Catch2)
 
 	include(CTest)
 	include(Catch)
