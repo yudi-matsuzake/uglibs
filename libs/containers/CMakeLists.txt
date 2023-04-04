@@ -22,6 +22,19 @@ target_include_directories(
 
 target_compile_features(containers INTERFACE cxx_std_20)
 
+target_compile_options(containers INTERFACE
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++>
+)
+
+target_link_options(containers INTERFACE
+	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
+			-fexperimental-library
+			-stdlib=libc++
+			-lc++abi>
+)
+
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)
 	enable_testing()

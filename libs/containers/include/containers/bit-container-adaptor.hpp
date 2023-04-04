@@ -133,6 +133,9 @@ public:
 		util::element_bit_reference<Q> m_reference;
 	};
 
+	template<std::integral Q, uint64_t N>
+	iterator(std::span<Q, N> s, int64_t bit_index) -> iterator<Q>;
+
 	static constexpr auto n_bits_per_element =
 		util::element_bit_reference<T>::n_bits_per_element;
 

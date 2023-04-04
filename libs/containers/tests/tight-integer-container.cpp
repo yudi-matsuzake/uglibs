@@ -86,6 +86,93 @@ TEST_CASE(
 
 }
 
+template<size_t N, util::signess S, util::mutability M, class T>
+static constexpr bool underint_test_with()
+{
+	return std::is_same_v<
+		containers::detail::underint_t<N, S, M>,
+		T
+	>;
+}
+
+TEST_CASE("underint",
+	"[tight-integers-container]")
+{
+	STATIC_REQUIRE(underint_test_with<7, util::signed_flag, util::mutable_flag,  int8_t>());
+	STATIC_REQUIRE(underint_test_with<8, util::signed_flag, util::mutable_flag,  int8_t>());
+	STATIC_REQUIRE(underint_test_with<9, util::signed_flag, util::mutable_flag, int16_t>());
+
+	STATIC_REQUIRE(underint_test_with<15, util::signed_flag, util::mutable_flag, int16_t>());
+	STATIC_REQUIRE(underint_test_with<16, util::signed_flag, util::mutable_flag, int16_t>());
+	STATIC_REQUIRE(underint_test_with<17, util::signed_flag, util::mutable_flag, int32_t>());
+
+	STATIC_REQUIRE(underint_test_with<31, util::signed_flag, util::mutable_flag, int32_t>());
+	STATIC_REQUIRE(underint_test_with<32, util::signed_flag, util::mutable_flag, int32_t>());
+	STATIC_REQUIRE(underint_test_with<33, util::signed_flag, util::mutable_flag, int64_t>());
+
+	STATIC_REQUIRE(underint_test_with<63, util::signed_flag, util::mutable_flag, int64_t>());
+	STATIC_REQUIRE(underint_test_with<64, util::signed_flag, util::mutable_flag, int64_t>());
+
+	STATIC_REQUIRE(underint_test_with<7, util::unsigned_flag, util::mutable_flag,  uint8_t>());
+	STATIC_REQUIRE(underint_test_with<8, util::unsigned_flag, util::mutable_flag,  uint8_t>());
+	STATIC_REQUIRE(underint_test_with<9, util::unsigned_flag, util::mutable_flag, uint16_t>());
+
+	STATIC_REQUIRE(underint_test_with<15, util::unsigned_flag, util::mutable_flag, uint16_t>());
+	STATIC_REQUIRE(underint_test_with<16, util::unsigned_flag, util::mutable_flag, uint16_t>());
+	STATIC_REQUIRE(underint_test_with<17, util::unsigned_flag, util::mutable_flag, uint32_t>());
+
+	STATIC_REQUIRE(underint_test_with<31, util::unsigned_flag, util::mutable_flag, uint32_t>());
+	STATIC_REQUIRE(underint_test_with<32, util::unsigned_flag, util::mutable_flag, uint32_t>());
+	STATIC_REQUIRE(underint_test_with<33, util::unsigned_flag, util::mutable_flag, uint64_t>());
+
+	STATIC_REQUIRE(underint_test_with<63, util::unsigned_flag, util::mutable_flag, uint64_t>());
+	STATIC_REQUIRE(underint_test_with<64, util::unsigned_flag, util::mutable_flag, uint64_t>());
+}
+
+template<size_t N, util::signess S, util::mutability M>
+static constexpr bool test_default_allocator_with()
+{
+	return std::is_same_v<
+		containers::detail::default_allocator_t<N, S, M>,
+		std::allocator<containers::detail::underint_t<N, S, M>>
+	>;
+}
+
+TEST_CASE("default allocator",
+	"[tight-integers-container]")
+{
+	STATIC_REQUIRE(test_default_allocator_with<7, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<8, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<9, util::signed_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<15, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<16, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<17, util::signed_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<31, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<32, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<33, util::signed_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<63, util::signed_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<64, util::signed_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<7, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<8, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<9, util::unsigned_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<15, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<16, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<17, util::unsigned_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<31, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<32, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<33, util::unsigned_flag, util::mutable_flag>());
+
+	STATIC_REQUIRE(test_default_allocator_with<63, util::unsigned_flag, util::mutable_flag>());
+	STATIC_REQUIRE(test_default_allocator_with<64, util::unsigned_flag, util::mutable_flag>());
+}
+
+
 template<size_t N, class S>
 static auto test_edge_case_for()
 {
@@ -93,7 +180,7 @@ static auto test_edge_case_for()
 	using tight_container_t = containers::tight_integer_container<
 		integer_t>;
 
-	constexpr uint8_t loose_n = (N == 64) ? N : (N+1);
+	constexpr size_t loose_n = (N == 64) ? N : (N+1);
 	using loose_container_t = containers::tight_integer_container<
 		util::integer<loose_n, S>>;
 
@@ -178,7 +265,7 @@ void test_sorting_for()
 	using integer_t = util::integer<N, S>;
 	using tight_container_t = containers::tight_integer_container<
 		integer_t>;
-	using underint_t = tight_container_t::underlying_integer_t;
+	using underint_t = typename tight_container_t::underlying_integer_t;
 	constexpr bool is_signed = tight_container_t::is_signed;
 
 	auto const values = make_values<is_signed>(
@@ -188,7 +275,7 @@ void test_sorting_for()
 	tight_container_t v(v_siz);
 
 	using iterator_t = typename tight_container_t::iterator;
-	using reference_t = iterator_t::reference;
+	using reference_t = typename iterator_t::reference;
 
 	rgs::copy(values | vws::reverse, v.begin());
 	REQUIRE(rgs::equal(values | vws::reverse, v));
@@ -246,7 +333,7 @@ void integral_sorting()
 		integer_t>;
 
 	STATIC_REQUIRE(std::is_base_of_v<std::vector<T>, tight_container_t>);
-	using underint_t = tight_container_t::underlying_integer_t;
+	using underint_t = typename tight_container_t::underlying_integer_t;
 
 	constexpr auto is_signed = tight_container_t::is_signed;
 
@@ -256,7 +343,7 @@ void integral_sorting()
 	tight_container_t v(v_siz);
 
 	using iterator_t = typename tight_container_t::iterator;
-	using reference_t = iterator_t::reference;
+	using reference_t = typename iterator_t::reference;
 
 	rgs::copy(values | vws::reverse, v.begin());
 	REQUIRE(rgs::equal(v, values | vws::reverse));

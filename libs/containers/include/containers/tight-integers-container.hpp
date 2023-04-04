@@ -568,7 +568,9 @@ public:
 			return a_index - b_index;
 		}
 
-		friend constexpr bool operator==(tight_iterator a, tight_iterator b)
+		friend constexpr bool operator==(
+			tight_iterator const& a,
+			tight_iterator const& b)
 		{
 			return a.m_reference.compare_real_reference(b.m_reference);
 		}
@@ -586,6 +588,10 @@ public:
 	private:
 		tight_element_reference<TightContainer> m_reference;
 	};
+
+	template<class TightContainer>
+	tight_iterator(TightContainer* a_ptr, int64_t index)
+		-> tight_iterator<TightContainer>;
 
 	constexpr tight_integer_container() = default;
 
@@ -774,15 +780,19 @@ public:
 	}
 
 	template<rgs::range OtherTight>
-	bool operator==(OtherTight const& other) const
+	friend bool operator==(
+		tight_integer_container const& t,
+		OtherTight const& other)
 	{
-		return rgs::equal(*this, other);
+		return rgs::equal(t, other);
 	}
 
 	template<rgs::range OtherTight>
-	bool operator!=(OtherTight const& other) const
+	friend bool operator!=(
+		tight_integer_container const& t,
+		OtherTight const& other)
 	{
-		return !(*this == other);
+		return !(t == other);
 	}
 
 private:
@@ -811,7 +821,7 @@ public:
 
 template<class S, class M, class Alloc, class Container>
 class tight_integer_container<16, S, M, Alloc, Container> :
-	public tight_integer_container_common<16, S, M, Container>,
+	public tight_integer_container_common<16, S, M, Alloc, Container>,
 	public Container
 {
 public:
@@ -820,7 +830,7 @@ public:
 
 template<class S, class M, class Alloc, class Container>
 class tight_integer_container<32, S, M, Alloc, Container> :
-	public tight_integer_container_common<32, S, M, Container>,
+	public tight_integer_container_common<32, S, M, Alloc, Container>,
 	public Container
 {
 public:
@@ -829,7 +839,7 @@ public:
 
 template<class S, class M, class Alloc, class Container>
 class tight_integer_container<64, S, M, Alloc, Container> :
-	public tight_integer_container_common<64, S, M, Container>,
+	public tight_integer_container_common<64, S, M, Alloc, Container>,
 	public Container
 {
 public:

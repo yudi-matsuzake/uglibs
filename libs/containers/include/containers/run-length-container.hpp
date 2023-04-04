@@ -15,6 +15,13 @@ namespace containers{
 	*/
 template<class T>
 struct run_length_item{
+
+	constexpr run_length_item() noexcept = default;
+	constexpr run_length_item(T const& v, uint64_t c) noexcept
+		: value(v), count(c)
+	{}
+
+
 	T value;
 	uint64_t count;
 };
@@ -219,6 +226,9 @@ private:
 
 	};
 
+	template<class RLC>
+	element_wrapper(RLC* a_rlc, uint64_t a_index) -> element_wrapper<RLC>;
+
 public:
 
 	template<class RLC>
@@ -334,6 +344,9 @@ public:
 				return !(a == b);
 			}
 	};
+
+	template<class RLC>
+	rl_iterator(RLC* a_rlc, uint64_t a_index) -> rl_iterator<RLC>;
 
 	static constexpr auto sentinel_value = rl_iterator<
 		run_length_container>::sentinel_value;
