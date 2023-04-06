@@ -20,18 +20,18 @@ target_link_libraries(gmt INTERFACE)
 
 target_compile_features(gmt INTERFACE cxx_std_20)
 
-target_compile_options(gmt INTERFACE
-	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
-			-fexperimental-library
-			-stdlib=libc++>
-)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_compile_options(gmt INTERFACE
+		-fexperimental-library
+		-stdlib=libc++
+	)
 
-target_link_options(gmt INTERFACE
-	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
-			-fexperimental-library
-			-stdlib=libc++
-			-lc++abi>
-)
+	target_link_options(gmt INTERFACE
+		-fexperimental-library
+		-stdlib=libc++
+		-lc++abi
+	)
+endif()
 
 if(ENABLE_TESTING)
 	if(NOT util_SOURCE_DIR)

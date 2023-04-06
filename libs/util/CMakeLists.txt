@@ -36,19 +36,18 @@ target_include_directories(
 
 target_compile_features(util PUBLIC cxx_std_23)
 
-target_compile_options(util PUBLIC
-	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
-			-fexperimental-library
-			-stdlib=libc++>
-)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_compile_options(util PUBLIC
+		-fexperimental-library
+		-stdlib=libc++
+	)
 
-target_link_options(util PUBLIC
-	$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:
-			-fexperimental-library
-			-stdlib=libc++
-			-lc++abi>
-)
-
+	target_link_options(util PUBLIC
+		-fexperimental-library
+		-stdlib=libc++
+		-lc++abi
+	)
+endif()
 
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)

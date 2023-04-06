@@ -43,7 +43,7 @@ class point :	public std::array<T, N>,
 			defaulted_type_t<OperationOutputType, point<T, N>>>
 {
 public:
-	using point_type = point<T, N, OperationOutputType>;
+	using point_type = point;
 	using element_type = T;
 	using operation_output_type = defaulted_type_t<
 		OperationOutputType, point<T, N>>;
@@ -60,7 +60,8 @@ public:
 
 	template<class ... Ts>
 	explicit constexpr point(Ts&& ... args)
-		requires (std::is_same_v<std::decay_t<Ts>, T> && ...)
+		requires ((std::is_same_v<std::decay_t<Ts>, T> && ...)
+			&& (sizeof...(Ts) == N))
 		: std::array<T, N>{ args ...  }
 	{}
 
