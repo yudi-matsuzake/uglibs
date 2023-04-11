@@ -25,10 +25,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 # find_package(Catch2 REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(Boost 1.81.0 COMPONENTS)
 
 # ug graphics library
 add_library(
@@ -97,7 +97,7 @@ target_link_libraries(
 		OpenGL::GL
 		imgui
 		glad
-		${OpenCV_LIBS}
+		Boost::boost
 		stdc++fs
 		glm
 )
@@ -107,7 +107,6 @@ target_include_directories(
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
-		${OpenCV_INCLUDE_DIRS}
 )
 target_include_directories(
 	graphics
@@ -117,8 +116,6 @@ target_include_directories(
 							 
 		$<BUILD_INTERFACE:${IMGUI_DIR}/examples>
 		$<INSTALL_INTERFACE:include>
-
-		# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/glm>
 )
 target_compile_features(graphics PUBLIC cxx_std_20)
 

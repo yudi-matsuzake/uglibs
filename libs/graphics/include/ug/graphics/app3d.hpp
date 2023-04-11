@@ -8,7 +8,7 @@ namespace ug::graphics{
 class app3d : public app{
 public:
 	
-	using projection_type = typename app::projection_type;
+	using projection_type = enum app::projection_type;
 
 	explicit app3d(
 		int32_t width,

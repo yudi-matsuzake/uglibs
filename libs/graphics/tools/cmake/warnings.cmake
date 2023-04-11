@@ -1,10 +1,11 @@
 add_library(ug-graphics-warnings INTERFACE)
 
 if(MSVC)
-	target_compile_options(ug-graphics-warnings INTERFACE /W4)
-else()
-	target_compile_options(ug-graphics-warnings
+	target_compile_options(project_warnings INTERFACE /W4)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	target_compile_options(project_warnings
 		INTERFACE
+		$<$<STREQUAL:${FATAL_WARNINGS},ON>:-Werror>
 		-Wall
 		-Wextra
 
@@ -31,9 +32,9 @@ else()
 		# warn if non-standard C++ is used
 		-Wpedantic
 		# warn on type conversions that may lose data
-		-Wconversion
+		# -Wconversion
 		# warn on sign conversions
-		-Wsign-conversion
+		# -Wsign-conversion
 		# warn if identation implies blocks where blocks
 		# do not exist
 		-Wmisleading-indentation
@@ -54,5 +55,47 @@ else()
 		# warn on security issues around functions that format output
 		# (ie printf)
 		-Wformat=2
+					
+	)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	target_compile_options(project_warnings
+		INTERFACE
+		-Wall
+		-Wextra
+
+		# warn the user if a variable declaration shadows one from a
+		# parent context
+		-Wshadow
+		# warn the user if a class with virtual functions has a
+		# non-virtual destructor. This helps catch hard to
+		# track down memory errors
+		-Wnon-virtual-dtor	
+					
+		# warn for c-style casts
+		-Wold-style-cast
+
+		# warn for potential performance problem casts
+		-Wcast-align
+		# warn on anything being unused
+		-Wunused
+		# warn if you overload (not override) a virtual
+		# function
+		-Woverloaded-virtual
+		# warn if non-standard C++ is used
+		-Wpedantic
+		# warn on type conversions that may lose data
+		# -Wconversion
+		# warn on sign conversions
+		# -Wsign-conversion
+
+		# probably wanted
+		# warn if a null dereference is detected
+		-Wnull-dereference
+		# warn if you perform a cast to the same type
+		-Wdouble-promotion
+		# warn on security issues around functions that format output
+		# (ie printf)
+		-Wformat=2
+					
 	)
 endif()

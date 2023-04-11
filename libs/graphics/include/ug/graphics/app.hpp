@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <tuple>
 
-#include <opencv2/core/core.hpp>
+#include <boost/gil.hpp>
 
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/window.hpp"
@@ -17,6 +17,8 @@
 #include "ug/graphics/camera.hpp"
 
 namespace ug::graphics{
+
+namespace gil = boost::gil;
 
 class app : public window {
 public:
@@ -118,8 +120,7 @@ public:
 	bool ui_want_capture_mouse() const;
 	bool ui_want_capture_keyboard() const;
 
-	cv::Mat get_current_frame_image() const;
-
+	gil::rgb8_image_t get_current_frame_image() const;
 
 	struct ui_window_view_t{
 	private:
