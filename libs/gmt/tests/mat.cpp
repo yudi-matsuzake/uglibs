@@ -242,8 +242,6 @@ TEST_CASE("basis matrix", "[mat]")
 		}});
 	}
 
-
-
 	constexpr auto b = gmt::make_basis_column_matrix(
 		gmt::vector{{ 1., 2., 3. }},
 		gmt::vector{{ 1., 0., 1. }}
@@ -255,7 +253,6 @@ TEST_CASE("basis matrix", "[mat]")
 	constexpr auto vd = gmt::vector{{ 8., -6.,  2. }};
 	constexpr auto x = gmt::resolve(b, to_mat(vd));
 
-	INFO("x = " << x[0][0] << ' ' << x[0][1] << ' ' << x[0][2]);
 	STATIC_REQUIRE(x == to_mat(gmt::vector{{ -3., 11., 0.0}}));
 }
 
