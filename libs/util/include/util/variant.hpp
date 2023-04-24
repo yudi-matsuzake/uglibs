@@ -5,18 +5,6 @@
 
 namespace util{
 
-namespace detail{
-
-template<class ... V0, class ... V1>
-constexpr auto merge_variant(std::variant<V0...>, std::variant<V1...>)
-	-> std::variant<V0..., V1...>;
-
-template<template<class...> class T, class ... Us>
-constexpr auto make_templated_variant(std::variant<Us ...>)
-	-> std::variant<T<Us> ...>{};
-
-} // end of namespace detail
-
 
 // helper type for visit
 template<class... Ts> struct visitor : Ts... {
@@ -25,7 +13,7 @@ template<class... Ts> struct visitor : Ts... {
 template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
 
 template<class T, class ... Ts>
-auto match(T&& arg, Ts&& ... fs)
+constexpr auto match(T&& arg, Ts&& ... fs)
 {
 	return std::visit(
 		visitor{ std::forward<Ts>(fs) ... },
@@ -35,13 +23,35 @@ auto match(T&& arg, Ts&& ... fs)
 
 // list of types
 template<class ... T>
-struct list_of_types{
-	using variant_type = std::variant<T ... >;
+struct list_of_types{};
+
+// list of values
+template<auto ... V>
+struct list_of_values{};
+
+template<class T>
+struct to_value_list{};
+
+template <class Integer, Integer... Ints>
+struct to_value_list<std::integer_sequence<Integer, Ints...>> {
+  using type = list_of_values<Ints...>;
 };
 
+template<class T>
+using to_value_list_t = typename to_value_list<T>::type;
+
 /**
-  * struct to merge variants
+  * merge variants
   */
+namespace detail{
+
+template<class ... V0, class ... V1>
+constexpr auto merge_variant(std::variant<V0...>, std::variant<V1...>)
+	-> std::variant<V0..., V1...>;
+
+
+} // end of namespace detail
+
 template<class...V>
 struct merged_variant;
 
@@ -98,26 +108,6 @@ constexpr auto make_integer_range()
 	);
 }
 
-template<class T, T Begin, T Size>
-using make_integer_range_t = decltype(
-	make_integer_range<T, Begin, Size>());
-
-template<
-	class V,
-	template<class ...> class T,
-	template<class ...> class ... Ts>
-struct templated_variant{
-	using type = merged_variant_t<
-		decltype(detail::make_templated_variant<T>(std::declval<V>())),
-		decltype(detail::make_templated_variant<Ts>(std::declval<V>())) ...
-	>;
-};
-
-template<class V,
-	template<class ...> class T,
-	template<class ...> class ... Ts>
-using templated_variant_t = typename templated_variant<V, T, Ts ...>::type;
-
 template<class Variant>
 constexpr bool variant_equality(Variant&& a, Variant&& b)
 {
@@ -129,5 +119,57 @@ constexpr bool variant_equality(Variant&& a, Variant&& b)
 		a, b
 	);
 }
+
+template<class T, T Begin, T Size>
+using make_integer_range_t = decltype(
+	make_integer_range<T, Begin, Size>());
+
+namespace detail {
+
+template<class ... Vs>
+using merged_variant_t = typename merged_variant<Vs...>::type;
+
+template<template <auto...> class T, auto ... Values>
+constexpr auto generate_variant_with(list_of_values<Values...>) noexcept
+	-> std::variant<T<Values>...>;
+
+template<template<class...> class T, class...Ts>
+constexpr auto generate_variant_with(list_of_types<Ts...>) noexcept
+	-> std::variant<T<Ts>...>;
+} // end of namespace detail
+
+template<template <auto...> class T, class ValueList>
+using generate_variant_with_v_t = decltype(
+	detail::generate_variant_with<T>(std::declval<ValueList>()));
+
+template<template <class...> class T, class TypeList>
+using generate_variant_with_t_t = decltype(
+	detail::generate_variant_with<T>(std::declval<TypeList>()));
+
+namespace detail {
+
+template<template<class, auto> class T, class Type, class ValueList>
+struct generate_variant_with_tv_helper {
+	template<auto V>
+	using pivo = T<Type, V>;
+	using type = generate_variant_with_v_t<pivo, ValueList>;
+};
+
+template<template<class, auto> class T, class Type, class ValueList>
+using generate_variant_with_tv_helper_t = typename generate_variant_with_tv_helper<
+	T, Type, ValueList>::type;
+
+
+template<template<class, auto> class T, class ValueList, class...Ts>
+constexpr auto generate_variant_with_tv(list_of_types<Ts...>, ValueList) noexcept
+	-> merged_variant_t<
+		generate_variant_with_tv_helper_t<T, Ts, ValueList> ...
+	>;
+
+} // end of namespace detail
+
+template<template <class, auto> class T, class TypeList, class ValueList>
+using generate_variant_with_tv_t = decltype(
+  detail::generate_variant_with_tv<T>(std::declval<TypeList>(), std::declval<ValueList>()));
 
 } // end of namespace util
