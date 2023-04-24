@@ -82,6 +82,24 @@ using various_type_array_t = util::generate_variant_with_t_t<
 	triple_with_one_type,
 	util::list_of_types<int, double, char, std::string>>;
 
+template <auto V, class Type>
+struct S{
+
+	using value_type = decltype(V);
+
+	template<auto OtherValue, class OtherType>
+	constexpr auto operator==(S<OtherValue, OtherType> const& other) const
+	{
+		using other_s = S<OtherValue, OtherType>;
+		if constexpr (std::is_same_v<OtherType, Type> &&
+			std::is_same_v<S::value_type, typename other_s::value_type>) {
+			return V == OtherValue;
+		}else{
+			return false;
+		}
+	}
+};
+
 template<class Variant, class Type>
 constexpr auto variant_test(Type const& value)
 {
@@ -123,5 +141,17 @@ TEST_CASE("arrays", "[util][variant]")
 		STATIC_REQUIRE(variant_test<arrays>(std::array{ 1, 2, 3, 4 }));
 		STATIC_REQUIRE(variant_test<arrays>(std::array{ 'a', 'b', 'c', 'd' }));
 	}
+
+	{
+		using types = util::generate_variant_with_vt_t<
+			S,
+			util::list_of_values<'a', 2>,
+			util::list_of_types<char, double, int>>;
+
+		STATIC_REQUIRE(variant_test<types>(S<'a', char>{}));
+		STATIC_REQUIRE(variant_test<types>(S<2, char>{}));
+		STATIC_REQUIRE(variant_test<types>(S<'a', double>{}));
+	}
+
 
 }
