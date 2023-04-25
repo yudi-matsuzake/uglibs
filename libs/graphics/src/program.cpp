@@ -1,3 +1,4 @@
+#include <utility>
 #include <vector>
 
 /* #include "ug/graphics/misc.hpp" */
@@ -41,9 +42,17 @@ program::program()
 	GL(m_id = glCreateProgram());
 }
 
+program::program(program&& other)
+{
+	if(this != &other) {
+		m_id = std::exchange(other.m_id, 0);
+	}
+}
+
 program::~program()
 {
-	GL(glDeleteProgram(m_id));
+	if(m_id != 0)
+		GL(glDeleteProgram(m_id));
 }
 
 void program::attach_shader(shader const& s) const

@@ -11,6 +11,8 @@ namespace rgs = std::ranges;
 class program{
 public:
 	program();
+	program(program const&) = delete;
+	program(program&&);
 	virtual ~program();
 
 	void attach_shader(shader const& s) const;
@@ -63,7 +65,7 @@ public:
 	}
 
 protected:
-	uint32_t m_id;
+	uint32_t m_id = 0;
 
 };
 
