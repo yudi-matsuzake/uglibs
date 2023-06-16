@@ -470,10 +470,11 @@ constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b)
 	return basis;
 }
 
-/* auto row_basis_matrix_to_vectors() */
-/* { */
-/* } */
-
+/**
+  * computes the n-dimensional rotation matrix
+  * the rotation is made from the base vector `x` to the direction
+  * of `y` vector with a angle of `theta`
+  */
 template<std::floating_point T, uint64_t N, class C>
 auto make_rotation_matrix(
 	gmt::vector<T, N, C> const& x,

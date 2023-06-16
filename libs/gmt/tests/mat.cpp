@@ -258,7 +258,7 @@ TEST_CASE("basis matrix", "[mat]")
 
 TEST_CASE("projection matrix", "[mat]")
 {
-	SECTION("example a"){
+	SECTION("khan academy example a"){
 		constexpr auto a = make_basis_column_matrix(
 			gmt::vector{{ 1., 0., 0., 1. }},
 			gmt::vector{{ 0., 1., 0., 1. }}
