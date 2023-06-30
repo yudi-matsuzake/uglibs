@@ -60,7 +60,10 @@ auto dot(Vector const& a, Vector const& b)
 template<class Vector>
 auto angle(Vector const& a, Vector const& b)
 {
-	return std::acos(dot(a, b)/(norm(a)*norm(b)));
+	auto const d = dot(a, b);
+	auto const l = norm(a) * norm(b);
+	auto const c = std::clamp(d/l, -1.0, +1.0);
+	return std::acos(c);
 }
 
 template<class Vector, class T = typename Vector::element_type>
