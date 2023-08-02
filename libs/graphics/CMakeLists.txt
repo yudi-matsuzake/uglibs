@@ -58,11 +58,11 @@ add_library(
 	./src/camera2d-controller.cpp
 	./src/camera3d-controller.cpp
 	./src/segment2d-render.cpp
-	./src/scene.cpp
 	./src/mesh3d-render.cpp
 	./src/mesh3d.cpp
 
 	./include/ug/graphics/program.hpp
+	./include/ug/graphics/light3d.hpp
 	./include/ug/graphics/misc.hpp
 	./include/ug/graphics/shader.hpp
 	./include/ug/graphics/vao.hpp
@@ -85,10 +85,10 @@ add_library(
 	./include/ug/graphics/camera2d-controller.hpp
 	./include/ug/graphics/camera3d-controller.hpp
 	./include/ug/graphics/segment2d-render.hpp
-	./include/ug/graphics/scene.hpp
 	./include/ug/graphics/mesh3d.hpp
 	./include/ug/graphics/mesh3d-render.hpp
 )
+
 target_link_libraries(
 	graphics
 	PUBLIC
@@ -129,8 +129,8 @@ if(${GRAPHICS_TEST})
 	add_executable(hello-segment ./test/hello-segment.cpp)
 	target_link_libraries(hello-segment PRIVATE graphics)
 
-	add_executable(hello-scene ./test/hello-scene.cpp)
-	target_link_libraries(hello-scene PRIVATE graphics)
+	add_executable(hello-cube ./test/hello-cube.cpp)
+	target_link_libraries(hello-cube PRIVATE graphics)
 
 	add_executable(raymarching-primitives ./test/raymarching-primitives.cpp)
 	target_link_libraries(raymarching-primitives PRIVATE graphics)
