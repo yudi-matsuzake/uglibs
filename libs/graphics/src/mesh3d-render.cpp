@@ -112,7 +112,7 @@ mesh3d_render::mesh3d_render(app* app_ptr)
 
 void mesh3d_render::common_program_setup(
 	camera const& cam,
-	std::span<light3d> lights,
+	std::span<light3d const> lights,
 	mesh3d const& mesh)
 {
 	if(lights.size() != 1){
@@ -145,7 +145,7 @@ void mesh3d_render::common_program_setup(
 
 void mesh3d_render::operator()(
 	camera const& cam,
-	std::span<light3d> lights,
+	std::span<light3d const> lights,
 	mesh3d const& mesh)
 {
 	common_program_setup(cam, lights, mesh);

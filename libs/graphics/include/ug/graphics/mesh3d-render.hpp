@@ -16,7 +16,7 @@ public:
 	mesh3d_render(app*);
 	void operator()(
 		camera const& cam,
-		std::span<light3d> lights,
+		std::span<light3d const> lights,
 		mesh3d const& mesh);
 
 	float ambient_light_strength = 0.2f;
@@ -41,7 +41,7 @@ public:
 private:
 	void common_program_setup(
 		camera const& cam,
-		std::span<light3d> lights,
+		std::span<light3d const> lights,
 		mesh3d const& mesh);
 
 	ug::graphics::program m_program;
