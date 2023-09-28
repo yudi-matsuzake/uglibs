@@ -779,18 +779,38 @@ public:
 		return const_iterator{ this, -1 };
 	}
 
-	template<rgs::range OtherTight>
+	template<
+		uint8_t OtherN,
+		class OtherS,
+		class OtherM,
+		class OtherAlloc,
+		class OtherContainer>
 	friend bool operator==(
 		tight_integer_container const& t,
-		OtherTight const& other)
+		tight_integer_container<
+			OtherN,
+			OtherS,
+			OtherM,
+			OtherAlloc,
+			OtherContainer> const& other)
 	{
 		return rgs::equal(t, other);
 	}
 
-	template<rgs::range OtherTight>
+	template<
+		uint8_t OtherN,
+		class OtherS,
+		class OtherM,
+		class OtherAlloc,
+		class OtherContainer>
 	friend bool operator!=(
 		tight_integer_container const& t,
-		OtherTight const& other)
+		tight_integer_container<
+			OtherN,
+			OtherS,
+			OtherM,
+			OtherAlloc,
+			OtherContainer> const& other)
 	{
 		return !(t == other);
 	}
