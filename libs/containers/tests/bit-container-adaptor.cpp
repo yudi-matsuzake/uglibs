@@ -1,8 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
-#include <ranges>
 
+#include "util/ranges.hpp"
 #include "containers/bit-container-adaptor.hpp"
-#include "range/v3/all.hpp"
 
 namespace rgs = std::ranges;
 

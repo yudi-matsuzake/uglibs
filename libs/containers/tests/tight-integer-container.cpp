@@ -1,13 +1,11 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include <numeric>
-#include <ranges>
 
+#include "util/ranges.hpp"
 #include "util/misc.hpp"
 #include "util/views.hpp"
 #include "containers/tight-integers-container.hpp"
-
-#include "range/v3/all.hpp"
 
 namespace rgs = std::ranges;
 namespace vws = std::ranges::views;

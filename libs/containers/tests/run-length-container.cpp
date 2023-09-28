@@ -1,7 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include <stdexcept>
-#include <ranges>
+#include "util/ranges.hpp"
 
 #include "containers/run-length-container.hpp"
 #include "util/misc.hpp"

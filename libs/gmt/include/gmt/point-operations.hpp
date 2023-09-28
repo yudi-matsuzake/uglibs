@@ -1,9 +1,6 @@
 #pragma once
 
-#include <ranges>
-
-#include "range/v3/algorithm.hpp"
-
+#include "util/ranges.hpp"
 #include "gmt/point-promotion.hpp"
 
 namespace gmt{

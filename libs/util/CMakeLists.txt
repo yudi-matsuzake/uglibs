@@ -22,6 +22,7 @@ add_library(util
 	./include/util/static-string.hpp
 	./include/util/underlying-integer.hpp
 	./include/util/integer-variant.hpp
+	./include/util/ranges.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
