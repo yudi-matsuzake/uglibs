@@ -33,29 +33,29 @@ public:
 	/// @return a interval that represents the empty set
 	static constexpr interval<T> empty();
 
-	constexpr interval()
+	explicit constexpr interval() noexcept
 		: m_lo{infinity}, m_hi{minus_infinity}
 	{}
 
-	constexpr interval(T scalar)
+	explicit constexpr interval(T scalar) noexcept
 		: m_lo(scalar), m_hi(scalar)
 	{}
 
-	constexpr interval(T lo, T hi)
+	explicit constexpr interval(T lo, T hi) noexcept
 		: m_lo(lo), m_hi(hi)
 	{}
 
-	constexpr bool is_empty() const
+	constexpr bool is_empty() const noexcept
 	{
 		return m_lo > m_hi;
 	}
 
-	constexpr bool is_full() const
+	constexpr bool is_full() const noexcept
 	{
 		return (*this) == R();
 	}
 
-	constexpr bool is_trivial() const
+	constexpr bool is_trivial() const noexcept
 	{
 		return lo() == hi();
 	}
@@ -164,6 +164,18 @@ constexpr auto operator+(interval<T> const& in)
 
 	auto [ lo, hi ] = util::minmax(+in.lo(), +in.hi());
 	return interval<T>{ lo, hi };
+}
+
+template<class T>
+constexpr auto operator==(interval<T> const& a, T s)
+{
+	return a.lo() == a.hi() && a.lo() == s;
+}
+
+template<class T>
+constexpr auto operator!=(interval<T> const& a, T s)
+{
+	return !(a == s);
 }
 
 template<class A, class B>
