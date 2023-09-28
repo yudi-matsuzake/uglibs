@@ -2,6 +2,8 @@
 
 #include <ranges>
 
+#include "range/v3/algorithm.hpp"
+
 #include "gmt/point-promotion.hpp"
 
 namespace gmt{
@@ -11,13 +13,15 @@ namespace detail{
 	template<class OutputType,
 		std::ranges::input_range R0,
 		std::ranges::input_range R1,
-		class BinaryOperator>
+		std::copy_constructible BinaryOperator>
 	[[nodiscard]] constexpr OutputType
 		binary_transform(R0 a, R1 b, BinaryOperator f)
-		requires std::default_initializable<OutputType>
+		requires (std::default_initializable<OutputType> &&
+				std::weakly_incrementable<
+				std::ranges::iterator_t<OutputType>>)
 	{
 		OutputType r{};
-		std::ranges::transform(a, b, begin(r), f);
+		ranges::transform(a, b, r.begin(), f);
 		return r;
 	}
 
