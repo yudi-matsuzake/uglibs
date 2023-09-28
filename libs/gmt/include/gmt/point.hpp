@@ -59,9 +59,9 @@ public:
 	constexpr point_type& operator=(point_type const&)= default;
 
 	template<class ... Ts>
+	requires ((std::is_same_v<std::decay_t<Ts>, T> && ...)
+		&& (sizeof...(Ts) == N))
 	explicit constexpr point(Ts&& ... args)
-		requires ((std::is_same_v<std::decay_t<Ts>, T> && ...)
-			&& (sizeof...(Ts) == N))
 		: std::array<T, N>{ args ...  }
 	{}
 
