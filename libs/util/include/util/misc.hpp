@@ -13,8 +13,6 @@
 
 namespace util{
 
-namespace rgs = std::ranges;
-namespace vws = std::ranges::views;
 
 template<class str_iterator, class ext_iterator>
 bool ends_with(
@@ -152,8 +150,8 @@ constexpr auto array_concat(
 	std::array<T, M> const& b)
 {
 	std::array<T, N + M> result;
-	rgs::copy(a, result.begin());
-	rgs::copy(b, result.begin() + a.size());
+	rg::copy(a, result.begin());
+	rg::copy(b, result.begin() + a.size());
 	return result;
 }
 
@@ -183,8 +181,8 @@ constexpr auto concatenate_arrays(
 	std::array<T, M> const& b)
 {
 	std::array<T, N+M> r;
-	rgs::copy(a, r.begin());
-	rgs::copy(b, r.begin() + N);
+	rg::copy(a, r.begin());
+	rg::copy(b, r.begin() + N);
 	return r;
 }
 

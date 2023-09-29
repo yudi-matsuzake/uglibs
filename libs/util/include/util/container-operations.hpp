@@ -14,7 +14,6 @@
 
 namespace util::cop{
 
-namespace rgs = std::ranges;
 
 /* template<class I, class S, class O> */
 /* void mult(I begin, I end, S const& scalar, O output) */
@@ -129,7 +128,7 @@ public:
 
 			out << c.m_begin;
 
-			for(auto&& i : rgs::subrange(it_begin, last))
+			for(auto&& i : rg::subrange(it_begin, last))
 				out << i << c.m_sep;
 
 			out << *last <<  c.m_end;

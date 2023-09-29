@@ -84,7 +84,7 @@ void gaussian_elimination(
 		 * Make all cells below the pivot element
 		 * equal to zero
 		 */
-		for(auto j : vws::iota(pivot+1, a.n_row)){
+		for(auto j : rg::vw::iota(pivot+1, a.n_row)){
 			auto const coef = a[j][c];
 			if(coef != T{0}){
 				a[j][c] = T{0};
@@ -98,9 +98,9 @@ void gaussian_elimination(
 	/*
 	 * make all elements above diagonal equal to zero
 	 */
-	for(auto r : vws::iota(0UL, a.n_row) | vws::reverse){
-		auto const pivot_indices = vws::iota(0UL, a.n_col);
-		auto const pivot = rgs::find_if(
+	for(auto r : rg::vw::iota(0UL, a.n_row) | rg::vw::reverse){
+		auto const pivot_indices = rg::vw::iota(0UL, a.n_col);
+		auto const pivot = rg::find_if(
 			pivot_indices,
 			[&a, r](auto i){ return a[r][i] != T{0}; }
 		);
@@ -108,7 +108,7 @@ void gaussian_elimination(
 		if(pivot == pivot_indices.end())
 			continue;
 
-		for(auto i : vws::iota(0UL, r) | vws::reverse){
+		for(auto i : rg::vw::iota(0UL, r) | rg::vw::reverse){
 			auto const coef = a[i][*pivot];
 			a[i][*pivot] = T{0};
 
@@ -140,12 +140,12 @@ constexpr auto rank(mat<T, Rows, Cols>& a)
 	std::array<uint64_t, Rows> r;
 	std::array<uint64_t, Cols> c;
 
-	rgs::fill(r, 0UL);
-	rgs::fill(c, 0UL);
+	rg::fill(r, 0UL);
+	rg::fill(c, 0UL);
 
 	auto n_rows = 0UL, n_cols = 0UL;
-	for(auto i : vws::iota(0UL, Rows)){
-		for(auto j : vws::iota(0UL, Cols)){
+	for(auto i : rg::vw::iota(0UL, Rows)){
+		for(auto j : rg::vw::iota(0UL, Cols)){
 			if(a[i][j] == T{0}){
 				r[i]++;
 				c[j]++;

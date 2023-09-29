@@ -7,8 +7,6 @@
 
 namespace containers{
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
 
 template<uint64_t N>
 class bitset{
@@ -80,7 +78,7 @@ private:
 template<uint64_t N>
 constexpr void add_one(bitset<N>& bs)
 {
-	for(auto&& bi : bs | vws::reverse)
+	for(auto&& bi : bs | rg::vw::reverse)
 	{
 		if(bi == 0){
 			bi = 1;

@@ -5,8 +5,6 @@
 #include "gmt/mat.hpp"
 #include "gmt/mat-inversion.hpp"
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
 
 static constexpr auto n_rows = 5UL;
 static constexpr auto n_cols = 10UL;
@@ -284,8 +282,8 @@ TEST_CASE("orthonormal basis", "[mat]")
 		auto ortho_base = gmt::compute_orthonormal_basis(s);
 		for(auto v : ortho_base)
 			REQUIRE(almost_equal(norm(v), 1.0));
-		for(auto i : vws::iota(0UL, ortho_base.size())){
-			for(auto j : vws::iota(0UL, ortho_base.size())){
+		for(auto i : rg::vw::iota(0UL, ortho_base.size())){
+			for(auto j : rg::vw::iota(0UL, ortho_base.size())){
 				auto const d = gmt::dot(
 					ortho_base[i],
 					ortho_base[j]

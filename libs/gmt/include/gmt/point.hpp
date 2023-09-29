@@ -19,8 +19,6 @@
 
 namespace gmt{
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
 
 /**
   * the type member of this class will be `T` only if `T` is not void
@@ -96,7 +94,7 @@ template<class PointType>
 constexpr auto point_ceil(PointType const& p)
 {
 	PointType r;
-	rgs::copy(p | vws::transform([](auto x){ return std::ceil(x); }),
+	rg::copy(p | rg::vw::transform([](auto x){ return std::ceil(x); }),
 		r.begin()
 	);
 	return r;
@@ -106,7 +104,7 @@ template<class PointType>
 constexpr auto point_floor(PointType const& p)
 {
 	PointType r;
-	rgs::copy(p | vws::transform([](auto x){ return std::floor(x); }),
+	rg::copy(p | rg::vw::transform([](auto x){ return std::floor(x); }),
 		r.begin()
 	);
 	return r;

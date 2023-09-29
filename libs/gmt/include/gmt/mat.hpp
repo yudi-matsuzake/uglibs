@@ -12,8 +12,6 @@
 
 namespace gmt{
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
 
 template<class T, uint64_t Row, uint64_t Col>
 class mat : public std::array<std::array<T, Col>, Row>{
@@ -29,13 +27,13 @@ public:
 	constexpr mat(Rows&& ... rows)
 	{
 		auto i = 0UL;
-		(rgs::copy_n(rows.begin(), Col, (*this)[i++].begin()), ...);
+		(rg::copy_n(rows.begin(), Col, (*this)[i++].begin()), ...);
 	}
 
 	constexpr mat(T const (&a)[Row][Col])
 	{
-		for(auto i : vws::iota(0UL, Row))
-			for(auto j : vws::iota(0UL, Col))
+		for(auto i : rg::vw::iota(0UL, Row))
+			for(auto j : rg::vw::iota(0UL, Col))
 				(*this)[i][j] = a[i][j];
 	}
 
@@ -61,11 +59,11 @@ auto operator*(mat<T, N, M> const& a, mat<Q, M, K> const& b) -> mat<Q, N, K>
 {
 	mat<Q, N, K> r;
 
-	for(auto i : vws::iota(0UL, N)){
-		for(auto j : vws::iota(0UL, K)){
+	for(auto i : rg::vw::iota(0UL, N)){
+		for(auto j : rg::vw::iota(0UL, K)){
 			r[i][j] = Q{0};
 
-			for(auto k : vws::iota(0UL, M))
+			for(auto k : rg::vw::iota(0UL, M))
 				r[i][j] += Q{a[i][k]} * b[k][j];
 		}
 	}
@@ -77,7 +75,7 @@ template<class T, uint64_t N, class Op>
 constexpr auto to_mat(gmt::vector<T, N, Op> const& v)
 {
 	mat<T, N, 1UL> m;
-	for(auto i : vws::iota(0UL, N))
+	for(auto i : rg::vw::iota(0UL, N))
 		m[i].front() = v[i];
 	return m;
 }
@@ -92,8 +90,8 @@ constexpr auto to_homogeneous_mat(mat<T, N, N> const& m)
 {
 	mat<T, N+1UL, N+1UL> m_prime;
 
-	for(auto r : vws::iota(0UL, m_prime.n_row)){
-		for(auto c : vws::iota(0UL, m_prime.n_col)){
+	for(auto r : rg::vw::iota(0UL, m_prime.n_row)){
+		for(auto c : rg::vw::iota(0UL, m_prime.n_col)){
 			m_prime[r][c] = (r < N && c < N)
 				? m[r][c]
 				: ((r == N && c == N)
@@ -115,7 +113,7 @@ auto operator*(mat<T, N+1UL, N+1UL> const& m, point<Q, N, C> const& v) -> C
 
 	auto rm = [&]{
 		mat<Q, N+1UL, 1UL> vm;
-		for(auto i : vws::iota(0UL, N))
+		for(auto i : rg::vw::iota(0UL, N))
 			vm[i].front() = v[i];
 		vm.back().front() = Q{1};
 
@@ -123,7 +121,7 @@ auto operator*(mat<T, N+1UL, N+1UL> const& m, point<Q, N, C> const& v) -> C
 	}();
 
 	C r;
-	for(auto i : vws::iota(0UL, N))
+	for(auto i : rg::vw::iota(0UL, N))
 		r[i] = rm[i].front();
 
 	return r;
@@ -144,7 +142,7 @@ auto operator*(mat<T, R, C> const& m, vector<Q, C, Op> const& v)
 	auto rm = m*to_mat(v);
 
 	result_t r;
-	for(auto i : vws::iota(0UL, R))
+	for(auto i : rg::vw::iota(0UL, R))
 		r[i] = rm[i].front();
 
 	return r;
@@ -158,8 +156,8 @@ auto operator*(mat<T, R, C> const& a, T const& s)
 
 	result_t r;
 
-	for(auto i : vws::iota(0UL, R)){
-		for(auto j : vws::iota(0UL, C)){
+	for(auto i : rg::vw::iota(0UL, R)){
+		for(auto j : rg::vw::iota(0UL, C)){
 			r[i][j] = a[i][j] * s;
 		}
 	}
@@ -179,8 +177,8 @@ template<class T, uint64_t N>
 constexpr auto make_identity_matrix()
 {
 	mat<T, N, N> m;
-	for(auto i : vws::iota(0UL, N))
-		for(auto j : vws::iota(0UL, N))
+	for(auto i : rg::vw::iota(0UL, N))
+		for(auto j : rg::vw::iota(0UL, N))
 			m[i][j] = (i == j)? T{1} : T{0};
 	return m;
 }
@@ -232,8 +230,8 @@ constexpr auto transpose(mat<T, R, C> const& m)
 {
 	mat<T, C, R> t;
 
-	for(auto r : vws::iota(0UL, R))
-		for(auto c : vws::iota(0UL, C))
+	for(auto r : rg::vw::iota(0UL, R))
+		for(auto c : rg::vw::iota(0UL, C))
 			t[c][r] = m[r][c];
 
 	return t;
@@ -245,7 +243,7 @@ constexpr auto make_translation_matrix(vector<T, N, C> const& t)
 	constexpr auto identity = make_identity_matrix<T, N+1UL>();
 
 	auto tm = identity;
-	for(auto i : vws::iota(0UL, N))
+	for(auto i : rg::vw::iota(0UL, N))
 		tm[i].back() = t[i];
 
 	return tm;
@@ -258,7 +256,7 @@ template<class Matrix, class First, class ... PointType>
 auto make_basis_column_matrix(Matrix& m, uint64_t col, First&& p, PointType&& ... vecs)
 	noexcept
 {
-	for(auto i : vws::iota(0UL, m.n_row))
+	for(auto i : rg::vw::iota(0UL, m.n_row))
 		m[i][col] = p[i];
 
 	if constexpr(sizeof...(PointType)){
@@ -302,8 +300,8 @@ auto make_basis_column_matrix(std::array<vector<T, N, C>, Size> const& a)
 
 	result_t m;
 
-	for(auto r : vws::iota(0UL, N))
-		for(auto c : vws::iota(0UL, Size))
+	for(auto r : rg::vw::iota(0UL, N))
+		for(auto c : rg::vw::iota(0UL, Size))
 			m[r][c] = a[c][r];
 
 	return m;
@@ -318,8 +316,8 @@ auto make_basis_row_matrix(std::array<vector<T, N, C>, Size> const& a)
 
 	result_t m;
 
-	for(auto r : vws::iota(0UL, m.n_row))
-		for(auto c : vws::iota(0UL, m.n_col))
+	for(auto r : rg::vw::iota(0UL, m.n_row))
+		for(auto c : rg::vw::iota(0UL, m.n_col))
 			m[r][c] = a[r][c];
 
 	return m;
@@ -376,10 +374,10 @@ auto compute_orthonormal_basis(std::array<vector<T, N, C>, Size> const& vs)
 
 	base.front() = to_versor(vs.front());
 
-	for(auto i : vws::iota(1UL, Size)){
+	for(auto i : rg::vw::iota(1UL, Size)){
 		auto const proj_sum = [&]{
 			auto s = gmt::vector<T, N, C>::all(T{0});
-			for(auto j : vws::iota(0UL, i))
+			for(auto j : rg::vw::iota(0UL, i))
 				s += proj(base[j], vs[i]);
 			return s;
 		}();
@@ -398,8 +396,8 @@ auto make_givens_rotation_matrix(uint64_t i, uint64_t j,  T theta)
 	auto const cos = std::cos(theta);
 	auto const sin = std::sin(theta);
 
-	for(auto r : vws::iota(0UL, N)){
-		for(auto c : vws::iota(0UL, N)){
+	for(auto r : rg::vw::iota(0UL, N)){
+		for(auto c : rg::vw::iota(0UL, N)){
 			m[r][c] = [&]{
 				if(r == c){
 					if(r == i || r == j)
@@ -427,8 +425,8 @@ constexpr auto make_standard_basis()
 {
 	std::array<vector<T, N, C>, N> b;
 	
-	for(auto i : vws::iota(0UL, N)){
-		for(auto j : vws::iota(0UL, N)){
+	for(auto i : rg::vw::iota(0UL, N)){
+		for(auto j : rg::vw::iota(0UL, N)){
 			if(i == j)
 				b[i][j] = T{1};
 			else
@@ -449,23 +447,23 @@ constexpr auto enlarge_basis(std::array<vector<T, N, C>, Size> const& b)
 	auto vs = util::concatenate_arrays(b, make_standard_basis<T, N, C>());
 	mat<T, N, N> m;
 
-	rgs::fill(m, []
+	rg::fill(m, []
 	{
 		std::array<T, N> a;
-		rgs::fill(a, T{0});
+		rg::fill(a, T{0});
 		return a;
 	}());
 
 	for(auto i=0UL, c_vs=0UL; i<N && c_vs<vs.size(); ++c_vs){
-		rgs::copy(vs[c_vs], m[i].begin());
+		rg::copy(vs[c_vs], m[i].begin());
 
 		if(rank(m) == (i+1UL))
 			++i;
 	}
 
 	std::array<vector<T, N, C>, N> basis;
-	for(auto r : vws::iota(0UL, m.n_row))
-		rgs::copy(m[r], basis[r].begin());
+	for(auto r : rg::vw::iota(0UL, m.n_row))
+		rg::copy(m[r], basis[r].begin());
 
 	return basis;
 }

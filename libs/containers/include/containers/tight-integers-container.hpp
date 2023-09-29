@@ -16,8 +16,6 @@ namespace containers{
 
 namespace detail{
 
-namespace rgs = std::ranges;
-namespace vws = std::views;
 
 template<uint8_t N, util::signess S, util::mutability M>
 using underint_t = typename util::underlying_integer<N, S, M>::type;
@@ -161,7 +159,7 @@ public:
 		{
 			auto tcb = tight_container_bits();
 			auto b = tcb.begin() + compute_bit_index();
-			return rgs::subrange(b, b + number_of_bits_per_element);
+			return rg::subrange(b, b + number_of_bits_per_element);
 		}
 
 		/**
@@ -172,7 +170,7 @@ public:
 		  */
 		constexpr auto get_element_number_region_bits() const noexcept
 		{
-			return get_element_bit_range() | vws::drop(int{is_signed});
+			return get_element_bit_range() | rg::vw::drop(int{is_signed});
 		}
 
 		/**
@@ -188,7 +186,7 @@ public:
 				bits_per_underlying_integer
 				- (N - int{is_signed});
 
-			return rgs::subrange(rgs::begin(c) + n, rgs::end(c));
+			return rg::subrange(rg::begin(c) + n, rg::end(c));
 		}
 
 		constexpr auto get_sign_iterator() const noexcept
@@ -212,7 +210,7 @@ public:
 		{
 			auto e_bits = get_element_number_region_bits();
 			auto v_bits = get_number_region_from_underlying_type(x);
-			rgs::copy(v_bits, e_bits.begin());
+			rg::copy(v_bits, e_bits.begin());
 			if constexpr (is_signed){
 				if(x < underlying_integer_t{0})
 					set_sign_bit(1);
@@ -244,7 +242,7 @@ public:
 
 			auto v_bits = get_number_region_from_underlying_type(v);
 			auto e_bits = get_element_number_region_bits();
-			rgs::copy(e_bits, v_bits.begin());
+			rg::copy(e_bits, v_bits.begin());
 			return v;
 		}
 
@@ -616,7 +614,7 @@ public:
 		const Alloc& alloc = Alloc())
 		: tight_integer_container(count, alloc)
 	{
-		rgs::fill(*this, value);
+		rg::fill(*this, value);
 	}
 
 
@@ -794,7 +792,7 @@ public:
 			OtherAlloc,
 			OtherContainer> const& other)
 	{
-		return rgs::equal(t, other);
+		return rg::equal(t, other);
 	}
 
 	template<

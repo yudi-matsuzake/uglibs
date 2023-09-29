@@ -7,11 +7,8 @@
 #include "util/views.hpp"
 #include "containers/tight-integers-container.hpp"
 
-namespace rgs = std::ranges;
-namespace vws = std::ranges::views;
 namespace acs = ranges::actions;
 
-namespace views = ranges::views;
 
 template<bool is_signed>
 constexpr static auto make_values(
@@ -23,11 +20,11 @@ constexpr static auto make_values(
 	if constexpr(is_signed){
 		int64_t const first_value = -default_size/2;
 		int64_t const last_value = first_value+default_size;
-		return rgs::iota_view(first_value, last_value);
+		return rg::iota_view(first_value, last_value);
 	}else{
 		uint64_t const first_value = 0;
 		uint64_t const last_value = default_size;
-		return rgs::iota_view(first_value, last_value);
+		return rg::iota_view(first_value, last_value);
 	}
 };
 
@@ -188,7 +185,7 @@ static auto test_edge_case_for()
 		S, util::signed_flag>;
 
 	tight_container_t v;
-	STATIC_REQUIRE(rgs::range<tight_container_t>);
+	STATIC_REQUIRE(rg::range<tight_container_t>);
 
 	constexpr auto min = tight_container_t::min_value();
 	constexpr auto max = tight_container_t::max_value();
@@ -208,19 +205,19 @@ static auto test_edge_case_for()
 		make_array(max - n_edge_values - 1)
 	};
 
-	auto const values = test_intervals | vws::join;
+	auto const values = test_intervals | rg::vw::join;
 
-	rgs::copy(values, v.begin());
+	rg::copy(values, v.begin());
 	INFO("min: " << min);
 	INFO("max: " << max);
 	INFO("values size: " << test_intervals.size() * n_edge_values);
-	INFO("v size: " << rgs::size(v));
+	INFO("v size: " << rg::size(v));
 	INFO("values size: " << test_intervals.size() * n_edge_values);
-	REQUIRE(rgs::equal(v, values));
+	REQUIRE(rg::equal(v, values));
 
 	loose_container_t l;
 	l.resize(v.size());
-	rgs::copy(values, l.begin());
+	rg::copy(values, l.begin());
 	REQUIRE(v == l);
 }
 
@@ -269,19 +266,19 @@ void test_sorting_for()
 	auto const values = make_values<is_signed>(
 		20, tight_container_t::max_value());
 
-	auto const v_siz = rgs::size(values);
+	auto const v_siz = rg::size(values);
 	tight_container_t v(v_siz);
 
 	using iterator_t = typename tight_container_t::iterator;
 	using reference_t = typename iterator_t::reference;
 
-	rgs::copy(values | vws::reverse, v.begin());
-	REQUIRE(rgs::equal(values | vws::reverse, v));
+	rg::copy(values | rg::vw::reverse, v.begin());
+	REQUIRE(rg::equal(values | rg::vw::reverse, v));
 
 	STATIC_REQUIRE(std::sortable<iterator_t>);
-	rgs::sort(v);
+	rg::sort(v);
 
-	REQUIRE(rgs::equal(v, values));
+	REQUIRE(rg::equal(v, values));
 }
 
 TEST_CASE("sorting tight-integers", "[tight-integers-container]")
@@ -337,18 +334,18 @@ void integral_sorting()
 
 	auto const values = make_values<is_signed>(
 		20, tight_container_t::max_value());
-	auto const v_siz = rgs::size(values);
+	auto const v_siz = rg::size(values);
 	tight_container_t v(v_siz);
 
 	using iterator_t = typename tight_container_t::iterator;
 	using reference_t = typename iterator_t::reference;
 
-	rgs::copy(values | vws::reverse, v.begin());
-	REQUIRE(rgs::equal(v, values | vws::reverse));
+	rg::copy(values | rg::vw::reverse, v.begin());
+	REQUIRE(rg::equal(v, values | rg::vw::reverse));
 
 	STATIC_REQUIRE(std::sortable<iterator_t>);
-	rgs::sort(v);
-	REQUIRE(rgs::equal(v, values));
+	rg::sort(v);
+	REQUIRE(rg::equal(v, values));
 }
 
 TEST_CASE("integral types sorting", "[tight-integers-container]")
@@ -375,22 +372,22 @@ TEST_CASE("binary tight integer container", "[tight-integers-container]")
 
 	uint8_t x = 42;
 	auto x_bits = containers::bit_container_adaptor(x);
-	rgs::copy(x_bits, c.begin());
+	rg::copy(x_bits, c.begin());
 
-	REQUIRE(rgs::equal(x_bits, c));
+	REQUIRE(rg::equal(x_bits, c));
 
-	rgs::sort(c);
-	REQUIRE(rgs::is_sorted(c));
+	rg::sort(c);
+	REQUIRE(rg::is_sorted(c));
 
-	rgs::copy(c, x_bits.begin());
-	REQUIRE(rgs::equal(x_bits, c));
+	rg::copy(c, x_bits.begin());
+	REQUIRE(rg::equal(x_bits, c));
 	REQUIRE(x == 7);
 }
 
 template<class T>
 bool check_constness(containers::tight_integer_container<T> const& c)
 {
-	return rgs::equal(c, vws::iota(0UL, c.size()));
+	return rg::equal(c, rg::vw::iota(0UL, c.size()));
 }
 
 TEST_CASE("constness", "[tight-integer-container]")
@@ -402,6 +399,6 @@ TEST_CASE("constness", "[tight-integer-container]")
 	tight_container_t c;
 	c.resize(7);
 
-	rgs::copy(vws::iota(0UL, c.size()), c.begin());
+	rg::copy(rg::vw::iota(0UL, c.size()), c.begin());
 	REQUIRE(check_constness(c));
 }

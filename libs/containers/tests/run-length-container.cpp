@@ -274,24 +274,22 @@ TEST_CASE("random tests", "[run-length-container]")
 
 TEST_CASE("wrapper test", "[run-length-container]")
 {
-	namespace rgs = std::ranges;
-	namespace vws = std::views;
 
 	static_assert(
-		rgs::output_range<
+		rg::output_range<
 			containers::run_length_container<int>,
 			int const&
 		>
 	);
 
 	static_assert(
-		rgs::input_range<containers::run_length_container<int>&>
+		rg::input_range<containers::run_length_container<int>&>
 	);
 
 	containers::run_length_container<int> v;
 	v.resize(10);
-	rgs::fill(v, 42);
+	rg::fill(v, 42);
 	auto is_42 = [](auto const& i){ return i == 42; };
-	REQUIRE(rgs::size(v) == 10);
-	REQUIRE(rgs::all_of(v, is_42));
+	REQUIRE(rg::size(v) == 10);
+	REQUIRE(rg::all_of(v, is_42));
 }

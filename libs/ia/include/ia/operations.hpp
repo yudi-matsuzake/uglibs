@@ -8,7 +8,6 @@
 
 namespace ia{
 
-namespace rgs = std::ranges;
 
 enum class interval_comparison{
 	UNDEFINED,
@@ -170,7 +169,7 @@ auto euclidean_distance(P p_begin, P p_end, Q q_begin, T init)
 
 	auto q_it = q_begin;
 
-	for(auto&& i : rgs::subrange(p_begin, p_end)){
+	for(auto&& i : rg::subrange(p_begin, p_end)){
 		auto p = T{ i };
 		auto q = T{ *q_it };
 		auto t = abs(p - q);
@@ -197,7 +196,7 @@ auto manhatan_distance(P p_begin, P p_end, Q q_begin)
 
 	auto q_it = q_begin;
 
-	for(auto&& i : rgs::subrange(p_begin, p_end)){
+	for(auto&& i : rg::subrange(p_begin, p_end)){
 		auto p = interval{ i };
 		auto q = interval{ *q_it };
 

@@ -3,7 +3,6 @@
 #include "util/ranges.hpp"
 #include "containers/bit-container-adaptor.hpp"
 
-namespace rgs = std::ranges;
 
 template<std::integral T>
 auto make_array()
@@ -14,7 +13,7 @@ auto make_array()
 	constexpr auto N = max - min;
 	auto a = std::array<T, N>{};
 
-	rgs::copy(rgs::views::iota(min, max), a.begin());
+	rg::copy(rg::v3::vw::iota(min, max), a.begin());
 	return a;
 }
 
@@ -23,7 +22,7 @@ constexpr bool simple_element_test()
 	uint8_t x = 0b10011100;
 	auto c = containers::bit_container_adaptor(x);
 
-	return rgs::all_of(c, [i = 0, x](auto&& bit) mutable
+	return rg::all_of(c, [i = 0, x](auto&& bit) mutable
 	{
 		return bit == util::get_bit(x, i++, util::bit_order::leftmost{});
 	});
@@ -41,7 +40,7 @@ bool check_elements(R&& a, ranges::range auto bit_container)
 	using vector_t = std::vector<value_t>;
 
 	vector_t v;
-	for(auto&& bits : a | ranges::views::transform(to_bits))
+	for(auto&& bits : a | rg::v3::vw::transform(to_bits))
 		for(auto&& bi : bits)
 			v.push_back(bi);
 
@@ -95,19 +94,19 @@ TEST_CASE("bit container adaptor related tests", "[containers]")
 	REQUIRE(a.size()*n_bits_per_element == (c.end() - c.begin()));
 
 	using c_type = decltype(c);
-	using c_iterator_type = rgs::iterator_t<c_type>;
+	using c_iterator_type = rg::iterator_t<c_type>;
 	c_iterator_type it;
 	it = c.begin();
-	STATIC_REQUIRE(rgs::range<c_type>);
+	STATIC_REQUIRE(rg::range<c_type>);
 
 	REQUIRE(check_elements(a, c));
 
 	auto b = c.begin() + (42 * n_bits_per_element);
-	auto bits_c42 = rgs::subrange(b, b + n_bits_per_element);
+	auto bits_c42 = rg::subrange(b, b + n_bits_per_element);
 	auto v42 = T{42};
 
 	auto bits_42 = containers::bit_container_adaptor(v42);
 
-	REQUIRE(rgs::size(bits_c42) == rgs::size(bits_42));
-	REQUIRE(rgs::equal(bits_c42, bits_42));
+	REQUIRE(rg::size(bits_c42) == rg::size(bits_42));
+	REQUIRE(rg::equal(bits_c42, bits_42));
 }
