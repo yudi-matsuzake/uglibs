@@ -23,6 +23,7 @@ add_library(util
 	./include/util/underlying-integer.hpp
 	./include/util/integer-variant.hpp
 	./include/util/ranges.hpp
+	./include/util/fmt.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 

@@ -2,7 +2,6 @@
 
 #include <limits>
 #include <iomanip>
-#include <iostream>
 
 #include "ia/interval.hpp"
 #include "ia/operations.hpp"
