@@ -2,6 +2,7 @@
 
 #include <variant>
 #include <stdexcept>
+#include "util/meta.hpp"
 
 namespace util{
 
@@ -20,30 +21,6 @@ constexpr auto match(T&& arg, Ts&& ... fs)
 		std::forward<T>(arg)
 	);
 }
-
-// list of types
-template<class ... T>
-struct list_of_types{};
-
-// list of values
-template<auto ... V>
-struct list_of_values{};
-
-template<class T>
-struct to_value_list{};
-
-template <class Integer, Integer... Ints>
-struct to_value_list<std::integer_sequence<Integer, Ints...>> {
-  using type = list_of_values<Ints...>;
-};
-
-template <class Integer, Integer... Ints>
-struct to_value_list<const std::integer_sequence<Integer, Ints...>> {
-  using type = list_of_values<Ints...>;
-};
-
-template<class T>
-using to_value_list_t = typename to_value_list<T>::type;
 
 template<class T>
 struct to_variant{};
@@ -213,6 +190,15 @@ constexpr auto generate_variant_with_vt(list_of_values<Vs...>, TypeList) noexcep
 template<template <auto, class, class...> class T, class ValueList, class TypeList>
 using generate_variant_with_vt_t = decltype(
   detail::generate_variant_with_vt<T>(std::declval<ValueList>(), std::declval<TypeList>()));
+
+template<class First, class ... Ts, class F>
+constexpr auto for_each_type(list_of_types<First, Ts...>, F&& f)
+{
+  f(First{});
+  if constexpr (sizeof...(Ts) > 0) {
+    for_each_type(list_of_types<Ts...>{}, std::forward<F>(f));
+  }
+}
 
 
 } // end of namespace util

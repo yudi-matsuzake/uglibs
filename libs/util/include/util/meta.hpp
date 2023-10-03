@@ -164,4 +164,29 @@ using integer_queue_push_front_t = decltype(
 		e>(Q{})
 );
 
+// list of types
+template<class ... T>
+struct list_of_types{};
+
+// list of values
+template<auto ... V>
+struct list_of_values{};
+
+template<class T>
+struct to_value_list{};
+
+template <class Integer, Integer... Ints>
+struct to_value_list<std::integer_sequence<Integer, Ints...>> {
+  using type = list_of_values<Ints...>;
+};
+
+template <class Integer, Integer... Ints>
+struct to_value_list<const std::integer_sequence<Integer, Ints...>> {
+  using type = list_of_values<Ints...>;
+};
+
+template<class T>
+using to_value_list_t = typename to_value_list<T>::type;
+
+
 } // end of namespace util
