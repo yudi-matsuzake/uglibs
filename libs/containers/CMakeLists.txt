@@ -42,6 +42,8 @@ if(ENABLE_TESTING)
 		containers-tests
 		tests/bit-container-adaptor.cpp
 		tests/tight-integer-container.cpp
+		tests/ring-vector.cpp
+		tests/ring-hash-map.cpp
 		tests/bitset.cpp
 		tests/run-length-container.cpp)
 
