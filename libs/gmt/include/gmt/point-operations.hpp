@@ -144,6 +144,9 @@ public:
 		return a;
 	}
 
+	/**
+	 * @returns set all values to zero
+	 */
 	template<class Scalar>
 	static constexpr T all(Scalar&& s)
 	{
@@ -151,6 +154,18 @@ public:
 		std::ranges::fill(r, s);
 		return r;
 	}
+
+	/**
+	 * @returns all zeros except by axis `idx` which will be setted by one
+	 */
+	static constexpr T set_axis(std::uint64_t idx)
+	{
+		using value_t = rg::range_value_t<T>;
+		auto r = all(value_t{0});
+		r[idx] = value_t{1};
+		return r;
+	}
+
 };
 
 } // end of namespace gmt
