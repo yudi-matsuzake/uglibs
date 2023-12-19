@@ -16,6 +16,8 @@ namespace util {
   * b -> extreme right value
   * c -> inner left value
   * d -> inner right value
+  * fa -> f of extreme left value
+  * fb -> f of extreme right value
   * fc -> f of inner left value
   * fd -> f of inner right value
   */
@@ -23,6 +25,7 @@ template<std::floating_point Float>
 struct golden_section_state {
 	Float a, b, c, d;
 	Float fc, fd;
+	std::optional<Float> fa, fb;
 };
 
 /**
@@ -71,7 +74,9 @@ template<
 			.c  = c,
 			.d  = d,
 			.fc = f(c),
-			.fd = f(d)
+			.fd = f(d),
+			.fa = std::nullopt,
+			.fb = std::nullopt,
 		};
 	}();
 
@@ -81,12 +86,16 @@ template<
 			s.d = s.c;
 			s.c = s.b - (s.b - s.a)/phi;
 
+			s.fb = s.fd;
+
 			s.fd = s.fc;
 			s.fc = f(s.c);
 		}else{
 			s.a = s.c;
 			s.c = s.d;
 			s.d = s.a + (s.b - s.a)/phi;
+
+			s.fa = s.fc;
 
 			s.fc = s.fd;
 			s.fd = f(s.d);
