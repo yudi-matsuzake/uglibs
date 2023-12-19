@@ -28,6 +28,7 @@ add_library(util
 	./include/util/ranges.hpp
 	./include/util/fmt.hpp
 	./include/util/log.hpp
+	./include/util/numeric-computing.hpp
 	./src/misc.cpp
 	./src/io.cpp)
 
@@ -69,6 +70,7 @@ if(ENABLE_TESTING)
 		./tests/meta.cpp
 		./tests/bit-adaptors.cpp
 		./tests/integer-variant.cpp
+		./tests/golden-section-search.cpp
 		./tests/arithmetic-friends.cpp)
 
 	target_link_libraries(util-tests util Catch2::Catch2WithMain Catch2::Catch2)
