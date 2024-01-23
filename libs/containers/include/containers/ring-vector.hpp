@@ -39,17 +39,25 @@ private:
 public:
 	constexpr explicit ring_vector(uint64_t max_size)
 		: m_max_size(max_size)
-	{}
+	{
+		m_vector.reserve(max_size);
+	}
 
-	constexpr auto size() const
+	[[nodiscard]] constexpr auto size() const
 	{
 		return m_vector.size();
 	}
 
-	constexpr auto max_size() const
+	[[nodiscard]] constexpr auto max_size() const
 	{
 		return m_max_size;
 	}
+
+	[[nodiscard]] constexpr auto is_full() const
+	{
+		return size() == max_size();
+	}
+
 
 	/**
 	 * push_back function is similar to the `std::vector::pushback`
