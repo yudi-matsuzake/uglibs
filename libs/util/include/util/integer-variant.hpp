@@ -80,27 +80,33 @@ constexpr auto make_integer(uint32_t n, std::integer_sequence<T, first, ints ...
 	}
 }
 
+} // end of namespace detail
+
+/**
+  * given a variant of integers `IntegerVariant`, returns a type of
+  * signed integer with `n` bits such that this type is in the variant
+  */
 template<class IntegerVariant>
-auto unsigned_integer_from_string(std::string_view str)
+constexpr auto unsigned_integer_from_precision(uint32_t n)
 	-> std::optional<IntegerVariant>
 {
-	auto n = std::strtoul(str.substr(4).data(), nullptr, 10);
-	return make_integer<IntegerVariant, util::unsigned_flag>(
+	return detail::make_integer<IntegerVariant, util::unsigned_flag>(
 		n,
 		util::integer_precisions_t<
-		util::unsigned_flag,
+			util::unsigned_flag,
 			IntegerVariant
 		>{}
 	);
-
-	return std::nullopt;
 }
 
+/**
+  * given a variant of integers `IntegerVariant`, returns a type of
+  * signed integer with `n` bits such that this type is in the variant
+  */
 template<class IntegerVariant>
-auto signed_integer_from_string(std::string_view str)
+constexpr auto signed_integer_from_precision(uint32_t n)
 	-> std::optional<IntegerVariant>
 {
-	auto n = std::strtoul(str.substr(3).data(), nullptr, 10);
 	return detail::make_integer<IntegerVariant, util::signed_flag>(
 		n,
 		util::integer_precisions_t<
@@ -108,6 +114,33 @@ auto signed_integer_from_string(std::string_view str)
 			IntegerVariant
 		>{}
 	);
+}
+
+
+namespace detail {
+
+template<class IntegerVariant>
+auto unsigned_integer_from_string(std::string_view str)
+	-> std::optional<IntegerVariant>
+{
+	auto n = std::strtoul(str.substr(4).data(), nullptr, 10);
+
+	if(n == ULONG_MAX)
+		return std::nullopt;
+
+	return unsigned_integer_from_precision<IntegerVariant>(n);
+}
+
+template<class IntegerVariant>
+auto signed_integer_from_string(std::string_view str)
+	-> std::optional<IntegerVariant>
+{
+	auto n = std::strtoul(str.substr(3).data(), nullptr, 10);
+
+	if(n == ULONG_MAX)
+		return std::nullopt;
+
+	return signed_integer_from_precision<IntegerVariant>(n);
 }
 
 } // end of namespace detail

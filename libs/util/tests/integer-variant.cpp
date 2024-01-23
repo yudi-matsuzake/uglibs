@@ -79,3 +79,56 @@ TEST_CASE("supported integers variant", "[integer-variant]")
 	REQUIRE_FALSE(test_string_to_integer<uinteger<20>>("int20"));
 	REQUIRE_FALSE(test_string_to_integer<uinteger<1>>("int1"));
 }
+
+template<class IntegerType>
+auto test_precision_to_unsigned_integer(uint32_t n)
+{
+	if(auto i = util::unsigned_integer_from_precision<integer_32>(n)) {
+		return util::match(
+			i.value(),
+			[n] <class Int>(Int)
+			{
+				using inf = util::integer_info<Int>;
+				static constexpr auto is_signed =
+					std::is_same_v<
+						typename inf::signess,
+						util::signed_flag>;
+				constexpr auto b = inf::n_bits;
+				return b == n && !is_signed;
+			}
+		);
+	}
+
+	return false;
+}
+
+template<class IntegerType>
+auto test_precision_to_signed_integer(uint32_t n)
+{
+	if(auto i = util::signed_integer_from_precision<integer_32>(n)) {
+		return util::match(
+			i.value(),
+			[n] <class Int>(Int)
+			{
+				using inf = util::integer_info<Int>;
+				static constexpr auto is_signed =
+					std::is_same_v<
+						typename inf::signess,
+						util::signed_flag>;
+				constexpr auto b = inf::n_bits;
+				return b == n && is_signed;
+			}
+		);
+	}
+
+	return false;
+}
+
+TEST_CASE("integers from precision", "[integer-variant]")
+{
+
+	for(auto b = 2; b <= 32; ++b) {
+		REQUIRE(test_precision_to_unsigned_integer<integer_32>(b));
+		REQUIRE(test_precision_to_signed_integer<integer_32>(b));
+	}
+}
