@@ -28,7 +28,7 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
-find_package(Boost 1.81.0 COMPONENTS)
+find_package(Boost REQUIRED)
 
 # ug graphics library
 add_library(
@@ -117,7 +117,10 @@ target_include_directories(
 		$<BUILD_INTERFACE:${IMGUI_DIR}/examples>
 		$<INSTALL_INTERFACE:include>
 )
+
 target_compile_features(graphics PUBLIC cxx_std_20)
+
+target_compile_options(graphics PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
 
 # test programs
 option(GRAPHICS_TEST "Add test programs for graphics library" ON)
