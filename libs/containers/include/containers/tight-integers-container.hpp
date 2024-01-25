@@ -42,7 +42,6 @@ struct tight_integer_container_common{
 	using underlying_integer_t = typename container_t::value_type;
 	using underlying_integer_info = util::underlying_integer<N, S, M>;
 
-	static constexpr auto number_of_bits_per_element = N;
 	static constexpr bool is_signed = underlying_integer_info::is_signed;
 	static constexpr bool is_unsigned = !is_signed;
 
@@ -65,6 +64,329 @@ struct tight_integer_container_common{
 
 };
 
+template<class TightContainer>
+class tight_element_reference{
+public:
+	using tight_container_t = TightContainer;
+	static constexpr auto N = tight_container_t
+		::number_of_bits_per_element;
+
+	using underlying_integer_info = typename tight_container_t
+		::underlying_integer_info;
+
+	using underlying_integer_t = typename tight_container_t
+		::underlying_integer_t;
+
+	static constexpr bool is_signed = tight_container_t ::is_signed;
+	static constexpr bool is_unsigned = tight_container_t::is_unsigned;
+
+	static constexpr auto bits_per_underlying_integer =
+		tight_container_t::bits_per_underlying_integer;
+
+private:
+	constexpr auto compute_bit_index() const
+	{
+		return N * tight_index;
+	}
+
+	constexpr auto tight_container_bits() const noexcept
+	{
+		return bit_container_adaptor(std::span(
+			m_container_ptr->m_data.data(),
+			m_container_ptr->m_data.size()
+		));
+	}
+
+	constexpr auto get_element_bit_range() const noexcept
+	{
+		auto tcb = tight_container_bits();
+		auto b = tcb.begin() + compute_bit_index();
+		return rg::subrange(b, b + N);
+	}
+
+	/**
+		* our number region from a element
+		* is the N bits of this element if the element is unsigned
+		* is the N-1 last bits of this element if the element is signed
+		*
+		*/
+	constexpr auto get_element_number_region_bits() const noexcept
+	{
+		return get_element_bit_range() | rg::vw::drop(int{is_signed});
+	}
+
+	/**
+		* our number region from a underlying_integer type
+		* is the last N bits for unsigned and the last
+		* N-1 bits for signed
+		*/
+	constexpr auto get_number_region_from_underlying_type(
+		underlying_integer_t& x) const noexcept
+	{
+		auto c = bit_container_adaptor(x);
+		auto const n =
+			bits_per_underlying_integer
+			- (N - int{is_signed});
+
+		return rg::subrange(rg::begin(c) + n, rg::end(c));
+	}
+
+	constexpr auto get_sign_iterator() const noexcept
+		requires is_signed
+	{
+		return get_element_bit_range().begin();
+	}
+
+	constexpr void set_sign_bit(underlying_integer_t v) const noexcept
+	{
+		v = static_cast<underlying_integer_t>(v&1);
+		*get_sign_iterator() = v;
+	}
+
+	constexpr underlying_integer_t get_sign_bit() const noexcept
+	{
+		return *get_sign_iterator();
+	}
+
+	constexpr void impl_from_underlying_integer(underlying_integer_t x) const
+	{
+		auto e_bits = get_element_number_region_bits();
+		auto v_bits = get_number_region_from_underlying_type(x);
+		rg::copy(v_bits, e_bits.begin());
+		if constexpr (is_signed){
+			if(x < underlying_integer_t{0})
+				set_sign_bit(1);
+			else
+				set_sign_bit(0);
+		}
+	}
+
+	constexpr auto& from_underlying_integer(underlying_integer_t x)
+	{
+		impl_from_underlying_integer(x);
+		return *this;
+	}
+
+	constexpr auto& from_underlying_integer(underlying_integer_t x) const
+	{
+		impl_from_underlying_integer(x);
+		return *this;
+	}
+
+	[[nodiscard]] constexpr
+	underlying_integer_t to_undelying_integer() const
+	{
+		underlying_integer_t v = 0;
+		if constexpr (is_signed){
+			if(get_sign_bit())
+				v = ~0;
+		}
+
+		auto v_bits = get_number_region_from_underlying_type(v);
+		auto e_bits = get_element_number_region_bits();
+		rg::copy(e_bits, v_bits.begin());
+		return v;
+	}
+
+public:
+
+	static constexpr bool is_container_const = std::is_const_v<
+		TightContainer>;
+
+	constexpr tight_element_reference() = default;
+
+	constexpr tight_element_reference(
+		TightContainer* a_ptr,
+		int64_t index) noexcept
+		: m_container_ptr(a_ptr),
+			tight_index(index)
+	{}
+
+	constexpr
+	tight_element_reference(tight_element_reference const& v) noexcept
+	{
+		real_assignment(v);
+	}
+
+	constexpr
+	tight_element_reference(tight_element_reference&& v) noexcept
+	{
+		real_assignment(std::forward<tight_element_reference>(v));
+	}
+
+	constexpr
+	auto& operator=(underlying_integer_t v) noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference const& v) noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference&& v) noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(underlying_integer_t v) const noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference const& v) const noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference&& v) const noexcept
+		requires (not is_container_const)
+	{
+		return from_underlying_integer(v);
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference const& v) noexcept
+		requires (is_container_const)
+	{
+		this->real_assignment(v);
+		return *this;
+	}
+
+	constexpr
+	auto& operator=(tight_element_reference&& v) noexcept
+		requires (is_container_const)
+	{
+		this->real_assignment(v);
+		return *this;
+	}
+
+	[[nodiscard]] constexpr
+	underlying_integer_t get_value() const noexcept
+	{
+		return to_undelying_integer();
+	}
+
+	constexpr auto& get_container() const
+	{
+		return *m_container_ptr;
+	}
+
+	constexpr auto& get_container()
+	{
+		return *m_container_ptr;
+	}
+
+	constexpr operator underlying_integer_t() const noexcept
+	{
+		return get_value();
+	}
+
+	constexpr operator underlying_integer_t() noexcept
+	{
+		return get_value();
+	}
+
+	constexpr
+	bool operator==(tight_element_reference const& other) const
+		noexcept
+	{
+		return get_value() == other.get_value();
+	}
+
+	constexpr
+	bool compare_real_reference(
+		tight_element_reference const& other) const
+	{
+		auto const both_before_begin =
+			[i = tight_index, o = other.tight_index]
+		{
+			return  i < 0 && o < 0;
+		};
+
+		auto const both_are_end =
+			[siz = m_container_ptr->size(),
+			i = static_cast<uint64_t>(tight_index),
+			o = static_cast<uint64_t>(other.tight_index)]
+		{
+			return i >= siz && o >= siz;
+		};
+
+		return m_container_ptr == other.m_container_ptr
+			&& (tight_index == other.tight_index
+			|| both_before_begin()
+			|| both_are_end());
+	}
+
+	constexpr
+	bool operator!=(tight_element_reference const& other) const
+		noexcept
+	{
+		return !(*this == other);
+	}
+
+	constexpr
+	auto operator<=>(underlying_integer_t o) const
+	{
+		return this->get_value() <=> o;
+	}
+
+	constexpr
+	auto operator<=>(tight_element_reference const& other) const
+	{
+		return *this <=> other.get_value();
+	}
+
+	auto real_assignment(tight_element_reference const& other)
+	{
+		m_container_ptr = other.m_container_ptr;
+		tight_index = other.tight_index;
+	}
+
+	auto real_assignment(tight_element_reference&& other)
+	{
+		m_container_ptr = std::exchange(other.m_container_ptr, nullptr);
+		tight_index = std::exchange(other.tight_index, 0);
+	}
+
+	TightContainer* get_container_ptr() const
+	{
+		return m_container_ptr;
+	}
+
+	TightContainer* get_container_ptr()
+		requires (not std::is_const_v<TightContainer>)
+	{
+		return m_container_ptr;
+	}
+
+	friend constexpr void swap(
+		tight_element_reference a,
+		tight_element_reference b)
+	{
+		underlying_integer_t cup = a.get_value();
+		a = b.get_value();
+		b = cup;
+	}
+
+private:
+	TightContainer* m_container_ptr = nullptr;
+public:
+	int64_t tight_index = 0;
+};
+
+
 template<
 	uint8_t N,
 	class S = util::signed_flag,
@@ -82,7 +404,7 @@ private:
 	constexpr auto compute_number_of_underint(size_t n_elements) const
 		noexcept
 	{
-		size_t const n_bits = n_elements*number_of_bits_per_element;
+		size_t const n_bits = n_elements*N;
 		auto const n = bits_per_underlying_integer;
 		size_t const n_ints = n_bits/n + ((n_bits % n) > 0);
 		return n_ints;
@@ -103,8 +425,9 @@ private:
 
 public:
 
-	template<class TightContainer>
-	class tight_element_reference;
+	friend class tight_element_reference<tight_integer_container>;
+	friend class tight_element_reference<tight_integer_container const>;
+
 	template<class TightContainer>
 	class tight_iterator;
 
@@ -138,311 +461,6 @@ public:
 	static constexpr auto bits_per_underlying_integer = std::numeric_limits<
 		std::make_unsigned_t<underlying_integer_t>
 	>::digits;
-
-	template<class TightContainer>
-	class tight_element_reference{
-	private:
-		constexpr auto compute_bit_index() const
-		{
-			return number_of_bits_per_element * tight_index;
-		}
-
-		constexpr auto tight_container_bits() const noexcept
-		{
-			return bit_container_adaptor(std::span(
-				m_container_ptr->m_data.data(),
-				m_container_ptr->m_data.size()
-			));
-		}
-
-		constexpr auto get_element_bit_range() const noexcept
-		{
-			auto tcb = tight_container_bits();
-			auto b = tcb.begin() + compute_bit_index();
-			return rg::subrange(b, b + number_of_bits_per_element);
-		}
-
-		/**
-		  * our number region from a element
-		  * is the N bits of this element if the element is unsigned
-		  * is the N-1 last bits of this element if the element is signed
-		  *
-		  */
-		constexpr auto get_element_number_region_bits() const noexcept
-		{
-			return get_element_bit_range() | rg::vw::drop(int{is_signed});
-		}
-
-		/**
-		  * our number region from a underlying_integer type
-		  * is the last N bits for unsigned and the last
-		  * N-1 bits for signed
-		  */
-		constexpr auto get_number_region_from_underlying_type(
-			underlying_integer_t& x) const noexcept
-		{
-			auto c = bit_container_adaptor(x);
-			auto const n =
-				bits_per_underlying_integer
-				- (N - int{is_signed});
-
-			return rg::subrange(rg::begin(c) + n, rg::end(c));
-		}
-
-		constexpr auto get_sign_iterator() const noexcept
-			requires is_signed
-		{
-			return get_element_bit_range().begin();
-		}
-
-		constexpr void set_sign_bit(underlying_integer_t v) const noexcept
-		{
-			v = static_cast<underlying_integer_t>(v&1);
-			*get_sign_iterator() = v;
-		}
-
-		constexpr underlying_integer_t get_sign_bit() const noexcept
-		{
-			return *get_sign_iterator();
-		}
-
-		constexpr void impl_from_underlying_integer(underlying_integer_t x) const
-		{
-			auto e_bits = get_element_number_region_bits();
-			auto v_bits = get_number_region_from_underlying_type(x);
-			rg::copy(v_bits, e_bits.begin());
-			if constexpr (is_signed){
-				if(x < underlying_integer_t{0})
-					set_sign_bit(1);
-				else
-					set_sign_bit(0);
-			}
-		}
-
-		constexpr auto& from_underlying_integer(underlying_integer_t x)
-		{
-			impl_from_underlying_integer(x);
-			return *this;
-		}
-
-		constexpr auto& from_underlying_integer(underlying_integer_t x) const
-		{
-			impl_from_underlying_integer(x);
-			return *this;
-		}
-
-		[[nodiscard]] constexpr
-		underlying_integer_t to_undelying_integer() const
-		{
-			underlying_integer_t v = 0;
-			if constexpr (is_signed){
-				if(get_sign_bit())
-					v = ~0;
-			}
-
-			auto v_bits = get_number_region_from_underlying_type(v);
-			auto e_bits = get_element_number_region_bits();
-			rg::copy(e_bits, v_bits.begin());
-			return v;
-		}
-
-	public:
-
-		static constexpr bool is_container_const = std::is_const_v<
-			TightContainer>;
-
-		constexpr tight_element_reference() = default;
-
-		constexpr tight_element_reference(
-			TightContainer* a_ptr,
-			int64_t index) noexcept
-			: m_container_ptr(a_ptr),
-			  tight_index(index)
-		{}
-
-		constexpr
-		tight_element_reference(tight_element_reference const& v) noexcept
-		{
-			real_assignment(v);
-		}
-
-		constexpr
-		tight_element_reference(tight_element_reference&& v) noexcept
-		{
-			real_assignment(std::forward<tight_element_reference>(v));
-		}
-
-		constexpr
-		auto& operator=(underlying_integer_t v) noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference const& v) noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference&& v) noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(underlying_integer_t v) const noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference const& v) const noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference&& v) const noexcept
-			requires (not is_container_const)
-		{
-			return from_underlying_integer(v);
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference const& v) noexcept
-			requires (is_container_const)
-		{
-			this->real_assignment(v);
-			return *this;
-		}
-
-		constexpr
-		auto& operator=(tight_element_reference&& v) noexcept
-			requires (is_container_const)
-		{
-			this->real_assignment(v);
-			return *this;
-		}
-
-		[[nodiscard]] constexpr
-		underlying_integer_t get_value() const noexcept
-		{
-			return to_undelying_integer();
-		}
-
-		constexpr auto& get_container() const
-		{
-			return *m_container_ptr;
-		}
-
-		constexpr auto& get_container()
-		{
-			return *m_container_ptr;
-		}
-
-		constexpr operator underlying_integer_t() const noexcept
-		{
-			return get_value();
-		}
-
-		constexpr operator underlying_integer_t() noexcept
-		{
-			return get_value();
-		}
-
-		constexpr
-		bool operator==(tight_element_reference const& other) const
-			noexcept
-		{
-			return get_value() == other.get_value();
-		}
-
-		constexpr
-		bool compare_real_reference(
-			tight_element_reference const& other) const
-		{
-			auto const both_before_begin =
-				[i = tight_index, o = other.tight_index]
-			{
-				return  i < 0 && o < 0;
-			};
-
-			auto const both_are_end =
-				[siz = m_container_ptr->size(),
-				i = static_cast<uint64_t>(tight_index),
-				o = static_cast<uint64_t>(other.tight_index)]
-			{
-				return i >= siz && o >= siz;
-			};
-
-			return m_container_ptr == other.m_container_ptr
-				&& (tight_index == other.tight_index
-				|| both_before_begin()
-				|| both_are_end());
-		}
-
-		constexpr
-		bool operator!=(tight_element_reference const& other) const
-			noexcept
-		{
-			return !(*this == other);
-		}
-
-		constexpr
-		auto operator<=>(underlying_integer_t o) const
-		{
-			return this->get_value() <=> o;
-		}
-
-		constexpr
-		auto operator<=>(tight_element_reference const& other) const
-		{
-			return *this <=> other.get_value();
-		}
-
-		auto real_assignment(tight_element_reference const& other)
-		{
-			m_container_ptr = other.m_container_ptr;
-			tight_index = other.tight_index;
-		}
-
-		auto real_assignment(tight_element_reference&& other)
-		{
-			m_container_ptr = std::exchange(other.m_container_ptr, nullptr);
-			tight_index = std::exchange(other.tight_index, 0);
-		}
-
-		TightContainer* get_container_ptr() const
-		{
-			return m_container_ptr;
-		}
-
-		TightContainer* get_container_ptr()
-			requires (not std::is_const_v<TightContainer>)
-		{
-			return m_container_ptr;
-		}
-
-		friend constexpr void swap(
-			tight_element_reference a,
-			tight_element_reference b)
-		{
-			underlying_integer_t cup = a.get_value();
-			a = b.get_value();
-			b = cup;
-		}
-
-	private:
-		TightContainer* m_container_ptr = nullptr;
-	public:
-		int64_t tight_index = 0;
-	};
 
 	template<class TightContainer>
 	class tight_iterator{
