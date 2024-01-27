@@ -731,4 +731,4 @@ private:
 
 // operator==
 
-} // end of namespace util
+} // end of namespace containers
