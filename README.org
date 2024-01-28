@@ -1,0 +1,13 @@
+* uglibs
+
+`uglibs` is a collection of c++ libraries.
+
+Currently, this project is composed by
+
+- *containers* `std`-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, container with tight integers
+
+- *gmt* geometric and linear algebra algorithms
+
+- *ia* intervalar arithmetic library
+
+- *util* c++ utilities like, custom views for `std::ranges`, logging operations, meta programming utilities, numeric computing, and others
