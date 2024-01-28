@@ -11,3 +11,5 @@ Currently, this project is composed by
 - *ia* intervalar arithmetic library
 
 - *util* c++ utilities like, custom views for `std::ranges`, logging operations, meta programming utilities, numeric computing, and others
+
+- *graphics* graphics library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently only supporting opengl backend
