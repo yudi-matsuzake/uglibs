@@ -38,17 +38,20 @@ class UgLibsRecipte(conan.ConanFile):
 
     def package_info(self):
         self.cpp_info.components['utils'].libs = ['utils']
-        self.cpp_info.components['utils'].requires = [
+        self.cpp_info.components['util'].requires = [
             'catch2/3.4.0',
             'range-v3/0.12.0',
             'spdlog/1.12.0'
         ]
-        self.cpp_info.components['utils'].set_property(
+        self.cpp_info.components['util'].set_property(
             'cmake_target_name',
-            'utils')
+            'util')
 
         self.cpp_info.components['gmt'].libs = ['gmt']
-        self.cpp_info.components['gmt'].requires = ['catch2/3.4.0']
+        self.cpp_info.components['gmt'].requires = [
+            'catch2/3.4.0',
+            'util'
+        ]
         self.cpp_info.components['gmt'].set_property(
             'cmake_target_name',
             'gmt')
@@ -60,7 +63,10 @@ class UgLibsRecipte(conan.ConanFile):
             'ia')
 
         self.cpp_info.components['containers'].libs = ['containers']
-        self.cpp_info.components['containers'].requires = ['catch2/3.4.0']
+        self.cpp_info.components['containers'].requires = [
+            'catch2/3.4.0',
+            'util'
+        ]
         self.cpp_info.components['containers'].set_property(
             'cmake_target_name',
             'containers')
