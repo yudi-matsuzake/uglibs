@@ -1,5 +1,7 @@
+import os.path
 import conan
 import conan.tools.cmake
+import conan.tools.files as files
 
 
 class UgLibsRecipte(conan.ConanFile):
@@ -23,9 +25,42 @@ class UgLibsRecipte(conan.ConanFile):
         conan.tools.cmake.cmake_layout(self)
 
     def requirements(self):
+        # all
         self.requires('catch2/3.4.0')
+
+        # util
         self.requires('range-v3/0.12.0')
         self.requires('spdlog/1.12.0')
+
+        # graphics
+        self.requires('glm/0.9.9.8')
+        self.requires('glad/0.1.36')
+        self.requires('imgui/cci.20220621+1.88.docking')
+        self.requires('glfw/3.3.8')
+        self.requires('boost/1.83.0')
+
+    def configure(self):
+        self.options['glad'].spec = 'gl'
+        self.options['glad'].gl_version = '4.6'
+        self.options['glad'].gl_profile = 'core'
+
+    def generate(self):
+        files.copy(
+            self,
+            "*glfw*",
+            os.path.join(
+                self.dependencies["imgui"].package_folder,
+                "res",
+                "bindings"),
+            os.path.join(self.build_folder, "imgui-bindings"))
+
+        files.copy(
+            self,
+            "*opengl3*",
+            os.path.join(
+                self.dependencies["imgui"].package_folder,
+                "res", "bindings"),
+            os.path.join(self.build_folder, "imgui-bindings"))
 
     def build(self):
         cmake = conan.tools.cmake.CMake(self)

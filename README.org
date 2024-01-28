@@ -12,4 +12,4 @@ Currently, this project is composed by
 
 - *util* c++ utilities like, custom views for `std::ranges`, logging operations, meta programming utilities, numeric computing, and others
 
-- *graphics* graphics library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently only supporting opengl backend
+- *graphics* graphics library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently, backend is supporting ImGui with docking, Opengl, glfw3, and glad.

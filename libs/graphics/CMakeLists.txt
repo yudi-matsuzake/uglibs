@@ -24,14 +24,30 @@ add_library(ug_graphics_project_warnings INTERFACE)
 
 # including extra scripts and subdirectories
 include(./tools/cmake/warnings.cmake)
-include(./tools/cmake/glad.cmake)
-include(./tools/cmake/imgui.cmake)
 
 # find_package(Catch2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED VERSION 0.9.9.8)
-find_package(Boost REQUIRED)
+find_package(glad REQUIRED VERSION 0.1.36)
+find_package(Boost REQUIRED COMPONENTS gil)
+
+find_package(imgui REQUIRED VERSION 0.1.36)
+
+add_library(ugimgui
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.h"
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3_loader.h"
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.h"
+
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.cpp"
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.cpp")
+
+target_include_directories(
+	ugimgui PUBLIC
+	"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
+	"$<INSTALL_INTERFACE:include/imgui-bindings>")
+
+target_link_libraries(ugimgui PUBLIC imgui::imgui)
 
 add_library(graphics STATIC
 
@@ -105,11 +121,11 @@ target_link_libraries(
 		ug-graphics-warnings
 		glfw
 		OpenGL::GL
-		glad
-		imgui
+		glad::glad
+		ugimgui
 		Boost::boost
 		stdc++fs
-		glm
+		glm::glm
 )
 
 target_compile_definitions(graphics PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
@@ -186,7 +202,12 @@ set_property(TARGET graphics
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS graphics ug-graphics-warnings glad imgui EXPORT graphicsTargets
+install(TARGETS graphics
+		ug-graphics-warnings
+		ugimgui
+
+	EXPORT graphicsTargets
+
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
