@@ -1,3 +1,5 @@
+#include <exception>
+
 #include "ug/graphics/mesh3d-render.hpp"
 #include "ug/graphics/program.hpp"
 #include "ug/graphics/shader.hpp"
@@ -108,19 +110,29 @@ mesh3d_render::mesh3d_render(app* app_ptr)
 	  m_program(make_program(phong_simple_vs, phong_simple_fs))
 {}
 
-void mesh3d_render::common_program_setup(scene const& s, mesh3d const& mesh)
+void mesh3d_render::common_program_setup(
+	camera const& cam,
+	std::span<light3d const> lights,
+	mesh3d const& mesh)
 {
+	if(lights.size() != 1){
+		throw std::runtime_error(
+			"not implemented mesh3d_render for a number of lights"
+			" different than 1"
+		);
+	}
+
 	m_program.use();
 	mesh.bind();
 
-	auto const view = s.camera.view();
+	auto const view = cam.view();
 	auto const projection = get_app()->compute_projection_matrix();
-	auto const& light = s.lights.at(0);
+	auto const& light = lights.front();
 
 	m_program.set_uniform("u_model", mesh.model_matrix() );
 	m_program.set_uniform("u_view", view);
 	m_program.set_uniform("u_projection", projection);
-	m_program.set_uniform("u_view_pos", s.camera.position);
+	m_program.set_uniform("u_view_pos", cam.position);
 
 	m_program.set_uniform("u_light_pos", light.position);
 	m_program.set_uniform("u_light_color", light.color);
@@ -132,12 +144,13 @@ void mesh3d_render::common_program_setup(scene const& s, mesh3d const& mesh)
 }
 
 void mesh3d_render::operator()(
-	scene const& s,
+	camera const& cam,
+	std::span<light3d const> lights,
 	mesh3d const& mesh)
 {
-	if(triangles.draw){
-		common_program_setup(s, mesh);
+	common_program_setup(cam, lights, mesh);
 
+	if(triangles.draw){
 		m_program.set_uniform("u_color", triangles.color);
 		m_program.set_uniform(
 			"u_use_attr_color",
@@ -147,10 +160,8 @@ void mesh3d_render::operator()(
 	}
 
 	if(lines.draw){
-		common_program_setup(s, mesh);
 		float saved_line_width;
 		GL(glGetFloatv(GL_LINE_WIDTH, &saved_line_width));
-
 		GL(glLineWidth(lines.line_width));
 		m_program.set_uniform("u_color", lines.color);
 		m_program.set_uniform(

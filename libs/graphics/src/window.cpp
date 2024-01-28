@@ -108,7 +108,7 @@ window::context::context()
 {
 	if (!glfwInit()){
 		throw std::runtime_error(
-			"Could not inicialize the glfw context"
+			"Could not initialize the glfw context"
 		);
 	}
 

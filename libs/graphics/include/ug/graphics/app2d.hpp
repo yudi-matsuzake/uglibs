@@ -14,8 +14,7 @@ public:
 	static constexpr auto default_fheight = static_cast<float>(default_height);
 
 	static constexpr std::array exit_keys{
-		GLFW_KEY_ESCAPE,
-		GLFW_KEY_Q
+		GLFW_KEY_ESCAPE
 	};
 
 	app2d(int width, int height, char const* title);

@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ug/graphics/buffers.hpp"
 
 namespace ug::graphics{
@@ -13,6 +15,19 @@ buffer::buffer(uint32_t a_target)
 	: m_id(gen_buffer()), m_target(a_target)
 {}
 
+buffer& buffer::operator=(buffer&& other)
+{
+	if(this != &other){
+		this->m_id = std::exchange(other.m_id, 0u);
+		this->m_target = std::exchange(other.m_target, 0u);
+	}
+	return *this;
+}
+
+buffer::buffer(buffer&& other)
+{
+	(*this) = std::forward<buffer>(other);
+}
 
 buffer::~buffer()
 {
@@ -22,6 +37,11 @@ buffer::~buffer()
 void buffer::bind() const
 {
 	GL(glBindBuffer(m_target, m_id));
+}
+
+uint32_t buffer::id() const
+{
+	return m_id;
 }
 
 } // end of namespace ug::graphics

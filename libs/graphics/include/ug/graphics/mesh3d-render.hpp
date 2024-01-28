@@ -1,9 +1,11 @@
 #pragma once
 
+#include <span>
+
 #include "ug/graphics/mesh3d.hpp"
+#include "ug/graphics/light3d.hpp"
 #include "ug/graphics/app.hpp"
 #include "ug/graphics/render.hpp"
-#include "ug/graphics/scene.hpp"
 #include "ug/graphics/program.hpp"
 
 namespace ug::graphics{
@@ -12,8 +14,10 @@ class mesh3d_render : public render{
 public:
 
 	mesh3d_render(app*);
-	void operator()(scene const& s, mesh3d const& mesh);
-
+	void operator()(
+		camera const& cam,
+		std::span<light3d const> lights,
+		mesh3d const& mesh);
 
 	float ambient_light_strength = 0.2f;
 	bool specular_lighting = true;
@@ -35,7 +39,10 @@ public:
 
 
 private:
-	void common_program_setup(scene const& s, mesh3d const& mesh);
+	void common_program_setup(
+		camera const& cam,
+		std::span<light3d const> lights,
+		mesh3d const& mesh);
 
 	ug::graphics::program m_program;
 };

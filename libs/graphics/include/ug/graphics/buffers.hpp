@@ -1,10 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include <ranges>
 
 #include "ug/graphics/opengl-error.hpp"
 
 namespace ug::graphics{
+
+namespace rgs = std::ranges;
 
 class buffer {
 public:
@@ -12,10 +15,13 @@ public:
 	buffer(std::uint32_t);
 
 	virtual ~buffer();
-	void bind() const;
+	virtual void bind() const;
 
 	buffer(buffer const&) = delete;
-	buffer(buffer&&) = default;
+	buffer& operator=(buffer const&) = delete;
+
+	buffer(buffer&&);
+	buffer& operator=(buffer&&);
 
 	/**
 	  * sets the buffer data
@@ -39,6 +45,13 @@ public:
 		));
 	}
 
+	template<rgs::range R>
+	void set_data(R const& r, uint32_t usage = GL_STATIC_DRAW)
+	{
+		set_data(rgs::cdata(r), rgs::size(r), usage);
+	}
+
+	uint32_t id() const;
 
 protected:
 	uint32_t m_id;
@@ -55,6 +68,12 @@ public:
 class ebo : public buffer {
 public:
 	ebo() : buffer(GL_ELEMENT_ARRAY_BUFFER)
+	{} 
+};
+
+class tdb : public buffer {
+public:
+	tdb() : buffer(GL_TEXTURE_BUFFER)
 	{} 
 };
 

@@ -17,6 +17,8 @@ class shader{
 public:
 	shader(unsigned int shader_type);
 
+	shader(shader const&) = delete;
+
 	virtual ~shader();
 
 	uint32_t id() const;

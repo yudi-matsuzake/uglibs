@@ -1,5 +1,6 @@
 #include "ug/graphics/app2d.hpp"
 
+
 namespace ug::graphics{
 
 app2d::app2d(int width, int height, char const* title)
@@ -48,51 +49,31 @@ void app2d::update()
 void app2d::draw_ui()
 {
 	app::draw_ui();
-	ImGuiWindowFlags window_flags =
-		ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_NoScrollbar
-		| ImGuiWindowFlags_NoMove
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoCollapse 
-		| ImGuiWindowFlags_NoNav;
 
-	bool p_open = true;
+	if(auto view = this->ui_window_view("app2d options")){
+		auto const mv = compute_space_point_of_cursor_position();
+		auto [ cx, cy ] = compute_cell_index_of_cursor_position(mv);
 
-	auto [ width, height ] = get_framebuffer_size();
+		ImGui::Text("index point: (%5d, %5d)		", cx, cy);
+		ImGui::Text("space point: (%5f, %5f)		",
+			static_cast<double>(mv.x),
+			static_cast<double>(mv.y)
+		);
 
-	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(
-		ImVec2(static_cast<float>(width), 20.f),
-		ImGuiCond_Always
-	);
-	ImGui::Begin("app2d options", &p_open, window_flags);
+		ImGui::Checkbox("show grid		", &m_show_grid);
 
-	auto fr = static_cast<double>(ImGui::GetIO().Framerate);
-	ImGui::Text("%3.2f FPS		", fr);
+		ImGui::ColorEdit3(
+			"background color		",
+			glm::value_ptr(m_background_color),
+			ImGuiColorEditFlags_NoInputs
+		);
 
-	auto [ cx, cy ] = compute_cell_index_of_cursor_position();
-
-	ImGui::SameLine();
-	ImGui::Text("cell index: (%5d, %5d)		", cx, cy);
-
-	ImGui::SameLine();
-	ImGui::Checkbox("show grid		", &m_show_grid);
-
-	ImGui::SameLine();
-	ImGui::ColorEdit3(
-		"background color		",
-		glm::value_ptr(m_background_color),
-		ImGuiColorEditFlags_NoInputs
-	);
-
-	ImGui::SameLine();
-	ImGui::ColorEdit3(
-		"grid color",
-		glm::value_ptr(m_grid_color),
-		ImGuiColorEditFlags_NoInputs
-	);
-
-	ImGui::End();
+		ImGui::ColorEdit3(
+			"grid color",
+			glm::value_ptr(m_grid_color),
+			ImGuiColorEditFlags_NoInputs
+		);
+	}
 }
 
 void app2d::draw()

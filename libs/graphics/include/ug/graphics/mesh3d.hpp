@@ -16,6 +16,11 @@ class mesh3d{
 public:
 
 	explicit mesh3d(std::vector<mesh3d_attributes_layout>&& attributes);
+	mesh3d(mesh3d const&) = delete;
+	mesh3d(mesh3d&&) = default;
+
+	mesh3d& operator=(mesh3d const&) = delete;
+	// mesh3d& operator=(mesh3d&&) = default;
 
 	void bind() const;
 

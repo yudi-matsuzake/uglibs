@@ -20,40 +20,32 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 endif()
 
+add_library(ug_graphics_project_warnings INTERFACE)
+
 # including extra scripts and subdirectories
 include(./tools/cmake/warnings.cmake)
-
-include(./tools/cmake/conan.cmake)
-run_conan()
+include(./tools/cmake/glad.cmake)
+include(./tools/cmake/imgui.cmake)
 
 # find_package(Catch2 REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED VERSION 0.9.9.8)
-find_package(glad REQUIRED VERSION 0.1.36)
-find_package(imgui REQUIRED VERSION 0.1.36)
-
-add_library(ugimgui
-	"imgui-bindings/imgui_impl_glfw.h"
-	"imgui-bindings/imgui_impl_glfw.cpp"
-	"imgui-bindings/imgui_impl_opengl3.h"
-	"imgui-bindings/imgui_impl_opengl3.cpp")
-
-target_link_libraries(ugimgui PUBLIC imgui::imgui)
-target_include_directories(ugimgui
-	PUBLIC
-		"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
-		"$<INSTALL_INTERFACE:include/imgui-bindings>"
-)
+find_package(Boost REQUIRED)
 
 add_library(graphics STATIC
+
 	include/ug/graphics/inputs.hpp
+	include/ug/graphics/camera3d-controller.hpp
 	include/ug/graphics/camera2d-controller.hpp
 	include/ug/graphics/texture2d.hpp
 	include/ug/graphics/misc.hpp
+	include/ug/graphics/light3d.hpp
 	include/ug/graphics/app.hpp
+	include/ug/graphics/buffer-texture.hpp
+	include/ug/graphics/texture1d.hpp
 	include/ug/graphics/ball2d-render.hpp
+	include/ug/graphics/basic-texture.hpp
 	include/ug/graphics/camera.hpp
 	include/ug/graphics/buffers.hpp
 	include/ug/graphics/app3d.hpp
@@ -64,7 +56,6 @@ add_library(graphics STATIC
 	include/ug/graphics/vao.hpp
 	include/ug/graphics/window.hpp
 	include/ug/graphics/program.hpp
-	include/ug/graphics/scene.hpp
 	include/ug/graphics/mesh3d.hpp
 	include/ug/graphics/render.hpp
 	include/ug/graphics/opengl-error.hpp
@@ -85,13 +76,16 @@ add_library(graphics STATIC
 	src/grid2d-render.cpp
 	src/render.cpp
 	src/buffers.cpp
-	src/scene.cpp
+	src/buffer-texture.cpp
+	src/basic-texture.cpp
 	src/app.cpp
 	src/mesh3d-render.cpp
+	src/texture1d.cpp
 	src/texture2d.cpp
 	src/app3d.cpp
 	src/app2d.cpp
 	src/mesh3d.cpp
+	src/camera3d-controller.cpp
 	src/opengl-error.cpp
 	src/ball2d-render.cpp
 )
@@ -111,25 +105,20 @@ target_link_libraries(
 		ug-graphics-warnings
 		glfw
 		OpenGL::GL
-		glad::glad
-		${OpenCV_LIBS}
+		glad
+		imgui
+		Boost::boost
 		stdc++fs
-		glm::glm
-		imgui::imgui
+		glm
 )
 
-target_link_libraries(graphics PRIVATE ugimgui)
-
-
 target_compile_definitions(graphics PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
-
 target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
 target_include_directories(
 	graphics
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
-		${OpenCV_INCLUDE_DIRS}
 )
 
 target_include_directories(
@@ -140,13 +129,10 @@ target_include_directories(
 							 
 		$<BUILD_INTERFACE:${IMGUI_DIR}/examples>
 		$<INSTALL_INTERFACE:include>
-
-		# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/glm>
 )
-
 if(ENABLE_PCH)
 	target_precompile_headers(
-		project_options
+		graphics
 		INTERFACE
 		include/ug/graphics/inputs.hpp
 		include/ug/graphics/camera2d-controller.hpp
@@ -174,6 +160,8 @@ if(ENABLE_PCH)
 )
 endif()
 
+target_compile_features(graphics PUBLIC cxx_std_20)
+target_compile_options(graphics PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
 
 # test programs
 option(GRAPHICS_TEST "Add test programs for graphics library" ON)
@@ -185,8 +173,11 @@ if(${GRAPHICS_TEST})
 	add_executable(hello-segment ./test/hello-segment.cpp)
 	target_link_libraries(hello-segment PRIVATE graphics)
 
-	add_executable(hello-scene ./test/hello-scene.cpp)
-	target_link_libraries(hello-scene PRIVATE graphics)
+	add_executable(hello-cube ./test/hello-cube.cpp)
+	target_link_libraries(hello-cube PRIVATE graphics)
+
+	add_executable(raymarching-primitives ./test/raymarching-primitives.cpp)
+	target_link_libraries(raymarching-primitives PRIVATE graphics)
 endif()
 
 set_property(TARGET graphics PROPERTY VERSION ${PROJECT_VERSION})
@@ -195,7 +186,7 @@ set_property(TARGET graphics
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS graphics ug-graphics-warnings ugimgui EXPORT graphicsTargets
+install(TARGETS graphics ug-graphics-warnings glad imgui EXPORT graphicsTargets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin

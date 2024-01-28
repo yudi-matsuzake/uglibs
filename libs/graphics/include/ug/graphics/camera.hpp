@@ -15,6 +15,14 @@ struct camera{
 	[[nodiscard]] glm::vec3 compute_up_axis(
 		std::optional<glm::vec3> const& right = std::nullopt) const;
 
+	constexpr camera() = default;
+	constexpr camera(glm::vec3 const& pos) noexcept
+		: position(pos)
+	{}
+	constexpr camera(glm::vec3 const& pos, glm::vec3 const& dir) noexcept
+		: position(pos), direction(dir)
+	{}
+
 	glm::vec3 position = glm::vec3{0.f, 0.f, 1.f};
 	glm::vec3 direction = glm::vec3{0.f, 0.f, -1.f};
 };

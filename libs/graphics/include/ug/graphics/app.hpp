@@ -1,14 +1,15 @@
 #pragma once
 
+#include <string_view>
+#include <unordered_map>
 #include <filesystem>
 #include <vector>
 #include <iostream>
 #include <memory>
-#include <string_view>
 #include <stdexcept>
 #include <tuple>
 
-#include <opencv2/core/core.hpp>
+#include <boost/gil.hpp>
 
 #include "ug/graphics/misc.hpp"
 #include "ug/graphics/window.hpp"
@@ -17,8 +18,15 @@
 
 namespace ug::graphics{
 
+namespace gil = boost::gil;
+
 class app : public window {
 public:
+
+	static constexpr std::array show_menubar_keys{
+		GLFW_KEY_LEFT_ALT,
+		GLFW_KEY_RIGHT_ALT
+	};
 
 	enum class projection_type : int8_t {
 		NONE,
@@ -86,6 +94,11 @@ public:
 	void on_key_input_components(key_input const& input);
 	void on_scroll_input_components(scroll_input const& input);
 
+	auto compute_projected_corners(
+		std::optional<glm::mat4> const& pm = std::nullopt,
+		std::optional<glm::mat4> const& vm = std::nullopt
+	) const -> std::tuple<glm::vec4, glm::vec4>;
+
 	rect2d compute_projected_viewport(
 		std::optional<glm::mat4> const& pm = std::nullopt,
 		std::optional<glm::mat4> const& vm = std::nullopt
@@ -107,7 +120,60 @@ public:
 	bool ui_want_capture_mouse() const;
 	bool ui_want_capture_keyboard() const;
 
-	cv::Mat get_current_frame_image() const;
+	gil::rgb8_image_t get_current_frame_image() const;
+
+	struct ui_window_view_t{
+	private:
+
+	public:
+
+		explicit ui_window_view_t(
+				char const* w, bool* p_open, int flags)
+			: m_window_name{ w },
+			  m_popen{ p_open },
+			  m_flags{ flags }
+		{
+			ImGui::Begin(m_window_name, m_popen, m_flags);
+		}
+
+		ui_window_view_t(ui_window_view_t const&) = delete;
+		ui_window_view_t& operator=(ui_window_view_t const&) = delete;
+
+		ui_window_view_t& operator=(ui_window_view_t&& other)
+		{
+			if(this != &other){
+				m_window_name = std::exchange(
+					other.m_window_name, nullptr
+				);
+				m_popen = std::exchange(other.m_popen, nullptr);
+				m_flags = std::exchange(other.m_flags, 0);
+				other.m_close = false;
+			}
+			return *this;
+		}
+
+		ui_window_view_t(ui_window_view_t&& other)
+		{
+			(*this) = std::forward<ui_window_view_t>(other);
+		}
+
+		~ui_window_view_t()
+		{
+			if(m_close)
+				ImGui::End();
+		}
+
+	private:
+		char const* m_window_name;
+		bool* m_popen;
+		int m_flags;
+		bool m_close = true;
+	};
+
+	auto ui_window_view(
+		std::string_view str,
+		ImGuiWindowFlags flags = ImGuiWindowFlags_None
+	) -> std::optional<ui_window_view_t>;
 
 protected:
 
@@ -115,18 +181,36 @@ protected:
 	void update_time();
 	void update_cached_data();
 
+	struct heterogeneous_string_hash {
+		using is_transparent = void;
+		[[nodiscard]] size_t operator()(char const* txt) const {
+			return std::hash<std::string_view>{}(txt);
+		}
+		[[nodiscard]] size_t operator()(std::string_view txt) const {
+			return std::hash<std::string_view>{}(txt);
+		}
+		[[nodiscard]] size_t operator()(std::string const& txt) const {
+			return std::hash<std::string>{}(txt);
+		}
+	};
 
-	double m_last_time{ get_time() };
-	double m_delta{ 0.0 };
-
-	float m_zoom{ 1.0 };
-
-	GLbitfield m_clear_flags = GL_COLOR_BUFFER_BIT;
+	using enabled_views_t = std::unordered_map<
+		std::string,
+		bool,
+		heterogeneous_string_hash,
+		std::equal_to<>
+	>;
 
 	component_manager m_component_manager;
-	rect2d m_viewport{ {0, 0}, 0, 0 };
-
+	enabled_views_t m_enabled_views;
 	ug::graphics::camera m_camera;
+	rect2d m_viewport{ {0, 0}, 0, 0 };
+	double m_last_time{ get_time() };
+	double m_delta{ 0.0 };
+	GLbitfield m_clear_flags = GL_COLOR_BUFFER_BIT;
+	float m_zoom{ 1.0 };
+	bool m_enable_menu_bar = true;
+
 public:
 	app::projection_type projection_type = app::projection_type::ORTHOGRAPHIC;
 };
