@@ -1,0 +1,24 @@
+image: yudimatsuzake/shrep
+
+stages:
+  - build
+  - test
+
+build-release-gcc:
+  stage: build
+  script:
+    - conan profile detect
+    - conan install --build=missing --settings=build_type=Release --profile=./tools/conan/gcc .
+    - conan build --settings=build_type=Release
+  artifacts:
+    paths:
+    - build
+
+test-release-gcc:
+  stage: test
+  script:
+    - TEST_OUTPUT_ON_FAILURE=1 ctest -VV --output-on-failure --test-dir build/Release | tee build/Release/Testing/tests-output.txt
+  artifacts:
+    paths:
+    - build/Release/Testing/tests-output.txt
+    - build/Release/Testing
