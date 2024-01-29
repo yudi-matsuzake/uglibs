@@ -8,7 +8,7 @@ Currently, this project is composed by
 
 - *gmt* geometric and linear algebra algorithms
 
-- *ia* [[https://en.wikipedia.org/wiki/Interval_arithmetic][intervalar arithmetic]] library
+- *ia* [[https://en.wikipedia.org/wiki/Interval_arithmetic][interval arithmetic]] library
 
 - *util* c++ utilities like, custom views for =std::ranges=, logging operations, meta programming utilities, numeric computing, and others
 
