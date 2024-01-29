@@ -8,7 +8,7 @@ build-release-gcc:
   stage: build
   script:
     - conan profile detect
-    - conan install --build=missing --settings=build_type=Release --profile=./tools/conan/gcc .
+    - conan install --build=missing --settings=build_type=Release .
     - conan build --settings=build_type=Release
   artifacts:
     paths:
