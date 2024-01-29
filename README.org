@@ -4,7 +4,7 @@
 
 Currently, this project is composed by
 
-- *containers* `std`-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, and container with tight integers
+- *containers* =std=-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, and container with tight integers
 
 - *gmt* geometric and linear algebra algorithms
 
