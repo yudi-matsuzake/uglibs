@@ -1,6 +1,6 @@
 * uglibs
 
-`uglibs` is a collection of c++ libraries.
+=uglibs= is a collection of c++ libraries.
 
 Currently, this project is composed by
 
