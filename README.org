@@ -4,12 +4,12 @@
 
 Currently, this project is composed by
 
-- *containers* `std`-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, container with tight integers
+- *containers* `std`-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, and container with tight integers
 
 - *gmt* geometric and linear algebra algorithms
 
-- *ia* intervalar arithmetic library
+- *ia* [[https://en.wikipedia.org/wiki/Interval_arithmetic][intervalar arithmetic]] library
 
 - *util* c++ utilities like, custom views for `std::ranges`, logging operations, meta programming utilities, numeric computing, and others
 
-- *graphics* graphics library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently, backend is supporting ImGui with docking, Opengl, glfw3, and glad.
+- *graphics* library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently, backend is supporting ImGui with docking, Opengl, glfw3, and glad
