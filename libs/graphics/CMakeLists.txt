@@ -47,7 +47,7 @@ target_include_directories(
 	"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
 	"$<INSTALL_INTERFACE:include/imgui-bindings>")
 
-target_link_libraries(ugimgui PUBLIC imgui::imgui)
+target_link_libraries(ugimgui PUBLIC imgui::imgui glfw)
 
 add_library(graphics STATIC
 
