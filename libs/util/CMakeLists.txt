@@ -4,8 +4,6 @@ project(util DESCRIPTION "util c++ library" VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
-
-find_package(OpenCV REQUIRED)
 find_package(range-v3 0.12.0 REQUIRED)
 find_package(spdlog 1.12.0 REQUIRED)
 find_package(fmt 10.1.1 REQUIRED)
@@ -33,9 +31,9 @@ add_library(util
 	./src/io.cpp)
 
 add_library(util::util ALIAS util)
-target_include_directories(util PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_include_directories(util PUBLIC)
 target_link_libraries(
-	util PUBLIC ${OpenCV_LIBS} range-v3::range-v3 spdlog::spdlog fmt::fmt)
+	util PUBLIC range-v3::range-v3 spdlog::spdlog fmt::fmt)
 
 target_include_directories(
 	util PUBLIC
