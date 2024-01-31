@@ -72,22 +72,30 @@ set_property(TARGET ia
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS ia EXPORT iaTargets
+install(TARGETS ia EXPORT ug-ia-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
 	INCLUDES DESTINATION include)
 
-install(EXPORT iaTargets
-	FILE iaTargets.cmake
-	NAMESPACE ia::
-	DESTINATION lib/cmake/ia)
+install(EXPORT ug-ia-targets
+	FILE ug-ia-targets.cmake
+	NAMESPACE ug::ia::
+	DESTINATION lib/cmake/ug/ia)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/iaConfigVersion.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-ia-config-version.cmake"
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion)
 
-install(FILES iaConfig.cmake iaConfigVersion.cmake
-	DESTINATION lib/cmake/ia)
+configure_package_config_file(
+	cmake/config.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-ia-config.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/ug/ia/cmake"
+)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-ia-config.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-ia-config-version.cmake"
+	DESTINATION lib/cmake/ug/ia)

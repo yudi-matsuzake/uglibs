@@ -202,27 +202,31 @@ set_property(TARGET graphics
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS graphics
-		ug-graphics-warnings
-		ugimgui
-
-	EXPORT graphicsTargets
-
+install(TARGETS graphics ug-graphics-warnings ugimgui
+	EXPORT ug-graphics-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
 	INCLUDES DESTINATION include)
 
-install(EXPORT graphicsTargets
-	FILE graphicsTargets.cmake
-	NAMESPACE ug::
-	DESTINATION lib/cmake/graphics)
+install(EXPORT ug-graphics-targets
+	FILE ug-graphics-targets.cmake
+	NAMESPACE ug::graphics::
+	DESTINATION lib/cmake/ug/graphics)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/graphicsConfigVersion.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-graphics-config-version.cmake"
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion)
 
-install(FILES graphicsConfig.cmake graphicsConfigVersion.cmake
-	DESTINATION lib/cmake/graphics)
+configure_package_config_file(
+	cmake/config.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-graphics-config.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/ug/graphics/cmake"
+)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-graphics-config.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-graphics-config-version.cmake"
+	DESTINATION lib/cmake/ug/graphics)

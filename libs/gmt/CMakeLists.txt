@@ -77,21 +77,30 @@ set_property(TARGET gmt
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS gmt EXPORT gmtTargets
+install(TARGETS gmt EXPORT ug-gmt-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
 	INCLUDES DESTINATION include)
 
-install(EXPORT gmtTargets
-	FILE gmtTargets.cmake
-	NAMESPACE gmt::
-	DESTINATION lib/cmake/gmt)
+install(EXPORT ug-gmt-targets
+	FILE ug-gmt-targets.cmake
+	NAMESPACE ug::gmt::
+	DESTINATION lib/cmake/ug/gmt)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/gmtConfigVersion.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-gmt-config-version.cmake"
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion)
 
-install(FILES gmtConfig.cmake gmtConfigVersion.cmake DESTINATION lib/cmake/gmt)
+configure_package_config_file(
+	cmake/config.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-gmt-config.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/ug/gmt/cmake"
+)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-gmt-config.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-gmt-config-version.cmake"
+	DESTINATION lib/cmake/ug/gmt)

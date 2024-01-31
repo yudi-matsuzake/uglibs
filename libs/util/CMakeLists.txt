@@ -38,7 +38,7 @@ target_link_libraries(
 target_include_directories(
 	util PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(util PUBLIC cxx_std_23)
 
@@ -97,22 +97,30 @@ set_property(TARGET util
 	APPEND PROPERTY
 	COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS util EXPORT utilTargets
+install(TARGETS util EXPORT ug-util-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
 	INCLUDES DESTINATION include)
 
-install(EXPORT utilTargets
-	FILE utilTargets.cmake
-	NAMESPACE util::
-	DESTINATION lib/cmake/util)
+install(EXPORT ug-util-targets
+	FILE ug-util-targets.cmake
+	NAMESPACE ug::util::
+	DESTINATION lib/cmake/ug/util)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/utilConfigVersion.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-util-config-version.cmake"
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion)
 
-install(FILES utilConfig.cmake utilConfigVersion.cmake
-	DESTINATION lib/cmake/util)
+configure_package_config_file(
+	cmake/config.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-util-config.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/ug/util/cmake"
+)
+
+install(FILES
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-util-config.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/ug-util-config-version.cmake"
+	DESTINATION lib/cmake/ug/util)

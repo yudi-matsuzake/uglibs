@@ -8,6 +8,18 @@ class UgLibsRecipte(conan.ConanFile):
     name = 'uglibs'
     version = '0.0.1'
 
+    # optional metadata
+    license = "MIT license"
+    author = "Yudi Matsuzake yudi.matsuzake@gmail.com"
+    url = "https://gitlab.com/yudi-matsuzake/uglibs"
+    description = "uglibs is a collection of c++ libraries."
+    topics = (
+        "opengl", "containers", "graphics", "linear algebra", "modern cpp",
+        "metaprogramming", "render", "run-length encoding",
+        "interval arithmetics", "numeric computing", "ranges", "cpp20",
+        "tight integers container"
+    )
+
     # binary configuration
     settings = 'os', 'compiler', 'build_type', 'arch'
     options = {'shared': [True, False], 'fPIC': [True, False]}
@@ -15,7 +27,7 @@ class UgLibsRecipte(conan.ConanFile):
     generators = 'CMakeToolchain', 'CMakeDeps'
 
     # sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = 'CMakeLists.txt'
+    exports_sources = 'CMakeLists.txt', 'libs/*'
 
     def config_options(self):
         if self.settings.os == 'Windows':
@@ -73,35 +85,23 @@ class UgLibsRecipte(conan.ConanFile):
 
     def package_info(self):
         self.cpp_info.components['utils'].libs = ['utils']
-        self.cpp_info.components['util'].requires = [
-            'catch2/3.4.0',
-            'range-v3/0.12.0',
-            'spdlog/1.12.0'
-        ]
         self.cpp_info.components['util'].set_property(
             'cmake_target_name',
             'util')
 
         self.cpp_info.components['gmt'].libs = ['gmt']
-        self.cpp_info.components['gmt'].requires = [
-            'catch2/3.4.0',
-            'util'
-        ]
+        self.cpp_info.components['gmt'].requires = ['util']
         self.cpp_info.components['gmt'].set_property(
             'cmake_target_name',
             'gmt')
 
         self.cpp_info.components['ia'].libs = ['ai']
-        self.cpp_info.components['ia'].requires = ['catch2/3.4.0']
         self.cpp_info.components['ia'].set_property(
             'cmake_target_name',
             'ia')
 
         self.cpp_info.components['containers'].libs = ['containers']
-        self.cpp_info.components['containers'].requires = [
-            'catch2/3.4.0',
-            'util'
-        ]
+        self.cpp_info.components['containers'].requires = ['util']
         self.cpp_info.components['containers'].set_property(
             'cmake_target_name',
             'containers')
