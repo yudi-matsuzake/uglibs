@@ -4,7 +4,7 @@ import conan.tools.cmake
 import conan.tools.files as files
 
 
-class UgLibsRecipte(conan.ConanFile):
+class UgLibsRecipe(conan.ConanFile):
     name = 'uglibs'
     version = '0.0.1'
 
