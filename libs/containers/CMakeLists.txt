@@ -20,6 +20,17 @@ target_include_directories(
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
+target_sources(containers PUBLIC FILE_SET HEADERS
+	BASE_DIRS "./include"
+	FILES
+		./include/containers/run-length-container.hpp
+		./include/containers/ring-hash-map.hpp
+		./include/containers/ring-vector.hpp
+		./include/containers/bitset.hpp
+		./include/containers/tight-integers-container.hpp
+		./include/containers/bit-container-adaptor.hpp)
+
+
 target_compile_features(containers INTERFACE cxx_std_20)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -73,7 +84,8 @@ install(TARGETS containers EXPORT ug-containers-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
-	INCLUDES DESTINATION include)
+	INCLUDES DESTINATION include
+	FILE_SET HEADERS)
 
 install(EXPORT ug-containers-targets
 	FILE ug-containers-targets.cmake

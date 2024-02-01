@@ -16,6 +16,20 @@ target_include_directories(
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
+target_sources(gmt PUBLIC FILE_SET HEADERS
+	BASE_DIRS "./include"
+	FILES
+		./include/gmt/mat-inversion.hpp
+		./include/gmt/mat.hpp
+		./include/gmt/embedded-point.hpp
+		./include/gmt/point-operations.hpp
+		./include/gmt/sphere.hpp
+		./include/gmt/point.hpp
+		./include/gmt/distance.hpp
+		./include/gmt/cross-product.hpp
+		./include/gmt/point-promotion.hpp
+		./include/gmt/vector.hpp)
+
 target_link_libraries(gmt INTERFACE)
 
 target_compile_features(gmt INTERFACE cxx_std_20)
@@ -81,7 +95,8 @@ install(TARGETS gmt EXPORT ug-gmt-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
-	INCLUDES DESTINATION include)
+	INCLUDES DESTINATION include
+	FILE_SET HEADERS)
 
 install(EXPORT ug-gmt-targets
 	FILE ug-gmt-targets.cmake

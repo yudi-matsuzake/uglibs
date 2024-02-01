@@ -12,10 +12,6 @@ if(NOT util_SOURCE_DIR)
 endif()
 
 add_library(ia
-	include/ia/operations.hpp
-	include/ia/interval.hpp
-	include/ia/scoped-round-mode.hpp
-
 	src/scoped-round-mode.cpp)
 
 add_library(ia::ia ALIAS ia)
@@ -24,6 +20,14 @@ target_include_directories(
 	ia PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+
+target_sources(ia PUBLIC FILE_SET HEADERS
+	BASE_DIRS "./include"
+	FILES
+		./include/ia/operations.hpp
+		./include/ia/interval.hpp
+		./include/ia/scoped-round-mode.hpp)
+
 
 target_link_libraries(ia PUBLIC util::util)
 
@@ -76,7 +80,8 @@ install(TARGETS ia EXPORT ug-ia-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
-	INCLUDES DESTINATION include)
+	INCLUDES DESTINATION include
+	FILE_SET HEADERS)
 
 install(EXPORT ug-ia-targets
 	FILE ug-ia-targets.cmake

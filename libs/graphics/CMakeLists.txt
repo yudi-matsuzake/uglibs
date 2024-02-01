@@ -35,50 +35,24 @@ find_package(Boost REQUIRED COMPONENTS gil)
 find_package(imgui REQUIRED VERSION 0.1.36)
 
 add_library(ugimgui
-	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.h"
-	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3_loader.h"
-	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.h"
-
 	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.cpp"
 	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.cpp")
 
 target_include_directories(
 	ugimgui PUBLIC
-	"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
-	"$<INSTALL_INTERFACE:include/imgui-bindings>")
+		"$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/imgui-bindings>"
+		"$<INSTALL_INTERFACE:include/imgui-bindings>")
+
+target_sources(ugimgui PUBLIC FILE_SET HEADERS
+	BASE_DIRS "${CMAKE_BINARY_DIR}"
+	FILES
+		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.h"
+		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3_loader.h"
+		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.h")
 
 target_link_libraries(ugimgui PUBLIC imgui::imgui glfw)
 
 add_library(graphics STATIC
-
-	include/ug/graphics/inputs.hpp
-	include/ug/graphics/camera3d-controller.hpp
-	include/ug/graphics/camera2d-controller.hpp
-	include/ug/graphics/texture2d.hpp
-	include/ug/graphics/misc.hpp
-	include/ug/graphics/light3d.hpp
-	include/ug/graphics/app.hpp
-	include/ug/graphics/buffer-texture.hpp
-	include/ug/graphics/texture1d.hpp
-	include/ug/graphics/ball2d-render.hpp
-	include/ug/graphics/basic-texture.hpp
-	include/ug/graphics/camera.hpp
-	include/ug/graphics/buffers.hpp
-	include/ug/graphics/app3d.hpp
-	include/ug/graphics/component.hpp
-	include/ug/graphics/app2d.hpp
-	include/ug/graphics/segment2d-render.hpp
-	include/ug/graphics/grid2d-render.hpp
-	include/ug/graphics/vao.hpp
-	include/ug/graphics/window.hpp
-	include/ug/graphics/program.hpp
-	include/ug/graphics/mesh3d.hpp
-	include/ug/graphics/render.hpp
-	include/ug/graphics/opengl-error.hpp
-	include/ug/graphics/component-manager.hpp
-	include/ug/graphics/mesh3d-render.hpp
-	include/ug/graphics/shader.hpp
-
 	src/misc.cpp
 	src/component.cpp
 	src/segment2d-render.cpp
@@ -113,6 +87,37 @@ target_include_directories(
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
+target_sources(graphics PUBLIC FILE_SET HEADERS
+	BASE_DIRS "./include"
+	FILES
+		./include/ug/graphics/inputs.hpp
+		./include/ug/graphics/camera3d-controller.hpp
+		./include/ug/graphics/camera2d-controller.hpp
+		./include/ug/graphics/texture2d.hpp
+		./include/ug/graphics/misc.hpp
+		./include/ug/graphics/light3d.hpp
+		./include/ug/graphics/app.hpp
+		./include/ug/graphics/buffer-texture.hpp
+		./include/ug/graphics/texture1d.hpp
+		./include/ug/graphics/ball2d-render.hpp
+		./include/ug/graphics/basic-texture.hpp
+		./include/ug/graphics/camera.hpp
+		./include/ug/graphics/buffers.hpp
+		./include/ug/graphics/app3d.hpp
+		./include/ug/graphics/component.hpp
+		./include/ug/graphics/app2d.hpp
+		./include/ug/graphics/segment2d-render.hpp
+		./include/ug/graphics/grid2d-render.hpp
+		./include/ug/graphics/vao.hpp
+		./include/ug/graphics/window.hpp
+		./include/ug/graphics/program.hpp
+		./include/ug/graphics/mesh3d.hpp
+		./include/ug/graphics/render.hpp
+		./include/ug/graphics/opengl-error.hpp
+		./include/ug/graphics/component-manager.hpp
+		./include/ug/graphics/mesh3d-render.hpp
+		./include/ug/graphics/shader.hpp)
+
 target_compile_features(graphics PUBLIC cxx_std_20)
 
 target_link_libraries(
@@ -128,14 +133,6 @@ target_link_libraries(
 		glm::glm
 )
 
-target_compile_definitions(graphics PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
-target_link_directories(graphics PUBLIC $<INSTALL_INTERFACE:lib/ug>)
-target_include_directories(
-	graphics
-	PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
-)
 
 target_include_directories(
 	graphics
@@ -207,7 +204,8 @@ install(TARGETS graphics ug-graphics-warnings ugimgui
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
-	INCLUDES DESTINATION include)
+	INCLUDES DESTINATION include
+	FILE_SET HEADERS)
 
 install(EXPORT ug-graphics-targets
 	FILE ug-graphics-targets.cmake
