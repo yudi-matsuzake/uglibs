@@ -84,23 +84,22 @@ class UgLibsRecipe(conan.ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.components['utils'].libs = ['utils']
+        self.cpp_info.components['util'].libs = ['util']
         self.cpp_info.components['util'].set_property(
             'cmake_target_name',
             'util')
 
-        self.cpp_info.components['gmt'].libs = ['gmt']
         self.cpp_info.components['gmt'].requires = ['util']
         self.cpp_info.components['gmt'].set_property(
             'cmake_target_name',
             'gmt')
 
-        self.cpp_info.components['ia'].libs = ['ai']
+        self.cpp_info.components['ia'].libs = ['ia']
+        self.cpp_info.components['ia'].requires = ['util']
         self.cpp_info.components['ia'].set_property(
             'cmake_target_name',
             'ia')
 
-        self.cpp_info.components['containers'].libs = ['containers']
         self.cpp_info.components['containers'].requires = ['util']
         self.cpp_info.components['containers'].set_property(
             'cmake_target_name',
