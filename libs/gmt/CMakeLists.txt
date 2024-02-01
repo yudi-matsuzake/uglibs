@@ -85,7 +85,7 @@ install(TARGETS gmt EXPORT ug-gmt-targets
 
 install(EXPORT ug-gmt-targets
 	FILE ug-gmt-targets.cmake
-	NAMESPACE ug::gmt::
+	NAMESPACE ug::
 	DESTINATION lib/cmake/ug/gmt)
 
 include(CMakePackageConfigHelpers)

@@ -80,7 +80,7 @@ install(TARGETS ia EXPORT ug-ia-targets
 
 install(EXPORT ug-ia-targets
 	FILE ug-ia-targets.cmake
-	NAMESPACE ug::ia::
+	NAMESPACE ug::
 	DESTINATION lib/cmake/ug/ia)
 
 include(CMakePackageConfigHelpers)

@@ -77,7 +77,7 @@ install(TARGETS containers EXPORT ug-containers-targets
 
 install(EXPORT ug-containers-targets
 	FILE ug-containers-targets.cmake
-	NAMESPACE ug::containers::
+	NAMESPACE ug::
 	DESTINATION lib/cmake/ug/containers)
 
 include(CMakePackageConfigHelpers)

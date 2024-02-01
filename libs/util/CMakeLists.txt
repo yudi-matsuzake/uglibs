@@ -105,7 +105,7 @@ install(TARGETS util EXPORT ug-util-targets
 
 install(EXPORT ug-util-targets
 	FILE ug-util-targets.cmake
-	NAMESPACE ug::util::
+	NAMESPACE ug::
 	DESTINATION lib/cmake/ug/util)
 
 include(CMakePackageConfigHelpers)

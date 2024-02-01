@@ -211,7 +211,7 @@ install(TARGETS graphics ug-graphics-warnings ugimgui
 
 install(EXPORT ug-graphics-targets
 	FILE ug-graphics-targets.cmake
-	NAMESPACE ug::graphics::
+	NAMESPACE ug::
 	DESTINATION lib/cmake/ug/graphics)
 
 include(CMakePackageConfigHelpers)
