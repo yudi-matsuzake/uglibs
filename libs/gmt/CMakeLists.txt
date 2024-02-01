@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 project(gmt
 	DESCRIPTION "gmt is a simple geometry library"
 	VERSION 0.0.1

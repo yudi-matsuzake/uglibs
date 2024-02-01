@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 project(containers
 	DESCRIPTION "containers is a library of containers; the aim is not to substitute the std:: containers but to complement it"
 	VERSION 0.0.1

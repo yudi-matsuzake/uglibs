@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 project(graphics
 	DESCRIPTION "ug-graphics is a graphics library comprised of window, input, and graphics abstraction/facilities"
 	VERSION 0.0.0
