@@ -8,37 +8,42 @@ find_package(range-v3 0.12.0 REQUIRED)
 find_package(spdlog 1.12.0 REQUIRED)
 find_package(fmt 10.1.1 REQUIRED)
 
-add_library(util
-	./include/util/io.hpp
-	./include/util/bit.hpp
-	./include/util/container-operations.hpp
-	./include/util/views.hpp
-	./include/util/concepts.hpp
-	./include/util/cv-adaptors.hpp
-	./include/util/static-vector.hpp
-	./include/util/bit-adaptors.hpp
-	./include/util/meta.hpp
-	./include/util/integers.hpp
-	./include/util/integer-concepts.hpp
-	./include/util/static-string.hpp
-	./include/util/underlying-integer.hpp
-	./include/util/integer-variant.hpp
-	./include/util/ranges.hpp
-	./include/util/fmt.hpp
-	./include/util/log.hpp
-	./include/util/numeric-computing.hpp
-	./src/misc.cpp
-	./src/io.cpp)
+add_library(util ./src/misc.cpp ./src/io.cpp)
 
 add_library(util::util ALIAS util)
-target_include_directories(util PUBLIC)
 target_link_libraries(
 	util PUBLIC range-v3::range-v3 spdlog::spdlog fmt::fmt)
 
 target_include_directories(
-	util PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+	util
+	PUBLIC 
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+target_sources(util PUBLIC FILE_SET HEADERS
+	BASE_DIRS "./include"
+	FILES
+		./include/util/variant.hpp
+		./include/util/io.hpp
+		./include/util/misc.hpp
+		./include/util/container-operations.hpp
+		./include/util/integers.hpp
+		./include/util/underlying-integer.hpp
+		./include/util/arithmetic-friends.hpp
+		./include/util/meta.hpp
+		./include/util/concepts.hpp
+		./include/util/integer-variant.hpp
+		./include/util/integer-concepts.hpp
+		./include/util/cv-adaptors.hpp
+		./include/util/views.hpp
+		./include/util/ranges.hpp
+		./include/util/log.hpp
+		./include/util/bit-adaptors.hpp
+		./include/util/bit.hpp
+		./include/util/numeric-computing.hpp
+		./include/util/static-string.hpp
+		./include/util/static-vector.hpp
+		./include/util/fmt.hpp)
 
 target_compile_features(util PUBLIC cxx_std_23)
 
@@ -101,7 +106,8 @@ install(TARGETS util EXPORT ug-util-targets
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
-	INCLUDES DESTINATION include)
+	INCLUDES DESTINATION include
+	FILE_SET HEADERS)
 
 install(EXPORT ug-util-targets
 	FILE ug-util-targets.cmake
