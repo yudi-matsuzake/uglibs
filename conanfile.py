@@ -29,27 +29,43 @@ class UgLibsRecipe(conan.ConanFile):
     # sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = 'CMakeLists.txt', 'libs/*'
 
-    def config_options(self):
-        if self.settings.os == 'Windows':
-            del self.options.fPIC
-
     def layout(self):
         conan.tools.cmake.cmake_layout(self)
 
     def requirements(self):
         # all
-        self.requires('catch2/3.4.0')
+        self.requires('catch2/3.4.0', test=True)
 
         # util
-        self.requires('range-v3/0.12.0')
-        self.requires('spdlog/1.12.0')
+        self.requires(
+            'range-v3/0.12.0',
+            transitive_headers = True,
+            transitive_libs = True)
+        self.requires(
+            'spdlog/1.12.0',
+            transitive_headers = True,
+            transitive_libs = True)
 
         # graphics
-        self.requires('glm/0.9.9.8')
-        self.requires('glad/0.1.36')
-        self.requires('imgui/cci.20220621+1.88.docking')
-        self.requires('glfw/3.3.8')
-        self.requires('boost/1.83.0')
+        self.requires(
+            'glm/0.9.9.8',
+            transitive_headers = True,
+            transitive_libs = True)
+        self.requires('glad/0.1.36',
+            transitive_headers = True,
+            transitive_libs = True)
+        self.requires(
+            'imgui/cci.20220621+1.88.docking',
+            transitive_headers = True,
+            transitive_libs = True)
+        self.requires(
+            'glfw/3.3.8',
+            transitive_headers = True,
+            transitive_libs = True)
+        self.requires(
+            'boost/1.83.0',
+            transitive_headers = True,
+            transitive_libs = True)
 
     def configure(self):
         self.options['glad'].spec = 'gl'
@@ -85,6 +101,10 @@ class UgLibsRecipe(conan.ConanFile):
 
     def package_info(self):
         self.cpp_info.components['util'].libs = ['util']
+        self.cpp_info.components['util'].requires = [
+            'range-v3::range-v3',
+            'spdlog::spdlog',
+        ]
         self.cpp_info.components['util'].set_property(
             'cmake_target_name',
             'util')
@@ -101,6 +121,23 @@ class UgLibsRecipe(conan.ConanFile):
             'ia')
 
         self.cpp_info.components['containers'].requires = ['util']
+        self.cpp_info.components['containers'].set_property(
+            'cmake_target_name',
+            'containers')
+
+        self.cpp_info.components['graphics'].libs = [
+            'graphics'
+        ]
+
+        self.cpp_info.components['graphics'].requires = [
+            'util',
+            'glm::glm',
+            'glad::glad',
+            'imgui::imgui',
+            'glfw::glfw',
+            'boost::boost'
+        ]
+
         self.cpp_info.components['containers'].set_property(
             'cmake_target_name',
             'containers')
