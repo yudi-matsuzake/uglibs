@@ -10,7 +10,7 @@ build-release-gcc:
     - conan profile detect
     - conan install --build=missing --settings=build_type=Release --profile=tools/conan/gcc .
     - conan build --settings=build_type=Release --profile=tools/conan/gcc .
-    - conan test --settings=build_type=Release --profile=tools/conan/gcc .
+    - conan test test_package uglibs/0.0.1 --settings=build_type=Release --profile=tools/conan/gcc
   artifacts:
     paths:
     - build
