@@ -23,4 +23,4 @@ class UgLibsTestRecipe(ConanFile):
     def test(self):
         if can_run(self):
             cmd = os.path.join(self.cpp.build.bindir, "example")
-            self.run(cmd, env="conanrun")
+            self.run(f'xvfb-run {cmd}', env="conanrun")

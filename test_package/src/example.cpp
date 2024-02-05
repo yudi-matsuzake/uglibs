@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <ranges>
 #include <cassert>
 
@@ -19,10 +20,13 @@ int main()
 			+ util::to_static_string<64>()
 			+ "_t";
 		static_assert(concat_64 == "uint64_t");
+
+		std::puts("util done");
 	}
 
 	{ // graphics
 		ug::graphics::app app(512, 512, "Hello, graphics");
+		std::puts("graphics done");
 	}
 
 	{ // gmt
@@ -31,6 +35,7 @@ int main()
 		point2d q{ 2., 2. };
 
 		assert(((p + q)*2. == point2d{ 6., 8. }));
+		std::puts("gmt done");
 	}
 
 	{ // ia
@@ -51,6 +56,8 @@ int main()
 
 		auto const div = i/interval{ 1.0, 2.0 };
 		assert((div == interval{ 0.5, 2.0 }));
+
+		std::puts("ia done");
 	}
 
 	{ // containers
@@ -65,5 +72,6 @@ int main()
 					assert(vi == gt++);
 			}
 		}
+		std::puts("containers done");
 	}
 }
