@@ -126,7 +126,7 @@ class UgLibsRecipe(conan.ConanFile):
             'containers')
 
         self.cpp_info.components['graphics'].libs = [
-            'graphics'
+            'graphics', 'ugimgui'
         ]
 
         self.cpp_info.components['graphics'].requires = [
@@ -138,6 +138,6 @@ class UgLibsRecipe(conan.ConanFile):
             'boost::boost'
         ]
 
-        self.cpp_info.components['containers'].set_property(
+        self.cpp_info.components['graphics'].set_property(
             'cmake_target_name',
-            'containers')
+            'graphics')
