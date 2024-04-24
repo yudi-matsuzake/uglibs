@@ -90,6 +90,23 @@ class UgLibsRecipe(conan.ConanFile):
                 "res", "bindings"),
             os.path.join(self.build_folder, "imgui-bindings"))
 
+        files.copy(
+            self,
+            "*.cpp",
+            os.path.join(
+                self.dependencies["imgui"].package_folder,
+                "res", "misc", "cpp"),
+            os.path.join(self.build_folder, "imgui-bindings"))
+
+        files.copy(
+            self,
+            "*.h",
+            os.path.join(
+                self.dependencies["imgui"].package_folder,
+                "res", "misc", "cpp"),
+            os.path.join(self.build_folder, "imgui-bindings"))
+
+
     def build(self):
         cmake = conan.tools.cmake.CMake(self)
         cmake.configure()

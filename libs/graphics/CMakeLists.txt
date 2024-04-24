@@ -36,7 +36,9 @@ find_package(imgui REQUIRED VERSION 0.1.36)
 
 add_library(ugimgui
 	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.cpp"
-	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.cpp")
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.cpp"
+	"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_stdlib.cpp"
+)
 
 target_include_directories(
 	ugimgui PUBLIC
@@ -48,7 +50,8 @@ target_sources(ugimgui PUBLIC FILE_SET HEADERS
 	FILES
 		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_glfw.h"
 		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3_loader.h"
-		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.h")
+		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_impl_opengl3.h"
+		"${CMAKE_BINARY_DIR}/imgui-bindings/imgui_stdlib.h")
 
 target_link_libraries(ugimgui PUBLIC imgui::imgui glfw)
 
@@ -116,7 +119,8 @@ target_sources(graphics PUBLIC FILE_SET HEADERS
 		./include/ug/graphics/opengl-error.hpp
 		./include/ug/graphics/component-manager.hpp
 		./include/ug/graphics/mesh3d-render.hpp
-		./include/ug/graphics/shader.hpp)
+		./include/ug/graphics/shader.hpp
+		./include/ug/graphics/imgui.hpp)
 
 target_compile_features(graphics PUBLIC cxx_std_20)
 
