@@ -6,8 +6,19 @@ project(uglibs
 	LANGUAGES C CXX
 )
 
+# C++ standard - owned by Nix; fallback for bare cmake invocations.
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+	set(CMAKE_CXX_STANDARD 23)
+endif()
+if(NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
+
+# Copies imgui backends from $IMGUI_DIR into build dir. No-op without Nix.
+include("${CMAKE_SOURCE_DIR}/cmake/nix-toolchain.cmake" OPTIONAL RESULT_VARIABLE _nix_toolchain)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 

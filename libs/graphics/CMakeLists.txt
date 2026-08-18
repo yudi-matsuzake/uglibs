@@ -30,7 +30,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED VERSION 0.9.9.8)
 find_package(glad REQUIRED VERSION 0.1.36)
-find_package(Boost REQUIRED COMPONENTS gil)
+find_package(Boost REQUIRED)
 
 find_package(imgui REQUIRED VERSION 0.1.36)
 
@@ -122,7 +122,7 @@ target_sources(graphics PUBLIC FILE_SET HEADERS
 		./include/ug/graphics/shader.hpp
 		./include/ug/graphics/imgui.hpp)
 
-target_compile_features(graphics PUBLIC cxx_std_20)
+target_compile_features(graphics PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 target_link_libraries(
 	graphics
@@ -177,7 +177,7 @@ if(ENABLE_PCH)
 )
 endif()
 
-target_compile_features(graphics PUBLIC cxx_std_20)
+target_compile_features(graphics PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 target_compile_options(graphics PUBLIC -DGLM_ENABLE_EXPERIMENTAL)
 
 # test programs

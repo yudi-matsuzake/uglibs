@@ -193,8 +193,18 @@ data
 # gitlab ci
 builds
 
+# nix
+result
+result-*
+
 CMakeFiles
 CMakeUserPresets.json
+CMakeCache.txt
+DartConfiguration.tcl
+cmake_install.cmake
+*-tests-*_include.cmake
+ug-*-config.cmake
+ug-*-config-version.cmake
 
 err.txt
 

@@ -31,7 +31,7 @@ target_sources(containers PUBLIC FILE_SET HEADERS
 		./include/containers/bit-container-adaptor.hpp)
 
 
-target_compile_features(containers INTERFACE cxx_std_20)
+target_compile_features(containers INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(containers INTERFACE

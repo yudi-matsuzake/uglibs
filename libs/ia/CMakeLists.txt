@@ -31,7 +31,7 @@ target_sources(ia PUBLIC FILE_SET HEADERS
 
 target_link_libraries(ia PUBLIC util::util)
 
-target_compile_features(ia PUBLIC cxx_std_20)
+target_compile_features(ia PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(ia PUBLIC

@@ -45,7 +45,7 @@ target_sources(util PUBLIC FILE_SET HEADERS
 		./include/util/static-vector.hpp
 		./include/util/fmt.hpp)
 
-target_compile_features(util PUBLIC cxx_std_23)
+target_compile_features(util PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(util PUBLIC

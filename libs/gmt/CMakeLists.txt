@@ -32,7 +32,7 @@ target_sources(gmt PUBLIC FILE_SET HEADERS
 
 target_link_libraries(gmt INTERFACE)
 
-target_compile_features(gmt INTERFACE cxx_std_20)
+target_compile_features(gmt INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(gmt INTERFACE
