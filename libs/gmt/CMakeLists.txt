@@ -34,19 +34,6 @@ target_link_libraries(gmt INTERFACE)
 
 target_compile_features(gmt INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(gmt INTERFACE
-		-fexperimental-library
-		-stdlib=libc++
-	)
-
-	target_link_options(gmt INTERFACE
-		-fexperimental-library
-		-stdlib=libc++
-		-lc++abi
-	)
-endif()
-
 if(ENABLE_TESTING)
 	if(NOT util_SOURCE_DIR)
 		find_package(util REQUIRED)

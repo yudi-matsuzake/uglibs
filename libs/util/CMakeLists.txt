@@ -47,19 +47,6 @@ target_sources(util PUBLIC FILE_SET HEADERS
 
 target_compile_features(util PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(util PUBLIC
-		-fexperimental-library
-		-stdlib=libc++
-	)
-
-	target_link_options(util PUBLIC
-		-fexperimental-library
-		-stdlib=libc++
-		-lc++abi
-	)
-endif()
-
 if(ENABLE_TESTING)
 	find_package(Catch2 REQUIRED)
 	enable_testing()

@@ -133,7 +133,6 @@ target_link_libraries(
 		glad::glad
 		ugimgui
 		Boost::boost
-		stdc++fs
 		glm::glm
 )
 
