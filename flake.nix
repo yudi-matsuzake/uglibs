@@ -7,12 +7,13 @@
 
   outputs = { self, nixpkgs }:
     let
+      lib = nixpkgs.lib;
       supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = fn:
-        nixpkgs.lib.genAttrs supportedSystems (system: fn system);
+        lib.genAttrs supportedSystems (system: fn system);
 
       paramsMod = system:
-        import ./nix/modules/params.nix { lib = nixpkgs.lib; };
+        import ./nix/modules/params.nix { inherit lib; };
 
       overlays = [
         (import ./nix/modules/imgui-docking.nix { })
@@ -37,25 +38,10 @@
         in
         mkShell {
           packages = with pkgs; [
-            cmake
-            ninja
-            clang-tools
-            pkg-config
-            catch2_3
-            range-v3
-            spdlog
-            fmt
-            glm
-            glfw3
-            boost
-            libGL
-            gladPkg
-            python3Packages.glad
-            imgui-docking
-            xvfb-run
-            mesa-demos
-            gnumake
-            ugRun
+            cmake ninja clang-tools pkg-config
+            catch2_3 range-v3 spdlog fmt glm glfw3 boost
+            libGL gladPkg python3Packages.glad imgui-docking
+            xvfb-run mesa-demos gnumake ugRun
           ];
 
           shellHook = ''
@@ -90,13 +76,38 @@
           src = self;
         };
 
+      # Config matrix: toolchain x buildType x sanitizer.
+      # Sanitizers only apply to Debug. msan is clang-only.
+      configs =
+        let
+          tcs = [ "gcc" "clang" ];
+          sans = [ "none" "asan" "tsan" "ubsan" ];
+          mkConfigs = tc: bt:
+            map (s:
+              { toolchain = tc; buildType = bt; sanitizer = s; }
+            ) sans;
+          releaseConfigs = map (tc: { toolchain = tc; buildType = "Release"; sanitizer = "none"; }) tcs;
+          debugConfigs = lib.concatMap (tc: mkConfigs tc "Debug") tcs;
+          msanConfig = { toolchain = "clang"; buildType = "Debug"; sanitizer = "msan"; };
+        in
+        releaseConfigs ++ debugConfigs ++ [ msanConfig ];
+
+      pkgName = c:
+        "uglibs-${c.toolchain}-${lib.toLower c.buildType}"
+        + lib.optionalString (c.sanitizer != "none") "-${c.sanitizer}";
+
       perSystem = system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            inherit overlays;
-          };
+          pkgs = import nixpkgs { inherit system; inherit overlays; };
           inherit (paramsMod system) defaultParams;
+
+          configPackages = builtins.listToAttrs (map (c: {
+            name = pkgName c;
+            value = mkBuild {
+              inherit pkgs;
+              params = defaultParams // c // { enableTesting = true; };
+            };
+          }) configs);
         in
         {
           devShells = {
@@ -108,12 +119,9 @@
             };
           };
 
-          packages = {
+          packages = configPackages // {
+            # Quick local build alias - release, no tests.
             default = mkBuild {
-              inherit pkgs;
-              params = defaultParams // { enableTesting = false; };
-            };
-            uglibs-gcc = mkBuild {
               inherit pkgs;
               params = defaultParams // { enableTesting = false; };
             };
@@ -124,7 +132,7 @@
 
     in
     {
-      overlays.default = nixpkgs.lib.composeManyExtensions overlays;
+      overlays.default = lib.composeManyExtensions overlays;
       devShells = forAllSystems (system: (perSystem system).devShells);
       packages = forAllSystems (system: (perSystem system).packages);
       lib = forAllSystems (system: (perSystem system).lib);

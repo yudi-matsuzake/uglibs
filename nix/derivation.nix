@@ -25,6 +25,13 @@ stdenv.mkDerivation {
   IMGUI_DIR = pkgs.imgui-docking-src;
   env = san.runtimeEnv;
 
+  # Sanitizer flags via env vars - cmake picks up CXXFLAGS/LDFLAGS.
+  # Passing them as -DCMAKE_CXX_FLAGS=... breaks when the value
+  # contains spaces (shell word-splitting feeds each flag to cmake
+  # as a separate argument).
+  CXXFLAGS = cxxFlags;
+  LDFLAGS = ldFlags;
+
   cmakeFlags = [
     "-G" params.generator
     "-S" "."
@@ -36,8 +43,6 @@ stdenv.mkDerivation {
     "-DENABLE_TESTING=${if params.enableTesting then "ON" else "OFF"}"
     "-DENABLE_PCH=${if params.enablePCH then "ON" else "OFF"}"
     "-DIMGUI_DIR=${pkgs.imgui-docking-src}"
-    "-DCMAKE_CXX_FLAGS=${cxxFlags}"
-    "-DCMAKE_EXE_LINKER_FLAGS=${ldFlags}"
   ];
 
   preConfigure = ''
@@ -47,7 +52,6 @@ stdenv.mkDerivation {
     }
   '';
 
-  # stdenv's cmake hook appends ".." which breaks our -S . -B <buildDir>.
   dontUseCmakeConfigure = true;
 
   configurePhase = ''
@@ -68,7 +72,16 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  doCheck = false;
+  doCheck = params.enableTesting;
+
+  # Headless CI: swrast via nixpkgs mesa + xvfb-run.
+  checkPhase = ''
+    runHook preCheck
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export __EGL_VENDOR_LIBRARY_FILENAMES="${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json"
+    xvfb-run -a ctest --test-dir "${buildDir}" --output-on-failure
+    runHook postCheck
+  '';
 
   meta = with pkgs.lib; {
     description = "uglibs - collection of C++ libraries";

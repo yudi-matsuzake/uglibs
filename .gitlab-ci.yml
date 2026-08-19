@@ -1,0 +1,82 @@
+image: nixos/nix:latest
+
+variables:
+  NIX_CONFIG: "extra-experimental-features = nix-command flakes"
+
+stages:
+  - build
+  - test
+
+.template: &template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+build:
+  <<: *template
+  stage: build
+  parallel:
+    matrix:
+      - TOOLCHAIN: gcc
+        BUILD_TYPE: release
+      - TOOLCHAIN: clang
+        BUILD_TYPE: release
+      - TOOLCHAIN: gcc
+        BUILD_TYPE: debug
+      - TOOLCHAIN: clang
+        BUILD_TYPE: debug
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: asan
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: tsan
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: ubsan
+      - TOOLCHAIN: clang
+        BUILD_TYPE: debug
+        SANITIZER: msan
+  script:
+    - |
+      if [ -n "$SANITIZER" ]; then
+        PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}-${SANITIZER}"
+      else
+        PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}"
+      fi
+      nix build .#${PKG} --no-link --print-out-paths
+
+test:
+  <<: *template
+  stage: test
+  needs:
+    - build
+  parallel:
+    matrix:
+      - TOOLCHAIN: gcc
+        BUILD_TYPE: release
+      - TOOLCHAIN: clang
+        BUILD_TYPE: release
+      - TOOLCHAIN: gcc
+        BUILD_TYPE: debug
+      - TOOLCHAIN: clang
+        BUILD_TYPE: debug
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: asan
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: tsan
+      - TOOLCHAIN: [gcc, clang]
+        BUILD_TYPE: debug
+        SANITIZER: ubsan
+      - TOOLCHAIN: clang
+        BUILD_TYPE: debug
+        SANITIZER: msan
+  script:
+    - |
+      if [ -n "$SANITIZER" ]; then
+        PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}-${SANITIZER}"
+      else
+        PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}"
+      fi
+      nix build .#${PKG} --no-link --print-out-paths

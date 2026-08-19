@@ -18,7 +18,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 # Copies imgui backends from $IMGUI_DIR into build dir. No-op without Nix.
-include("${CMAKE_SOURCE_DIR}/cmake/nix-toolchain.cmake" OPTIONAL RESULT_VARIABLE _nix_toolchain)
+include(
+	"${CMAKE_SOURCE_DIR}/cmake/nix-toolchain.cmake"
+	OPTIONAL RESULT_VARIABLE
+	UG_NIX_TOOLCHAIN)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 

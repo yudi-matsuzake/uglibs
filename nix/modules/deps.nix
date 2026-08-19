@@ -6,6 +6,7 @@
     cmake
     ninja
     pkg-config
+    xvfb-run
   ];
 
   buildInputs = with pkgs; [
