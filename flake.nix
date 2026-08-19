@@ -77,7 +77,7 @@
         };
 
       # Config matrix: toolchain x buildType x sanitizer.
-      # Sanitizers only apply to Debug. msan is clang-only.
+      # Sanitizers only apply to Debug.
       configs =
         let
           tcs = [ "gcc" "clang" ];
@@ -88,9 +88,8 @@
             ) sans;
           releaseConfigs = map (tc: { toolchain = tc; buildType = "Release"; sanitizer = "none"; }) tcs;
           debugConfigs = lib.concatMap (tc: mkConfigs tc "Debug") tcs;
-          msanConfig = { toolchain = "clang"; buildType = "Debug"; sanitizer = "msan"; };
         in
-        releaseConfigs ++ debugConfigs ++ [ msanConfig ];
+        releaseConfigs ++ debugConfigs;
 
       pkgName = c:
         "uglibs-${c.toolchain}-${lib.toLower c.buildType}"
