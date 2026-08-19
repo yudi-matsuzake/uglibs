@@ -39,4 +39,4 @@ build:
       else
         PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}"
       fi
-      nix build .#${PKG} --no-link --print-out-paths
+      nix build .#${PKG} --no-link --print-out-paths -L
