@@ -19,6 +19,33 @@
         (import ./nix/modules/imgui-docking.nix { })
       ];
 
+      # Overlay for downstream consumers. Adds `uglibs` (release,
+      # no tests) and `imgui-docking-src` to any nixpkgs that applies
+      # it. Usage in a downstream flake:
+      #
+      #   inputs.uglibs.url = "gitlab:yudi-matsuzake/uglibs";
+      #   ...
+      #   pkgs = import nixpkgs {
+      #     overlays = [ uglibs.overlays.default ];
+      #   };
+      #   # then use pkgs.uglibs as a buildInput
+      consumerOverlay = final: prev:
+        let
+          localPkgs = import nixpkgs {
+            system = final.system;
+            inherit overlays;
+          };
+          inherit (paramsMod final.system) defaultParams;
+        in
+        {
+          uglibs = mkBuild {
+            pkgs = localPkgs;
+            params = defaultParams // { enableTesting = false; };
+          };
+          imgui-docking-src = localPkgs.imgui-docking-src;
+          imgui-docking = localPkgs.imgui-docking;
+        };
+
       mkDevShell = { pkgs, params, stdenv ? pkgs.stdenv }:
         let
           inherit (paramsMod pkgs.system) buildDirName;
@@ -131,7 +158,7 @@
 
     in
     {
-      overlays.default = lib.composeManyExtensions overlays;
+      overlays.default = lib.composeManyExtensions (overlays ++ [ consumerOverlay ]);
       devShells = forAllSystems (system: (perSystem system).devShells);
       packages = forAllSystems (system: (perSystem system).packages);
       lib = forAllSystems (system: (perSystem system).lib);

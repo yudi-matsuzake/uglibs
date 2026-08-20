@@ -1,20 +1,122 @@
 * uglibs
 
-=uglibs= is a collection of c++ libraries.
+=uglibs= is a collection of C++23 libraries for graphics, numerics,
+containers, and utilities.
 
-Currently, this project is composed by
+** Libraries
 
-- *containers* =std=-like containers with ad-hoc semantics like bit container, run-length enconded container, ring container, ring hash container, and container with tight integers
+- *util* -- custom views for =std::ranges=, logging, meta programming,
+  numeric computing, tight integers, bit adaptors
 
-- *gmt* geometric and linear algebra algorithms
+- *gmt* -- geometric and linear algebra algorithms (points, vectors,
+  matrices, spheres, distance, cross product, matrix inversion)
 
-- *ia* [[https://en.wikipedia.org/wiki/Interval_arithmetic][interval arithmetic]] library
+- *ia* -- [[https://en.wikipedia.org/wiki/Interval_arithmetic][interval arithmetic]] library with scoped rounding modes
 
-- *util* c++ utilities like, custom views for =std::ranges=, logging operations, meta programming utilities, numeric computing, and others
+- *containers* -- =std=-like containers with ad-hoc semantics: bit
+  container, run-length encoded container, ring container, ring hash
+  map, tight integers container
 
-- *graphics* library comprised of graphic objects, window, input, and render abstractions written in modern c++; currently, backend is supporting ImGui with docking, Opengl, glfw3, and glad
+- *graphics* -- window, input, and render abstractions over OpenGL 4.6,
+  GLFW3, glad, and ImGui (docking branch)
 
-* [[https://www.boost.org/users/license.html][LICENSE]]
+** Build
+
+The project is managed with [[https://nixos.wiki/wiki/Flakes][Nix flakes]] and built with CMake + Ninja.
+
+#+BEGIN_SRC sh
+  # enter dev shell (gcc, Release)
+  nix develop
+
+  # clang shell
+  nix develop .#clang
+
+  # configure + build
+  cmake -G Ninja -S . -B $UGLIBS_BUILD_DIR
+  cmake --build $UGLIBS_BUILD_DIR
+
+  # run tests
+  ctest --test-dir $UGLIBS_BUILD_DIR --output-on-failure
+#+END_SRC
+
+** Packages
+
+#+BEGIN_SRC sh
+  # default: gcc, Release, no tests
+  nix build
+
+  # specific configs (build + test)
+  nix build .#uglibs-gcc-debug
+  nix build .#uglibs-clang-debug-asan
+  nix build .#uglibs-gcc-debug-tsan
+  nix build .#uglibs-clang-debug-ubsan
+#+END_SRC
+
+** Running graphics examples
+
+Graphics examples need a display. Inside the dev shell:
+
+#+BEGIN_SRC sh
+  ug-run ./$UGLIBS_BUILD_DIR/libs/graphics/hello-cube
+#+END_SRC
+
+=ug-run= prepends =/usr/lib= to =LD_LIBRARY_PATH= so libglvnd finds
+the host GPU driver. On NixOS this is automatic (no =ug-run= needed).
+
+Outside the dev shell:
+
+#+BEGIN_SRC sh
+  LD_LIBRARY_PATH=/usr/lib:/usr/lib64 ./build-gcc-Release/libs/graphics/hello-cube
+#+END_SRC
+
+** Consuming from another flake
+
+Apply =uglibs.overlays.default= to your nixpkgs, then use =pkgs.uglibs=
+as a buildInput. Transitive dependencies (spdlog, fmt, range-v3, glm,
+glfw3, boost, imgui, glad, libGL) are propagated automatically.
+
+#+BEGIN_SRC nix
+  {
+    inputs = {
+      nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+      uglibs.url = "gitlab:yudi-matsuzake/uglibs";
+    };
+
+    outputs = { self, nixpkgs, uglibs }:
+      let
+        system = "x86_64-linux";
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ uglibs.overlays.default ];
+        };
+      in {
+        packages.${system}.default =
+          pkgs.stdenv.mkDerivation {
+            pname = "my-app";
+            version = "0.1.0";
+            src = ./.;
+            nativeBuildInputs = [ pkgs.cmake pkgs.ninja ];
+            buildInputs = [ pkgs.uglibs ];
+          };
+      };
+  }
+#+END_SRC
+
+In your CMakeLists:
+
+#+BEGIN_SRC cmake
+  find_package(util REQUIRED)
+  find_package(graphics REQUIRED)
+  target_link_libraries(my-app PRIVATE util::util ug::graphics)
+#+END_SRC
+
+** CI
+
+GitLab CI runs on every push to every branch. The matrix covers all
+10 configurations listed above. Each job builds and tests via
+=nix build .#<package>= with =doCheck=true= (ctest under xvfb-run).
+
+** [[https://www.boost.org/users/license.html][LICENSE]]
 
 #+BEGIN_SRC
   Boost Software License - Version 1.0 - August 17th, 2003
