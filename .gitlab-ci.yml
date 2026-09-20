@@ -22,13 +22,10 @@ build:
         BUILD_TYPE: debug
       - TOOLCHAIN: [gcc, clang]
         BUILD_TYPE: debug
-        SANITIZER: asan
-      - TOOLCHAIN: [gcc, clang]
+        SANITIZER: asan-ubsan
+      - TOOLCHAIN: clang
         BUILD_TYPE: debug
-        SANITIZER: tsan
-      - TOOLCHAIN: [gcc, clang]
-        BUILD_TYPE: debug
-        SANITIZER: ubsan
+        SANITIZER: msan
   script:
     - |
       if [ -n "$SANITIZER" ]; then

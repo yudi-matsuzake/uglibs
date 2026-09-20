@@ -6,7 +6,7 @@ let
     toolchain = "gcc";      # "gcc" | "clang"
     buildType = "Release";  # "Release" | "Debug" | "RelWithDebInfo"
     generator = "Ninja";    # "Ninja" | "Unix Makefiles"
-    sanitizer = "none";     # "none" | "asan" | "tsan" | "ubsan" | "msan"
+    sanitizer = "none";     # "none" | "asan" | "tsan" | "ubsan" | "msan" | "asan-ubsan"
     cxxStandard = 23;
     enableTesting = true;
     enablePCH = false;
@@ -47,6 +47,14 @@ in
         cxx = base ++ [ "-fsanitize=undefined" ];
         ld = [ "-fsanitize=undefined" ];
         runtimeEnv = { UBSAN_OPTIONS = "halt_on_error=1"; };
+      };
+      "asan-ubsan" = {
+        cxx = base ++ [ "-fsanitize=address,undefined" ];
+        ld = [ "-fsanitize=address,undefined" ];
+        runtimeEnv = {
+          ASAN_OPTIONS = "detect_leaks=1:abort_on_error=1";
+          UBSAN_OPTIONS = "halt_on_error=1";
+        };
       };
       "msan" = {
         cxx = base ++ [ "-fsanitize=memory" ];

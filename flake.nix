@@ -108,7 +108,7 @@
       configs =
         let
           tcs = [ "gcc" "clang" ];
-          sans = [ "none" "asan" "tsan" "ubsan" ];
+          sans = [ "none" "asan-ubsan" "tsan" ];
           mkConfigs = tc: bt:
             map (s:
               { toolchain = tc; buildType = bt; sanitizer = s; }

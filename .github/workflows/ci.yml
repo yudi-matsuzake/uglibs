@@ -10,14 +10,12 @@ jobs:
       matrix:
         toolchain: [gcc, clang]
         build_type: [release, debug]
-        sanitizer: ["", asan, tsan, ubsan]
+        sanitizer: ["", asan-ubsan, tsan]
         exclude:
           - build_type: release
-            sanitizer: asan
+            sanitizer: asan-ubsan
           - build_type: release
             sanitizer: tsan
-          - build_type: release
-            sanitizer: ubsan
     name: build (${{ matrix.toolchain }}-${{ matrix.build_type }}${{ matrix.sanitizer && format('-{0}', matrix.sanitizer) || '' }})
     steps:
       - uses: actions/checkout@v4
