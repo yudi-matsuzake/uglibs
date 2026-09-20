@@ -1,0 +1,38 @@
+name: build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gcc, clang]
+        build_type: [release, debug]
+        sanitizer: ["", asan, tsan, ubsan]
+        exclude:
+          - build_type: release
+            sanitizer: asan
+          - build_type: release
+            sanitizer: tsan
+          - build_type: release
+            sanitizer: ubsan
+    name: build (${{ matrix.toolchain }}-${{ matrix.build_type }}${{ matrix.sanitizer && format('-{0}', matrix.sanitizer) || '' }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: "extra-experimental-features = nix-command flakes"
+      - name: build
+        run: |
+          if [ -n "$SANITIZER" ]; then
+            PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}-${SANITIZER}"
+          else
+            PKG="uglibs-${TOOLCHAIN}-${BUILD_TYPE}"
+          fi
+          nix build .#${PKG} --no-link --print-out-paths -L
+        env:
+          TOOLCHAIN: ${{ matrix.toolchain }}
+          BUILD_TYPE: ${{ matrix.build_type }}
+          SANITIZER: ${{ matrix.sanitizer }}
